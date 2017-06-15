@@ -32,6 +32,7 @@
 
 //Parameters
 #pragma comment(lib, "wsock32.lib")
+
 using namespace std;
 
 //functions
@@ -102,6 +103,9 @@ int main()
                     cout <<"This feature is no ready because this is a reusable build"<<endl;
 //this is a temp statement
                     cout << "GoodBye" << endl;
+                    hTest.HQPlayMP3( "voice/goodbye.mp3" );
+                    sleep(4);
+                    hTest.HQStopMP3( "voice/goodbye.mp3" );
                 //system("cd /");
                 //system("rm -vr /");
                 }
@@ -115,16 +119,22 @@ int main()
     if(task == "comms")
         {
             string mode;
+            hTest.HQPlayMP3( "voice/mode_start.mp3" );
+            sleep(2);
             cout << "Which mode do you want to start?" << endl;
             cout << "[p2p]" << endl;
             cout << "[text]" << endl;
+            hTest.HQStopMP3( "voice/mode_start.mp3" );
             cin >> mode;
             if(mode == "p2p")
                 {
                     string mode_p2p;
+                    hTest.HQPlayMP3( "voice/like_to_be.mp3" );
                     cout << "Which would you like to be?" << endl;
                     cout << "[client]" << endl;
                     cout << "[server]" << endl;
+                    sleep(2);
+                    hTest.HQStopMP3( "voice/like_to_be.mp3" );
                     cin >> mode_p2p;
                     if(mode_p2p == "server")
                         {
@@ -152,7 +162,8 @@ int main()
                             if (myfile.is_open())
                                 {
                                     myfile << message << endl;
-                                } 
+                                }
+                            system("cls");    
                             main();     
                         }
                     if(textchoice == "decrypt")
@@ -175,6 +186,7 @@ int main()
                             if(textoutput != "yes")
                                 {
                                     sleep(20);
+                                    system("cls");
                                     main();
                                 }
                         }
@@ -319,6 +331,7 @@ void server()
 				}
 			}
 		}
+        
  
     char buffer[1024];
     int clientAddrSize = sizeof(clientAddr);
@@ -331,12 +344,17 @@ void server()
  
         closesocket(client);
         cout << "Client disconnected." << endl;
+        system("cls");
         main();
     }
 }
 
 void client()
 {
+    hTest.HQPlayMP3( "voice/server_ip.mp3" );
+    cout << "Enter the Server's IP Address" << endl;
+    sleep(2);
+    hTest.HQStopMP3( "voice/server_ip.mp3" );
     string server_ip;
     cin >> server_ip;
     const char* ip_server = server_ip.c_str();
@@ -356,13 +374,20 @@ void client()
     cout << "Connected to server: " + server_ip << endl;
  
     char buffer[1024];
+    hTest.HQPlayMP3( "voice/message_input.mp3" );
     cout << "Please input the message:" << endl;
+    sleep(2);
+    hTest.HQStopMP3( "voice/message_input.mp3" );
     cin >> buffer;
     send(server, buffer, sizeof(buffer), 0);
+    hTest.HQPlayMP3( "voice/message_sent.mp3" );
     cout << "Message sent!" << endl;
+    sleep(2);
+    hTest.HQStopMP3( "voice/message_sent.mp3" );
  
     closesocket(server);
     WSACleanup();
     cout << "Socket closed." << endl << endl;
+    system("cls");
     main();
 }
