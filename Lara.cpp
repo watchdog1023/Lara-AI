@@ -66,6 +66,7 @@ void memo_check();
 void debug();
 void server();
 void client();
+void lara();
 
 //global variables
 string task;
