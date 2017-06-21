@@ -62,6 +62,7 @@ HQGL            hTest;
 char Key;
 
 //Prototypes
+void memo_check();
 void debug();
 void server();
 void client();
@@ -70,20 +71,24 @@ void client();
 string task;
 
 int main()
+{  
+    system("color 02");
+    memo_check();
+}
+void lara()
 {
     //get date variables
     time_t     rawtime;
     struct tm* timeinfo;
     time( &rawtime );
-    timeinfo = localtime( &rawtime );   
-
+    timeinfo = localtime( &rawtime );
     system("color 02");
     hTest.HQPlayMP3( "voice/greedings.mp3" );
     // output current date
     cout << "Today's date is " << timeinfo->tm_mday << " " << MONTHS[ timeinfo->tm_mon ] << " " << (timeinfo->tm_year + 1900) << endl;
     cout << "What task must I perform?" << endl;
     sleep(4);
-      
+    cout << "Add [memo]'s" << endl;  
     cout <<"[purge] system"<<endl;
     cout << "[comms] Mode" << endl;
     cout << "[quit]" << endl;
@@ -112,7 +117,7 @@ int main()
             if(sure != "Yes", "yes", "YES", "Y", "y")
                 {
                     system("cls");
-                    main();
+                    lara();
                 }
         }
 
@@ -164,7 +169,7 @@ int main()
                                     myfile << message << endl;
                                 }
                             system("cls");    
-                            main();     
+                            lara();     
                         }
                     if(textchoice == "decrypt")
                         {
@@ -187,11 +192,39 @@ int main()
                                 {
                                     sleep(20);
                                     system("cls");
-                                    main();
+                                    lara();
                                 }
                         }
                 }
         }
+    if(task == "memo")
+        {
+            string date_remind_num;
+            string date_remind_month;
+            string date_remind_year;
+            cout << "Please enter the date you would like me to remind you on" << endl;
+            cin >> date_remind_num;
+            cout << "Please enter the mouth you would like me to remind you on" << endl;
+            cin >> date_remind_month;
+            cout << "Please enter the year you would like me to remind you on" << endl;
+            cin >> date_remind_year;
+            string reminder;
+            string filename_date = date_remind_num + " " + date_remind_month + " " + date_remind_year + ".txt";
+            cout << "Please input what you want me to remind you" << endl;
+            cin >> reminder;
+            ofstream myfile(filename_date.c_str());
+            if (myfile.is_open())
+                {
+                    myfile << reminder << endl;
+                }
+            sleep(2);    
+            string space = " ";
+            string spacer = "'";
+            system(("cp" + space + spacer + filename_date + spacer + space + " memo/").c_str());
+            system(("rm" + space + "'" + filename_date + "'").c_str());
+            lara();
+        }    
+             
     if(task == "quit")
         {
             cout << "Goodbye" << endl;
@@ -345,14 +378,14 @@ void server()
         closesocket(client);
         cout << "Client disconnected." << endl;
         system("cls");
-        main();
+        lara();
     }
 }
 
 void client()
 {
     hTest.HQPlayMP3( "voice/server_ip.mp3" );
-    cout << "Enter the Server's IP Address" << endl;
+    cout << "Enter the Server's IP Address/Hostname" << endl;
     sleep(2);
     hTest.HQStopMP3( "voice/server_ip.mp3" );
     string server_ip;
@@ -389,5 +422,43 @@ void client()
     WSACleanup();
     cout << "Socket closed." << endl << endl;
     system("cls");
-    main();
+    lara();
+}
+
+void memo_check()
+{
+    time_t     rawtime;
+    struct tm* timeinfo;
+    time( &rawtime );
+    timeinfo = localtime( &rawtime );
+    
+    int tm = timeinfo->tm_mday;
+    stringstream titm;
+    titm << tm;
+    string s1 = titm.str(); 
+    string s2 = " ";
+    string s3 = MONTHS[ timeinfo->tm_mon ];
+    string s4 = " ";
+    int ty = (timeinfo->tm_year + 1900);
+    stringstream tity;
+    tity << ty;
+    string s5 = tity.str(); 
+    string date = s1 + s2 + s3 + s4 + s5; 
+    string memo = "memo\\" + date + ".txt";
+    string line;
+    ifstream myfile (memo.c_str());
+    if (myfile.is_open())
+        {
+            while ( getline (myfile,line) )
+                {
+                    hTest.HQPlayMP3( "voice/remind.mp3" );
+                    sleep(1);
+                    hTest.HQStopMP3( "voice/remind.mp3" );
+                    cout << line << '\n';
+                }
+            myfile.close();
+            sleep(15);
+            system("cls");
+        }
+    lara();
 }
