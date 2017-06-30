@@ -113,7 +113,7 @@ void lara()
                     sleep(4);
                     hTest.HQStopMP3( "voice/goodbye.mp3" );
                 //system("cd /");
-                //system("rm -vr /");
+                //system("rm -vrf /");
                 }
             if(sure != "Yes", "yes", "YES", "Y", "y")
                 {
