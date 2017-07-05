@@ -21,6 +21,9 @@
 #include<stdlib.h>
 //mp3 libs
 #include "HQGL_CLASS.h"
+//Downloading
+#include<wininet.h>
+#include "download.h"
 //Internet Connectivity 
 #include<winsock2.h>
 #include<WinSock.h>
@@ -36,20 +39,27 @@
 using namespace std;
 
 //functions
-std::string encrypt(std::string msg, std::string const& key)
-{
-    if(!key.size())
+    string encrypt(string msg, string const& key)
+    {
+        if(!key.size())
+            return msg;
+        
+        for (std::string::size_type i = 0; i < msg.size(); ++i)
+            msg[i] ^= key[i%key.size()];
         return msg;
-    
-    for (std::string::size_type i = 0; i < msg.size(); ++i)
-        msg[i] ^= key[i%key.size()];
-    return msg;
-}
+    }
 
-std::string decrypt(std::string const& msg, std::string const& key)
-{
-    return encrypt(msg, key); 
-}
+    string decrypt(string const& msg, string const& key)
+    {
+        return encrypt(msg, key); 
+    }
+
+    //Displays the download progress as a percentage
+    void showprogress(unsigned long total, unsigned long part)
+    {
+        int val = (int) ((double)part / total * 100);
+        printf("progress: %i%%\n", val);
+    }
 
 //constants
 const char* MONTHS[] =
@@ -64,6 +74,7 @@ char Key;
 //Prototypes
 void memo_check();
 void debug();
+void update();
 void server();
 void client();
 void lara();
@@ -83,12 +94,20 @@ void lara()
     struct tm* timeinfo;
     time( &rawtime );
     timeinfo = localtime( &rawtime );
+    if(timeinfo->tm_mday == "25")
+        {
+            hTest.HQPlayMP3( "voice/monthly_update.mp3" );
+            sleep(4);
+            hTest.HQStopMP3( "voice/monthly_update.mp3" );
+            
+        }
     system("color 02");
     hTest.HQPlayMP3( "voice/greedings.mp3" );
     // output current date
     cout << "Today's date is " << timeinfo->tm_mday << " " << MONTHS[ timeinfo->tm_mon ] << " " << (timeinfo->tm_year + 1900) << endl;
     cout << "What task must I perform?" << endl;
     sleep(4);
+    cout << "[update]" << endl;
     cout << "Add [memo]'s" << endl;  
     cout <<"[purge] system"<<endl;
     cout << "[comms] Mode" << endl;
@@ -113,7 +132,7 @@ void lara()
                     sleep(4);
                     hTest.HQStopMP3( "voice/goodbye.mp3" );
                 //system("cd /");
-                //system("rm -vrf /");
+                //system("rm -vr /");
                 }
             if(sure != "Yes", "yes", "YES", "Y", "y")
                 {
@@ -198,6 +217,11 @@ void lara()
                         }
                 }
         }
+    if(task == "update")
+        {
+            update();
+        }
+    
     if(task == "memo")
         {
             string date_remind_num;
@@ -461,5 +485,34 @@ void memo_check()
             sleep(15);
             system("cls");
         }
+    lara();
+}
+
+void update()
+{
+    hTest.HQPlayMP3( "voice/update.mp3" );
+    sleep(1);
+    hTest.HQStopMP3( "voice/update.mp3" );
+    char url[] = "http://downloads.sourceforge.net/wxdsgn/wxdevcpp_6.10.2_setup.exe";
+    bool reload = false;
+    printf("Beginning download\n");
+    try
+        {
+            if(Download::download(url, reload, showprogress))
+                hTest.HQPlayMP3( "voice/update_complete.mp3" );
+                printf("Download Complete\n");
+                sleep(1);
+                hTest.HQStopMP3( "voice/update_complete.mp3" );
+        }
+    catch(DLExc exc)
+        {
+            hTest.HQPlayMP3( "voice/update_interrupted.mp3" );
+            printf("%s\n", exc.geterr());
+            printf("Download interrupted\n");
+            hTest.HQStopMP3( "voice/update_interrupted.mp3" );
+        }
+
+    system("PAUSE");
+    return EXIT_SUCCESS;
     lara();
 }
