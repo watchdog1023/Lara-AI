@@ -6,4 +6,5 @@ Build with -static -static-libgcc -static-libstdc++ flags at start and -L. -lchi
 Download the requird .a & .dll at:
 https://drive.google.com/open?id=0ByLm512z8MOibm50NHVORy1kelU
 
-Pre-built:
+Pre-built(weekly builds,possibly unstable):
+https://drive.google.com/open?id=0ByLm512z8MOiZURjcEJxazc3YWM
