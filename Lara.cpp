@@ -3,6 +3,7 @@
 #include<iostream>
 #include<sstream>
 #include<fstream>
+#include<istream>
 #include<string>
 #include<vector>
 #include<cmath>
@@ -20,14 +21,21 @@
 #include<stdio.h>
 #include<stdlib.h>
 //mp3 libs
-#include "HQGL_CLASS.h"
+#include "include/HQGL_CLASS.h"
 //Downloading
 #include<wininet.h>
-#include "download.h"
+#include "include/download.h"
+//UUID Generaterion
+#include "include/CkCrypt2.h"
+//Spidering
+#include "include/CkSpider.h"
+#include "include/CkStringArray.h"
 //Internet Connectivity 
 #include<winsock2.h>
 #include<WinSock.h>
 #include<ws2tcpip.h>
+//MYSQL database
+
 //Neural Net
 /*#include<Neuron.h>
 #include<Network.h>
@@ -40,26 +48,26 @@ using namespace std;
 
 //functions
     string encrypt(string msg, string const& key)
-    {
-        if(!key.size())
+        {
+            if(!key.size())
+                return msg;
+            
+            for (std::string::size_type i = 0; i < msg.size(); ++i)
+                msg[i] ^= key[i%key.size()];
             return msg;
-        
-        for (std::string::size_type i = 0; i < msg.size(); ++i)
-            msg[i] ^= key[i%key.size()];
-        return msg;
-    }
-
+        }
+    
     string decrypt(string const& msg, string const& key)
-    {
-        return encrypt(msg, key); 
-    }
-
+        {
+            return encrypt(msg, key); 
+        }
+    
     //Displays the download progress as a percentage
     void showprogress(unsigned long total, unsigned long part)
-    {
-        int val = (int) ((double)part / total * 100);
-        printf("progress: %i%%\n", val);
-    }
+        {
+            int val = (int) ((double)part / total * 100);
+            printf("progress: %i%%\n", val);
+        }
 
 //constants
 const char* MONTHS[] =
@@ -75,18 +83,43 @@ char Key;
 void memo_check();
 void debug();
 void update();
+void uuid_gen_first();
+void spider();
 void server();
 void client();
 void lara();
 
 //global variables
 string task;
+string uuid_text;
+string version_check;
+ifstream myfile2 ("version.txt");
+
+//Version Variable
+string version = "1.0.0";
+
+//UUID Variable
+string uuid = uuid_text;
 
 int main()
 {  
     system("color 02");
-    memo_check();
+    ifstream myfile3 ("uuid.txt");
+    if (myfile3.is_open())
+        {
+            while ( getline (myfile3,uuid_text) )
+                {
+                    uuid = uuid_text;
+                    memo_check();
+                }
+            myfile3.close();
+        }
+    else
+        {
+            uuid_gen_first();
+        }
 }
+
 void lara()
 {
     //get date variables
@@ -99,7 +132,7 @@ void lara()
             hTest.HQPlayMP3( "voice/monthly_update.mp3" );
             sleep(4);
             hTest.HQStopMP3( "voice/monthly_update.mp3" );
-            
+            update();
         }
     system("color 02");
     hTest.HQPlayMP3( "voice/greedings.mp3" );
@@ -109,8 +142,9 @@ void lara()
     sleep(4);
     cout << "[update]" << endl;
     cout << "Add [memo]'s" << endl;  
-    cout <<"[purge] system"<<endl;
+    cout << "[purge] system" <<endl;
     cout << "[comms] Mode" << endl;
+    cout << "[spider] a website" << endl;
     cout << "[quit]" << endl;
     hTest.HQStopMP3( "voice/greedings.mp3" );
     cin >> task;
@@ -222,6 +256,10 @@ void lara()
             update();
         }
     
+    if(task == "spider")
+        {
+            spider();
+        }
     if(task == "memo")
         {
             string date_remind_num;
@@ -431,12 +469,14 @@ void client()
     connect(server, (SOCKADDR *)&addr, sizeof(addr));
     cout << "Connected to server: " + server_ip << endl;
  
-    char buffer[1024];
+    string test;
+    const char* buffer = test.c_str();
     hTest.HQPlayMP3( "voice/message_input.mp3" );
-    cout << "Please input the message:" << endl;
+    cout << "Please input the message:";
     sleep(2);
     hTest.HQStopMP3( "voice/message_input.mp3" );
-    cin >> buffer;
+    cin.ignore();
+    getline(cin, test);
     send(server, buffer, sizeof(buffer), 0);
     hTest.HQPlayMP3( "voice/message_sent.mp3" );
     cout << "Message sent!" << endl;
@@ -490,29 +530,162 @@ void memo_check()
 
 void update()
 {
-    hTest.HQPlayMP3( "voice/update.mp3" );
-    sleep(1);
-    hTest.HQStopMP3( "voice/update.mp3" );
-    char url[] = "http://downloads.sourceforge.net/wxdsgn/wxdevcpp_6.10.2_setup.exe";
+    char url[] = "http://tomb.ddns.net/lara-v/lara-v.zip";
+    char url2[] = "http://tomb.ddns.net/lara-v/version.txt";
     bool reload = false;
-    printf("Beginning download\n");
+    string line;
+    hTest.HQPlayMP3( "voice/update.mp3" );
+    sleep(5);
+    hTest.HQStopMP3( "voice/update.mp3" );
     try
         {
-            if(Download::download(url, reload, showprogress))
-                hTest.HQPlayMP3( "voice/update_complete.mp3" );
-                printf("Download Complete\n");
-                sleep(1);
-                hTest.HQStopMP3( "voice/update_complete.mp3" );
+            if(Download::download(url2, reload))
+            if (myfile2.is_open())
+                {
+                    while ( getline (myfile2,line) )
+                        {
+                            version_check = line;
+                            if(version_check > version)
+                                {
+                                    hTest.HQPlayMP3( "voice/update_found.mp3" );
+                                    printf("Beginning download\n");
+                                    sleep(1);
+                                    hTest.HQStopMP3( "voice/update_found.mp3" );
+                                    try
+                                        {   
+                                            if(Download::download(url, reload, showprogress))
+                                                hTest.HQPlayMP3( "voice/update_complete.mp3" );
+                                                printf("Update Complete\n");
+                                                sleep(1);
+                                                hTest.HQStopMP3( "voice/update_complete.mp3" );
+                                        }      
+                                    catch(DLExc exc)
+                                        {
+                                            hTest.HQPlayMP3( "voice/update_interrupted.mp3" );
+                                            printf("%s\n", exc.geterr());
+                                            printf("Download interrupted\n");
+                                            sleep(1);
+                                            hTest.HQStopMP3( "voice/update_interrupted.mp3" );
+                                        }    
+                                }
+                            if(version_check == version)
+                                {
+                                    hTest.HQPlayMP3( "voice/update_no.mp3" );
+                                    cout << "There is no update available" << endl;
+                                    sleep(1);
+                                    hTest.HQStopMP3( "voice/update_no.mp3" );
+                                    lara();
+                                }
+                            if(version_check < version)
+                                {
+                                    hTest.HQPlayMP3( "voice/update_no.mp3" );
+                                    cout << "There is no update available" << endl;
+                                    sleep(1);
+                                    hTest.HQStopMP3( "voice/update_no.mp3" );
+                                    lara();
+                                }
+                        }
+                    myfile2.close();
+                }
         }
     catch(DLExc exc)
         {
             hTest.HQPlayMP3( "voice/update_interrupted.mp3" );
             printf("%s\n", exc.geterr());
             printf("Download interrupted\n");
+            sleep(1);
             hTest.HQStopMP3( "voice/update_interrupted.mp3" );
-        }
-
-    system("PAUSE");
-    return EXIT_SUCCESS;
+            lara();
+        }    
     lara();
+}
+
+void uuid_gen_first()
+{
+    CkCrypt2 crypt;
+    const char *uuid_gen = crypt.generateUuid();
+    ofstream myfile("uuid.txt");
+            if (myfile.is_open())
+                {
+                    myfile << uuid_gen << endl;
+                }
+    memo_check();
+}
+
+void spider()
+{
+    CkSpider spider;
+    CkStringArray seenDomains;
+    CkStringArray seedUrls;
+    seenDomains.put_Unique(true);
+    seedUrls.put_Unique(true);
+
+    string spider_input;
+    hTest.HQPlayMP3( "voice/spider_website.mp3" );
+    cout << "Please input the website to spider:" << endl;
+    getline(cin, spider_input);
+    sleep(4);
+    hTest.HQStopMP3( "voice/spider_website.mp3" );
+    seedUrls.Append(spider_input.c_str());
+
+    //  Set outbound URL exclude patterns
+    //  URLs matching any of these patterns will not be added to the
+    //  collection of outbound links.
+    spider.AddAvoidOutboundLinkPattern("*?id=*");
+    spider.AddAvoidOutboundLinkPattern("*.mypages.*");
+    spider.AddAvoidOutboundLinkPattern("*.personal.*");
+    spider.AddAvoidOutboundLinkPattern("*.comcast.*");
+    spider.AddAvoidOutboundLinkPattern("*.aol.*");
+    spider.AddAvoidOutboundLinkPattern("*~*");
+
+    //  Use a cache so we don't have to re-fetch URLs previously fetched.
+    spider.put_CacheDir("Cache/spider");
+    spider.put_FetchFromCache(true);
+    spider.put_UpdateCache(true);
+
+    while (seedUrls.get_Count() > 0)
+        {
+            const char *url = seedUrls.pop();
+            spider.Initialize(url);
+            //  Spider 5 URLs of this domain.
+            //  but first, save the base domain in seenDomains
+            const char *domain = spider.getUrlDomain(url);
+            seenDomains.Append(spider.getBaseDomain(domain));
+            int i;
+            bool success;
+            for (i = 0; i <= 4; i++)
+                {
+                    success = spider.CrawlNext();
+                    if (success == true)
+                        {
+                            //  Display the URL we just crawled.
+                            std::cout << spider.lastUrl() << "\r\n";
+                            if (spider.get_LastFromCache() != true)
+                                {
+                                    spider.SleepMs(1000);
+                                }
+                        }
+                    else
+                        {
+                            //  cause the loop to exit..
+                            i = 999;
+                        }
+                }
+            //  Add the outbound links to seedUrls, except
+            //  for the domains we've already seen.
+            for (i = 0; i <= spider.get_NumOutboundLinks() - 1; i++)
+                {
+                    url = spider.getOutboundLink(i);
+                    const char *domain = spider.getUrlDomain(url);
+                    const char *baseDomain = spider.getBaseDomain(domain);
+                    if (seenDomains.Contains(baseDomain) == false)
+                        {
+                            //  Don't let our list of seedUrls grow too large.
+                            if (seedUrls.get_Count() < 1000)
+                                {
+                                    seedUrls.Append(url);
+                                }   
+                        }
+                }
+        }
 }
