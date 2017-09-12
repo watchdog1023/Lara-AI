@@ -33,10 +33,7 @@
 #include "include/CkStringArray.h"
 //Threading
 #include<limits.h>
-/*#include "include/pthread.h"
-#include "include/sched.h"
-#include "include/semaphore.h"
-*///Internet Connectivity 
+//Internet Connectivity 
 #include<winsock2.h>
 #include<WinSock.h>
 #include<ws2tcpip.h>
