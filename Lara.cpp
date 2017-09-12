@@ -12,6 +12,7 @@
 #include<cstdio>
 //for date & time
 #include<ctime>
+#include<time.h>
 #include<dos.h>
 //for sleep fuction
 #include<conio.h>
@@ -30,53 +31,86 @@
 //Spidering
 #include "include/CkSpider.h"
 #include "include/CkStringArray.h"
-//Internet Connectivity 
+//Threading
+#include<limits.h>
+/*#include "include/pthread.h"
+#include "include/sched.h"
+#include "include/semaphore.h"
+*///Internet Connectivity 
 #include<winsock2.h>
 #include<WinSock.h>
 #include<ws2tcpip.h>
 //MYSQL database
 
+//Video and Image Displaying
+#include "include/opencv2/highgui/highgui.hpp"
+#include "include/opencv/cv.h"
+#include "include/opencv/highgui.h"
+//IRC Commuication
+#include<map>
+#include<algorithm>
+#include<signal.h>
+#include "include/irc/IRCClient.h"
+#include "include/irc/IRCHandler.h"
+#include "include/irc/IRCSocket.h"
+#include "include/irc/Thread.h"
 //Neural Net
-/*#include<Neuron.h>
-#include<Network.h>
+/*#include "include/Neuron.h"
+#include "include/Network.h"
+#include "include/trainingdata.h"
 */
 
 //Parameters
 #pragma comment(lib, "wsock32.lib")
 
 using namespace std;
+using namespace cv;
 
-//functions
-    string encrypt(string msg, string const& key)
-        {
-            if(!key.size())
-                return msg;
-            
-            for (std::string::size_type i = 0; i < msg.size(); ++i)
-                msg[i] ^= key[i%key.size()];
+//Volatile Bool
+volatile bool running;
+
+//String Functions
+string encrypt(string msg, string const& key)
+    {
+        if(!key.size())
             return msg;
-        }
+        
+        for (string::size_type i = 0; i < msg.size(); ++i)
+            msg[i] ^= key[i%key.size()];
+        return msg;
+    }
     
-    string decrypt(string const& msg, string const& key)
-        {
-            return encrypt(msg, key); 
-        }
+string decrypt(string const& msg, string const& key)
+    {
+        return encrypt(msg, key); 
+    }
     
-    //Displays the download progress as a percentage
-    void showprogress(unsigned long total, unsigned long part)
-        {
-            int val = (int) ((double)part / total * 100);
-            printf("progress: %i%%\n", val);
-        }
+//Prototypes Functions
+void showprogress(unsigned long total, unsigned long part)//Displays the download progress as a percentage
+    {
+        int val = (int) ((double)part / total * 100);
+        printf("progress: %i%%\n", val);
+    }
+    
+void signalHandler(int signal)
+{
+    running = false;
+}
 
-//constants
+//Constants
 const char* MONTHS[] =
   {
     "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
-  };
+  };  
+const static int SENSITIVITY_VALUE = 40;//for higher sensitivity, use a lower value
+const static int BLUR_SIZE = 10;//size of blur used to smooth the intensity image output from absdiff() function
+
+//Bool Vaules
+bool debugMode;//toggled pressing 'd'
+bool trackingEnabled;//toggled pressing 't'
 
 //for mp3 output
-HQGL            hTest;
+HQGL hTest;
 char Key;
 
 //Prototypes
@@ -88,6 +122,9 @@ void spider();
 void server();
 void client();
 void lara();
+void webcam_streaming();
+void vid_diplay();
+void irc();
 
 //global variables
 string task;
@@ -95,28 +132,218 @@ string uuid_text;
 string version_check;
 ifstream myfile2 ("version.txt");
 
+//Bool fuctions
+
+//Classes
+class ConsoleCommandHandler
+{
+    public:
+        bool AddCommand(std::string name, int argCount, void (*handler)(std::string /*params*/, IRCClient* /*client*/))
+            {
+                CommandEntry entry;
+                entry.argCount = argCount;
+                entry.handler = handler;
+                std::transform(name.begin(), name.end(), name.begin(), towlower);
+                _commands.insert(std::pair<std::string, CommandEntry>(name, entry));
+                return true;
+            }
+    
+        void ParseCommand(std::string command, IRCClient* client)
+            {
+                if (_commands.empty())
+                    {
+                        std::cout << "No commands available." << std::endl;
+                        return;
+                    }
+        
+                if (command[0] == '/')
+                    command = command.substr(1); // Remove the slash
+        
+                std::string name = command.substr(0, command.find(" "));
+                std::string args = command.substr(command.find(" ") + 1);
+                int argCount = std::count(args.begin(), args.end(), ' ');
+        
+                std::transform(name.begin(), name.end(), name.begin(), towlower);
+    
+                std::map<std::string, CommandEntry>::const_iterator itr = _commands.find(name);
+                if (itr == _commands.end())
+                    {
+                        std::cout << "Command not found." << std::endl;
+                        return;
+                    }
+    
+                if (++argCount < itr->second.argCount)
+                    {
+                        std::cout << "Insuficient arguments." << std::endl;
+                        return;
+                    }
+        
+                (*(itr->second.handler))(args, client);
+            }
+    
+    private:
+        struct CommandEntry
+            {
+                int argCount;
+                void (*handler)(std::string /*arguments*/, IRCClient* /*client*/);
+            };
+    
+        std::map<std::string, CommandEntry> _commands;
+};
+
+ConsoleCommandHandler commandHandler;
+
+//Voids
+void msgCommand(std::string arguments, IRCClient* client)
+{
+    std::string to = arguments.substr(0, arguments.find(" "));
+    std::string text = arguments.substr(arguments.find(" ") + 1);
+
+    std::cout << "To " + to + ": " + text << std::endl;
+    client->SendIRC("PRIVMSG " + to + " :" + text);
+};
+
+void joinCommand(std::string channel, IRCClient* client)
+{
+    if (channel[0] != '#')
+        channel = "#" + channel;
+
+    client->SendIRC("JOIN " + channel);
+}
+
+void partCommand(std::string channel, IRCClient* client)
+{
+    if (channel[0] != '#')
+        channel = "#" + channel;
+
+    client->SendIRC("PART " + channel);
+}
+
+void ctcpCommand(std::string arguments, IRCClient* client)
+{
+    std::string to = arguments.substr(0, arguments.find(" "));
+    std::string text = arguments.substr(arguments.find(" ") + 1);
+
+    std::transform(text.begin(), text.end(), text.begin(), towupper);
+
+    client->SendIRC("PRIVMSG " + to + " :\001" + text + "\001");
+}
+
+//Threading functions
+ThreadReturn inputThread(void* client)
+{
+    std::string command;
+
+    commandHandler.AddCommand("msg", 2, &msgCommand);
+    commandHandler.AddCommand("join", 1, &joinCommand);
+    commandHandler.AddCommand("part", 1, &partCommand);
+    commandHandler.AddCommand("ctcp", 2, &ctcpCommand);
+
+    while(true)
+        {
+            getline(std::cin, command);
+            if (command == "")
+                continue;
+    
+            if (command[0] == '/')
+                commandHandler.ParseCommand(command, (IRCClient*)client);
+            else
+                ((IRCClient*)client)->SendIRC(command);
+    
+            if (command == "quit")
+                break;
+        }
+
+#ifdef _WIN32
+    _endthread();
+#else
+    pthread_exit(NULL);
+#endif
+}
+
 //Version Variable
 string version = "1.0.0";
+
+//Greeting Variable
+string greet;
 
 //UUID Variable
 string uuid = uuid_text;
 
-int main()
-{  
+int main(int argc, char* argv[])
+{
+    system ("title Lara");
     system("color 02");
-    ifstream myfile3 ("uuid.txt");
-    if (myfile3.is_open())
+    greet = "1";
+    if(argc != 2)
         {
-            while ( getline (myfile3,uuid_text) )
+            ifstream myfile3 ("uuid.txt");
+            if(myfile3.is_open())
                 {
-                    uuid = uuid_text;
-                    memo_check();
+                    while(getline (myfile3,uuid_text))
+                        {
+                            uuid = uuid_text;
+                            memo_check();
+                        }
+                    myfile3.close();
                 }
-            myfile3.close();
-        }
+            else
+                {
+                    uuid_gen_first();
+                }
+            }
     else
         {
-            uuid_gen_first();
+            string path = "music\\";
+            string name = path + argv[1];
+            string output = name + ".mp3";
+            string song = argv[1];
+            hTest.HQPlayMP3(output.c_str());
+            cout << "Now Playing " << song << endl;
+            cout << "1 - Resume Song" << endl;
+            cout << "2 - Pause Song" << endl;
+            cout << "3 - Stop Song" << endl;
+            cout << "4 - Play Song again" << endl;
+            cout << "5 - Close Song" << endl;
+            cout << "ESC - Exit MP3 Player" << endl;
+            while( 2013 )
+                {
+                    for( Key = 0;Key < 256;Key++ )
+                        {
+                            if( GetAsyncKeyState( Key ) == -32767 )
+                                {    
+                                    switch( Key )
+                                        {
+                                            case VK_NUMPAD1:
+                                                hTest.HQPauseMP3(output.c_str());
+                                                break;
+                                            case VK_NUMPAD2:
+                                                hTest.HQResumeMP3(output.c_str());
+                                                break;
+                                            case VK_NUMPAD3:
+                                                hTest.HQStopMP3(output.c_str());
+                                                break;
+                                            case VK_NUMPAD4:
+                                                hTest.HQPlayMP3(output.c_str());
+                                                break;
+                                            case VK_NUMPAD5:
+                                                hTest.HQCloseMP3(output.c_str());
+                                                break;
+                                            case VK_ESCAPE:
+                                                ifstream myfile3 ("uuid.txt");
+                                                if(myfile3.is_open())
+                                                    {
+                                                        while(getline (myfile3,uuid_text))
+                                                            {
+                                                                uuid = uuid_text;
+                                                                memo_check();
+                                                            }
+                                                        myfile3.close();
+                                                    }
+                                        }
+                                }         
+                        }
+                }
         }
 }
 
@@ -129,24 +356,33 @@ void lara()
     timeinfo = localtime( &rawtime );
     if(timeinfo->tm_mday == "25")
         {
-            hTest.HQPlayMP3( "voice/monthly_update.mp3" );
-            sleep(4);
-            hTest.HQStopMP3( "voice/monthly_update.mp3" );
             update();
         }
     system("color 02");
-    hTest.HQPlayMP3( "voice/greedings.mp3" );
+    if(greet == "1")
+        {
+            hTest.HQPlayMP3( "voice/greedings1.mp3" );
+            sleep(4);
+        }
+    if(greet == "2")
+        {
+            hTest.HQPlayMP3( "voice/greedings2.mp3" );
+            sleep(2);
+        }
     // output current date
     cout << "Today's date is " << timeinfo->tm_mday << " " << MONTHS[ timeinfo->tm_mon ] << " " << (timeinfo->tm_year + 1900) << endl;
     cout << "What task must I perform?" << endl;
-    sleep(4);
     cout << "[update]" << endl;
     cout << "Add [memo]'s" << endl;  
     cout << "[purge] system" <<endl;
     cout << "[comms] Mode" << endl;
     cout << "[spider] a website" << endl;
+    cout << "Display a [video]" << endl;
+    cout << "Turn On [webcam]" << endl;
     cout << "[quit]" << endl;
-    hTest.HQStopMP3( "voice/greedings.mp3" );
+    hTest.HQStopMP3( "voice/greedings1.mp3" );
+    hTest.HQStopMP3( "voice/greedings2.mp3" );
+    greet = "2";
     cin >> task;
     if(task == "purge")
         {
@@ -182,6 +418,7 @@ void lara()
             sleep(2);
             cout << "Which mode do you want to start?" << endl;
             cout << "[p2p]" << endl;
+            cout << "[IRC]" << endl;
             cout << "[text]" << endl;
             hTest.HQStopMP3( "voice/mode_start.mp3" );
             cin >> mode;
@@ -215,7 +452,7 @@ void lara()
                         {
                             string message5;
                             cout << "Please enter the text,press enter to encrypt the text" << endl;
-                            cin >> message5;
+                            getline(cin, message5);
                             string message = encrypt(message5 , "monkey");
                             ofstream myfile("encrypted.txt");
                             if (myfile.is_open())
@@ -250,10 +487,19 @@ void lara()
                                 }
                         }
                 }
+            if(mode == "irc")
+                {
+                    irc();    
+                }  
         }
     if(task == "update")
         {
             update();
+        }
+        
+    if(task == "video")
+        {
+            vid_diplay();
         }
     
     if(task == "spider")
@@ -264,11 +510,65 @@ void lara()
         {
             string date_remind_num;
             string date_remind_month;
+            string date_remind_month_input;
             string date_remind_year;
+            
             cout << "Please enter the date you would like me to remind you on" << endl;
             cin >> date_remind_num;
             cout << "Please enter the mouth you would like me to remind you on" << endl;
-            cin >> date_remind_month;
+            cin >> date_remind_month_input;
+            if(date_remind_month_input == "01")
+                {
+                    date_remind_month = "January";
+                }
+            if(date_remind_month_input == "02")
+                {
+                    date_remind_month = "February";
+                }
+            if(date_remind_month_input == "03")
+                {
+                    date_remind_month = "March";
+                }
+            if(date_remind_month_input == "04")
+                {
+                    date_remind_month = "April";
+                }
+            if(date_remind_month_input == "05")
+                {
+                    date_remind_month = "May";
+                }
+            if(date_remind_month_input == "06")
+                {
+                    date_remind_month = "June";
+                }
+            if(date_remind_month_input == "07")
+                {
+                    date_remind_month = "July";
+                }
+            if(date_remind_month_input == "08")
+                {
+                    date_remind_month = "August";
+                }
+            if(date_remind_month_input == "09")
+                {
+                    date_remind_month = "September";
+                }
+            if(date_remind_month_input == "10")
+                {
+                    date_remind_month = "October";
+                }
+            if(date_remind_month_input == "11")
+                {
+                    date_remind_month = "November";
+                }
+            if(date_remind_month_input == "12")
+                {
+                    date_remind_month = "December";
+                }
+            else
+                {
+                    date_remind_month = date_remind_month_input;
+                }
             cout << "Please enter the year you would like me to remind you on" << endl;
             cin >> date_remind_year;
             string reminder;
@@ -284,7 +584,9 @@ void lara()
             string space = " ";
             string spacer = "'";
             system(("cp" + space + spacer + filename_date + spacer + space + " memo/").c_str());
-            system(("rm" + space + "'" + filename_date + "'").c_str());
+            sleep(5);
+            myfile.close();
+            remove(filename_date.c_str());
             lara();
         }    
              
@@ -292,8 +594,15 @@ void lara()
         {
             cout << "Goodbye" << endl;
             hTest.HQPlayMP3( "voice/goodbye.mp3" );
-            sleep(4);
+            sleep(2);
             hTest.HQStopMP3( "voice/goodbye.mp3" );
+        }
+     if(task == "webcam")
+        {
+            cout << "The first time you open the webcam it will crash" << endl;
+            cout << "Plaese try again" << endl;
+            sleep(10);
+            webcam_streaming();
         }
     if(task == "debug")
         {
@@ -304,6 +613,7 @@ void lara()
 void debug()
 {
     cout << "I am Lara" << endl;
+    cout << uuid << endl;
     sleep(2);
     hTest.HQPlayMP3( "voice/debug.mp3" );
     sleep(2);
@@ -492,6 +802,7 @@ void client()
 
 void memo_check()
 {
+    //get date variables
     time_t     rawtime;
     struct tm* timeinfo;
     time( &rawtime );
@@ -530,8 +841,8 @@ void memo_check()
 
 void update()
 {
-    char url[] = "http://tomb.ddns.net/lara-v/lara-v.zip";
-    char url2[] = "http://tomb.ddns.net/lara-v/version.txt";
+    char url[] = "ftp://tomb.ddns.net:8080/lara-v/lara-v.zip";
+    char url2[] = "ftp://tomb.ddns.net:8080/lara-v/version.txt";
     bool reload = false;
     string line;
     hTest.HQPlayMP3( "voice/update.mp3" );
@@ -614,6 +925,9 @@ void uuid_gen_first()
 
 void spider()
 {
+    cout << "Powered by the Watchdog's Hunter System" << endl;
+    lara();
+    /*
     CkSpider spider;
     CkStringArray seenDomains;
     CkStringArray seedUrls;
@@ -627,7 +941,7 @@ void spider()
     sleep(4);
     hTest.HQStopMP3( "voice/spider_website.mp3" );
     seedUrls.Append(spider_input.c_str());
-
+    
     //  Set outbound URL exclude patterns
     //  URLs matching any of these patterns will not be added to the
     //  collection of outbound links.
@@ -687,5 +1001,130 @@ void spider()
                                 }   
                         }
                 }
+        }
+    */
+}
+
+void webcam_streaming()
+{
+    string type_of_webcam;
+    cout << "What webcam would you like to active?" << endl;
+    cout << "[internal]" << endl;
+    cout << "[external]" << endl;
+    cin >> type_of_webcam;
+    
+    if(type_of_webcam == "internal")
+        {
+            cout << "To close the webcam press ESC" << endl;
+            cvNamedWindow("Streaming", CV_WINDOW_AUTOSIZE);
+            CvCapture* capture = cvCreateCameraCapture(0);
+            IplImage* frame;
+            while(1)
+                {
+                    frame = cvQueryFrame(capture);
+                    if (!frame)
+                        break;
+                    cvShowImage("Streaming", frame);
+                    char c = cvWaitKey(33);
+                    if (c == 27)
+                        break;
+                }
+            cvReleaseCapture(&capture);
+            cvDestroyWindow("Streaming");
+            lara();
+        }
+        
+    if(type_of_webcam == "external")
+        {
+            cout << "To close the webcam press ESC" << endl;
+            cvNamedWindow("Streaming", CV_WINDOW_AUTOSIZE);
+            CvCapture* capture = cvCreateCameraCapture(1);
+            IplImage* frame;
+            while(1)
+                {
+                    frame = cvQueryFrame(capture);
+                    if (!frame)
+                        break;
+                    cvShowImage("Streaming", frame);
+                    char c = cvWaitKey(33);
+                    if (c == 27)
+                        break;
+                }
+            cvReleaseCapture(&capture);
+            cvDestroyWindow("Streaming");
+            lara();
+        }
+}
+
+void vid_diplay()
+{
+    cvNamedWindow("Video Display", CV_WINDOW_AUTOSIZE);
+    CvCapture* capture = cvCreateFileCapture("video.mp4");
+    IplImage* frame;
+    while(1)
+    {
+        frame = cvQueryFrame(capture);
+        if(!frame)
+            break;
+        cvShowImage("Video Display", frame);
+        char c = cvWaitKey(20);
+        if(c == 27)
+            break;    
+    }
+    cvReleaseCapture(&capture);
+    cvDestroyWindow("Video Display");
+    lara();
+}
+
+void irc()
+{
+    cin.ignore();
+    string irc_host;
+    cout << "Please Enter the IRC Server Address" << endl;
+    getline(cin, irc_host);
+    string irc_port;
+    cout << "Please Enter the IRC Server Port" << endl;
+    getline(cin, irc_port);
+    char* host = irc_host.c_str();
+    int port = atoi(irc_port.c_str());
+    std::string nick("MyIRCClient");
+    std::string user("IRCClient");
+
+    IRCClient client;
+
+    client.Debug(true);
+
+    // Start the input thread
+    Thread thread;
+    thread.Start(&inputThread, &client);
+
+    if (client.InitSocket())
+        {
+            std::cout << "Socket initialized. Connecting..." << std::endl;
+    
+            if (client.Connect(host, port))
+                {
+                    std::cout << "Connected. Loggin in..." << std::endl;
+    
+                    if (client.Login(nick, user))
+                        {
+                            std::cout << "Logged." << std::endl;
+        
+                            running = true;
+                            signal(SIGINT, signalHandler);
+        
+                            while (client.Connected() && running)
+                                client.ReceiveData();
+                        }
+    
+                    if (client.Connected())
+                        client.Disconnect();
+        
+                    std::cout << "Disconnected." << std::endl;
+                }
+            else
+            {    
+                lara();
+            }
         }
 }
