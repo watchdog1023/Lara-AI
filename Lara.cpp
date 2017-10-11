@@ -7,6 +7,7 @@
 #include<string>
 #include<vector>
 #include<cmath>
+#include<math>
 #include<cstdlib>
 #include<cassert>
 #include<cstdio>
@@ -21,7 +22,7 @@
 //C libs to use system function
 #include<stdio.h>
 #include<stdlib.h>
-//mp3 libs
+//mp3 Playback
 #include "include/HQGL_CLASS.h"
 //Downloading
 #include<wininet.h>
@@ -33,6 +34,9 @@
 #include "include/CkStringArray.h"
 //Threading
 #include<limits.h>
+//#include<pthread.h>
+/*#include "include/sched.h"
+#include "include/semaphore.h"*/
 //Internet Connectivity 
 #include<winsock2.h>
 #include<WinSock.h>
@@ -42,6 +46,10 @@
 //Video and Image Displaying
 #include "include/opencv2/highgui/highgui.hpp"
 #include "include/opencv/cv.h"
+#include "include/opencv/highgui.h"
+//Hand Recognition
+#include "include/opencv/cv.h"
+#include "include/opencv/cxcore.h"
 #include "include/opencv/highgui.h"
 //IRC Commuication
 #include<map>
@@ -106,7 +114,7 @@ const static int BLUR_SIZE = 10;//size of blur used to smooth the intensity imag
 bool debugMode;//toggled pressing 'd'
 bool trackingEnabled;//toggled pressing 't'
 
-//for mp3 output
+//mp3 Playback Variables
 HQGL hTest;
 char Key;
 
@@ -122,6 +130,7 @@ void lara();
 void webcam_streaming();
 void vid_diplay();
 void irc();
+void hand_rec();
 
 //global variables
 string task;
@@ -1059,15 +1068,15 @@ void vid_diplay()
     CvCapture* capture = cvCreateFileCapture("video.mp4");
     IplImage* frame;
     while(1)
-    {
-        frame = cvQueryFrame(capture);
-        if(!frame)
-            break;
-        cvShowImage("Video Display", frame);
-        char c = cvWaitKey(20);
-        if(c == 27)
-            break;    
-    }
+        {
+            frame = cvQueryFrame(capture);
+            if(!frame)
+                break;
+            cvShowImage("Video Display", frame);
+            char c = cvWaitKey(20);
+            if(c == 27)
+                break;    
+        }
     cvReleaseCapture(&capture);
     cvDestroyWindow("Video Display");
     lara();
@@ -1077,18 +1086,24 @@ void irc()
 {
     cin.ignore();
     string irc_host;
-    cout << "Please Enter the IRC Server Address" << endl;
+    cout << "Please Enter the IRC Server Address(Default is TOMB server)" << endl;
     getline(cin, irc_host);
     string irc_port;
-    cout << "Please Enter the IRC Server Port" << endl;
+    cout << "Please Enter the IRC Server Port(Default is 6000)" << endl;
     getline(cin, irc_port);
+    if( irc_host.length() == 0)
+        {
+            irc_host = "tomb.ddns.net";
+        }
+    if( irc_port.length() == 0)
+        {
+            irc_port = "6000";
+        }
     char* host = irc_host.c_str();
     int port = atoi(irc_port.c_str());
-    std::string nick("MyIRCClient");
-    std::string user("IRCClient");
-
+    string nick("MyIRCClient");
+    string user("IRCClient");
     IRCClient client;
-
     client.Debug(true);
 
     // Start the input thread
@@ -1097,31 +1112,164 @@ void irc()
 
     if (client.InitSocket())
         {
-            std::cout << "Socket initialized. Connecting..." << std::endl;
-    
+            cout << "Socket initialized. Connecting..." << endl;
             if (client.Connect(host, port))
                 {
-                    std::cout << "Connected. Loggin in..." << std::endl;
-    
+                    cout << "Connected. Loggin in..." << endl;
                     if (client.Login(nick, user))
                         {
-                            std::cout << "Logged." << std::endl;
-        
+                            cout << "Logged." << endl;
                             running = true;
                             signal(SIGINT, signalHandler);
-        
                             while (client.Connected() && running)
                                 client.ReceiveData();
                         }
-    
                     if (client.Connected())
                         client.Disconnect();
-        
-                    std::cout << "Disconnected." << std::endl;
+                    cout << "Disconnected." << endl;
                 }
             else
-            {    
-                lara();
-            }
+                {    
+                    lara();
+                }
         }
+}
+
+void hand_rec()
+{
+	int c = 0;
+	CvCapture* capture = cvCaptureFromCAM(1);
+	if(!cvQueryFrame(capture))
+		{
+			cout<<"Video camera capture status: OK"<<endl;
+		}
+	else
+		{
+			cout<<"Video capture failed, please check the camera."<<endl;
+		}
+	
+    CvSize sz = cvGetSize(cvQueryFrame( capture));
+	cout << "Height & width of captured frame: " << sz.height <<" x " << sz.width;
+	IplImage* src    = cvCreateImage( sz,8, 3 );
+	IplImage* gray   = cvCreateImage( cvSize(270,270),8, 1 );
+	
+	while( c != 27)
+		{
+			src = cvQueryFrame(capture);
+			cvSetImageROI(src, cvRect(340,100,270,270));
+			cvCvtColor(src,gray,CV_BGR2GRAY);
+			cvSmooth(gray,gray,CV_BLUR,(12,12),0);
+			cvNamedWindow( "Blur",1);cvShowImage( "Blur",gray);   // blur-not-clear
+			cvThreshold(gray,gray,0,255,(CV_THRESH_BINARY_INV+CV_THRESH_OTSU));
+			cvNamedWindow( "Threshold",1);cvShowImage( "Threshold",gray);  // black-white
+			CvMemStorage* storage = cvCreateMemStorage();
+			CvSeq* first_contour = NULL;
+			CvSeq* maxitem=NULL;
+			int cn=cvFindContours(gray,storage,&first_contour,sizeof(CvContour),CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE,cvPoint(0,0));
+			double area,max_area=0.0;
+			CvSeq* ptr=0;
+			if(cn>0)
+				{
+					for(ptr=first_contour;ptr!=NULL;ptr=ptr->h_next)
+						{
+							area=fabs(cvContourArea(ptr,CV_WHOLE_SEQ,0));
+							if(area>max_area)
+								{
+									max_area=area;
+									maxitem=ptr;
+								}
+						}
+					if(max_area > 1000)
+						{
+							CvPoint pt0;
+							CvMemStorage* storage1 = cvCreateMemStorage();
+							CvMemStorage* storage2 = cvCreateMemStorage(0);
+							CvSeq* ptseq = cvCreateSeq( CV_SEQ_KIND_GENERIC|CV_32SC2, sizeof(CvContour),sizeof(CvPoint), storage1 );
+							CvSeq* hull;
+							CvSeq* defects;
+							for(int i = 0; i < maxitem->total; i++ )
+								{
+									CvPoint* p = CV_GET_SEQ_ELEM( CvPoint, maxitem, i );
+									pt0.x = p->x;
+									pt0.y = p->y;
+									cvSeqPush( ptseq, &pt0 );
+								}
+							hull = cvConvexHull2( ptseq, 0, CV_CLOCKWISE, 0 );
+							int hullcount = hull->total;
+							defects= cvConvexityDefects(ptseq,hull,storage2  );
+							CvConvexityDefect* defectArray;
+							for(int i = 1; i <= hullcount; i++ )
+								{
+									CvPoint pt = **CV_GET_SEQ_ELEM( CvPoint*, hull, i );
+									cvLine( src, pt0, pt, CV_RGB( 255, 0, 0 ), 1, CV_AA, 0 );
+									pt0 = pt;
+								}
+							for( ; defects; defects = defects->h_next)  
+								{
+									int nomdef = defects->total; // defect amount
+									if(nomdef == 0)
+										continue;
+									// Allocate memory for defect set.
+									defectArray = (CvConvexityDefect*)malloc(sizeof(CvConvexityDefect)*nomdef);
+									// Get defect set.
+									cvCvtSeqToArray(defects,defectArray, CV_WHOLE_SEQ);
+									// Draw marks for all defects.
+									int con=0;
+									for(int i=0; i<nomdef; i++)
+										{
+											if(defectArray[i].depth > 40 )
+												{
+													con=con+1;
+													cvLine(src, *(defectArray[i].start), *(defectArray[i].depth_point),CV_RGB(255,255,0),1, CV_AA, 0 );  
+													cvCircle( src, *(defectArray[i].depth_point), 5, CV_RGB(0,0,255), 2, 8,0);
+													cvCircle( src, *(defectArray[i].start), 5, CV_RGB(0,255,0), 2, 8,0);  
+													cvLine(src, *(defectArray[i].depth_point), *(defectArray[i].end),CV_RGB(0,255,255),1, CV_AA, 0 );  
+													cvDrawContours(src,defects,CV_RGB(0,0,0),CV_RGB(255,0,0),-1,CV_FILLED,8);
+												}
+										}		
+									char txt[40]="";
+									if(con==1)
+										{
+											char txt1[]="Hi , People";
+											strcat(txt,txt1);
+										}
+                                    else if(con==2)
+                                        {
+                                        	char txt1[]="I want to ask you";
+                                        	strcat(txt,txt1);
+                                        }   
+                                    else if(con==3)
+                                        {
+                                        	char txt1[]="Can I get my";
+                                        	strcat(txt,txt1);
+                                        }
+                                    else if(con==4)
+                                        {
+                                        	char txt1[]="Reward";
+                                        	strcat(txt,txt1);
+                                        }   
+                                    else
+                                        {
+                                        	char txt1[]="Lara can't recognize  your hand gesture";
+                                        	strcat(txt,txt1);
+                                        }
+                            		cvNamedWindow( "contour",1);cvShowImage( "contour",src);
+                            		cvResetImageROI(src);
+                            		CvFont font;
+                            		cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1.5, 1.5, 0, 5, CV_AA);
+                            		cvPutText(src, txt, cvPoint(50, 50), &font, cvScalar(0, 0, 255, 0));
+                                	// Free memory.
+                                    free(defectArray);
+                                } 
+                            cvReleaseMemStorage( &storage1 );
+                            cvReleaseMemStorage( &storage2 );
+                        }
+                }
+            cvReleaseMemStorage( &storage );
+            cvNamedWindow( "threshold",1);cvShowImage( "threshold",src);
+            c = cvWaitKey(100);
+        }
+	cvReleaseCapture( &capture);
+	cvDestroyAllWindows();
+    lara();
 }
