@@ -7,7 +7,6 @@
 #include<string>
 #include<vector>
 #include<cmath>
-#include<math>
 #include<cstdlib>
 #include<cassert>
 #include<cstdio>
@@ -59,6 +58,18 @@
 #include "include/irc/IRCHandler.h"
 #include "include/irc/IRCSocket.h"
 #include "include/irc/Thread.h"
+//QR Code Generation
+#include <cstdint>
+#include "include/qr_code/QrCode.hpp"
+//SDL Creation
+//#include<SDL2/SDL.h>
+//Set width
+#include<iomanip>
+//Colour Changer
+//#include "include/termcolor/termcolor.hpp"
+//Nerve
+#include<locale>
+#include<cstring>
 //Neural Net
 /*#include "include/Neuron.h"
 #include "include/Network.h"
@@ -70,6 +81,8 @@
 
 using namespace std;
 using namespace cv;
+using namespace qrcodegen;
+//using namespace termcolor;
 
 //Volatile Bool
 volatile bool running;
@@ -144,43 +157,43 @@ ifstream myfile2 ("version.txt");
 class ConsoleCommandHandler
 {
     public:
-        bool AddCommand(std::string name, int argCount, void (*handler)(std::string /*params*/, IRCClient* /*client*/))
+        bool AddCommand(string name, int argCount, void (*handler)(string /*params*/, IRCClient* /*client*/))
             {
                 CommandEntry entry;
                 entry.argCount = argCount;
                 entry.handler = handler;
-                std::transform(name.begin(), name.end(), name.begin(), towlower);
-                _commands.insert(std::pair<std::string, CommandEntry>(name, entry));
+                transform(name.begin(), name.end(), name.begin(), towlower);
+                _commands.insert(pair<string, CommandEntry>(name, entry));
                 return true;
             }
     
-        void ParseCommand(std::string command, IRCClient* client)
+        void ParseCommand(string command, IRCClient* client)
             {
                 if (_commands.empty())
                     {
-                        std::cout << "No commands available." << std::endl;
+                        cout << "No commands available." << endl;
                         return;
                     }
         
                 if (command[0] == '/')
                     command = command.substr(1); // Remove the slash
         
-                std::string name = command.substr(0, command.find(" "));
-                std::string args = command.substr(command.find(" ") + 1);
-                int argCount = std::count(args.begin(), args.end(), ' ');
+                string name = command.substr(0, command.find(" "));
+                string args = command.substr(command.find(" ") + 1);
+                int argCount = count(args.begin(), args.end(), ' ');
         
-                std::transform(name.begin(), name.end(), name.begin(), towlower);
+                transform(name.begin(), name.end(), name.begin(), towlower);
     
-                std::map<std::string, CommandEntry>::const_iterator itr = _commands.find(name);
+                map<string, CommandEntry>::const_iterator itr = _commands.find(name);
                 if (itr == _commands.end())
                     {
-                        std::cout << "Command not found." << std::endl;
+                        cout << "Command not found." << endl;
                         return;
                     }
     
                 if (++argCount < itr->second.argCount)
                     {
-                        std::cout << "Insuficient arguments." << std::endl;
+                        cout << "Insuficient arguments." << endl;
                         return;
                     }
         
@@ -191,25 +204,25 @@ class ConsoleCommandHandler
         struct CommandEntry
             {
                 int argCount;
-                void (*handler)(std::string /*arguments*/, IRCClient* /*client*/);
+                void (*handler)(string /*arguments*/, IRCClient* /*client*/);
             };
     
-        std::map<std::string, CommandEntry> _commands;
+        map<string, CommandEntry> _commands;
 };
 
 ConsoleCommandHandler commandHandler;
 
 //Voids
-void msgCommand(std::string arguments, IRCClient* client)
+void msgCommand(string arguments, IRCClient* client)
 {
-    std::string to = arguments.substr(0, arguments.find(" "));
-    std::string text = arguments.substr(arguments.find(" ") + 1);
+    string to = arguments.substr(0, arguments.find(" "));
+    string text = arguments.substr(arguments.find(" ") + 1);
 
-    std::cout << "To " + to + ": " + text << std::endl;
+    cout << "To " + to + ": " + text << endl;
     client->SendIRC("PRIVMSG " + to + " :" + text);
 };
 
-void joinCommand(std::string channel, IRCClient* client)
+void joinCommand(string channel, IRCClient* client)
 {
     if (channel[0] != '#')
         channel = "#" + channel;
@@ -217,7 +230,7 @@ void joinCommand(std::string channel, IRCClient* client)
     client->SendIRC("JOIN " + channel);
 }
 
-void partCommand(std::string channel, IRCClient* client)
+void partCommand(string channel, IRCClient* client)
 {
     if (channel[0] != '#')
         channel = "#" + channel;
@@ -225,12 +238,12 @@ void partCommand(std::string channel, IRCClient* client)
     client->SendIRC("PART " + channel);
 }
 
-void ctcpCommand(std::string arguments, IRCClient* client)
+void ctcpCommand(string arguments, IRCClient* client)
 {
-    std::string to = arguments.substr(0, arguments.find(" "));
-    std::string text = arguments.substr(arguments.find(" ") + 1);
+    string to = arguments.substr(0, arguments.find(" "));
+    string text = arguments.substr(arguments.find(" ") + 1);
 
-    std::transform(text.begin(), text.end(), text.begin(), towupper);
+    transform(text.begin(), text.end(), text.begin(), towupper);
 
     client->SendIRC("PRIVMSG " + to + " :\001" + text + "\001");
 }
@@ -238,7 +251,7 @@ void ctcpCommand(std::string arguments, IRCClient* client)
 //Threading functions
 ThreadReturn inputThread(void* client)
 {
-    std::string command;
+    string command;
 
     commandHandler.AddCommand("msg", 2, &msgCommand);
     commandHandler.AddCommand("join", 1, &joinCommand);
@@ -247,7 +260,7 @@ ThreadReturn inputThread(void* client)
 
     while(true)
         {
-            getline(std::cin, command);
+            getline(cin, command);
             if (command == "")
                 continue;
     
@@ -281,6 +294,13 @@ int main(int argc, char* argv[])
     system ("title Lara");
     system("color 02");
     greet = "1";
+    if (argv[1] == "hand")
+        {
+            hTest.HQPlayMP3("voice/hand_rec.mp3");
+            sleep(2);
+            hTest.HQStopMP3("voice/hand_rec.mp3");
+            hand_rec();
+        }
     if(argc != 2)
         {
             ifstream myfile3 ("uuid.txt");
@@ -298,7 +318,7 @@ int main(int argc, char* argv[])
                     uuid_gen_first();
                 }
             }
-    else
+    if(argv[1] == "-")
         {
             string path = "music\\";
             string name = path + argv[1];
@@ -355,6 +375,10 @@ int main(int argc, char* argv[])
 
 void lara()
 {
+    //Get Time Variables
+    char current_time [10];
+    _strtime(current_time);
+    
     //get date variables
     time_t     rawtime;
     struct tm* timeinfo;
@@ -376,12 +400,14 @@ void lara()
             sleep(2);
         }
     // output current date
-    cout << "Today's date is " << timeinfo->tm_mday << " " << MONTHS[ timeinfo->tm_mon ] << " " << (timeinfo->tm_year + 1900) << endl;
-    cout << "What task must I perform?" << endl;
+    cout << "Today's date is: " << timeinfo->tm_mday << " " << MONTHS[ timeinfo->tm_mon ] << " " << (timeinfo->tm_year + 1900) << endl;
+	cout << "Current Time is: "<< current_time << endl;
+	cout << "What task must I perform?" << endl;
     cout << "[update]" << endl;
     cout << "Add [memo]'s" << endl;  
     cout << "[purge] system" <<endl;
     cout << "[comms] Mode" << endl;
+    cout << "Activate [hand] Recognition" << endl;
     cout << "[spider] a website" << endl;
     cout << "Display a [video]" << endl;
     cout << "Turn On [webcam]" << endl;
@@ -1232,28 +1258,37 @@ void hand_rec()
 										{
 											char txt1[]="Hi , People";
 											strcat(txt,txt1);
+                                            sleep(20);
+                                            
 										}
                                     else if(con==2)
                                         {
                                         	char txt1[]="I want to ask you";
                                         	strcat(txt,txt1);
+                                            sleep(20);
+                                            
                                         }   
                                     else if(con==3)
                                         {
                                         	char txt1[]="Can I get my";
                                         	strcat(txt,txt1);
+                                            sleep(20);
+                                            
                                         }
                                     else if(con==4)
                                         {
                                         	char txt1[]="Reward";
                                         	strcat(txt,txt1);
+                                            sleep(20);
+                                            
                                         }   
                                     else
                                         {
-                                        	char txt1[]="Lara can't recognize  your hand gesture";
+                                        	char txt1[]="Lara can't recognize your hand gesture";
                                         	strcat(txt,txt1);
                                         }
-                            		cvNamedWindow( "contour",1);cvShowImage( "contour",src);
+                            		cvNamedWindow( "contour",1);
+                                    cvShowImage( "contour",src);
                             		cvResetImageROI(src);
                             		CvFont font;
                             		cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1.5, 1.5, 0, 5, CV_AA);
