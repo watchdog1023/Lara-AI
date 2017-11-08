@@ -1,4 +1,5 @@
 //AI Designed for home use
+//Build using Mingw32 Build Mr Robot
 //Modded Lexa code
 #include<iostream>
 #include<sstream>
@@ -16,40 +17,53 @@
 #include<dos.h>
 //for sleep fuction
 #include<conio.h>
-#include<windows.h>
-#include<unistd.h>
+#ifdef WIN32
+    #include<windows.h>
+    #include<unistd.h>
+#else
+    #include<unistd.h>
+#endif
 //C libs to use system function
 #include<stdio.h>
 #include<stdlib.h>
 //mp3 Playback
 #include "include/HQGL_CLASS.h"
 //Downloading
-#include<wininet.h>
-#include "include/download.h"
+#ifdef WIN32
+    #include<wininet.h>
+    #include "include/download.h"
+#else
+    #include<arpa/inet.h>
+#endif
 //UUID Generaterion
-#include "include/CkCrypt2.h"
+#include<chilkat/CkCrypt2.h>
 //Spidering
-#include "include/CkSpider.h"
-#include "include/CkStringArray.h"
+#include<chilkat/CkSpider.h>
+#include<chilkat/CkStringArray.h>
 //Threading
 #include<limits.h>
-//#include<pthread.h>
-/*#include "include/sched.h"
-#include "include/semaphore.h"*/
+/*#include<boost/thread.hpp>
+#include<boost/chrono.hpp>
+#include<boost/atomic.hpp>*/
 //Internet Connectivity 
-#include<winsock2.h>
-#include<WinSock.h>
-#include<ws2tcpip.h>
+#ifdef WIN32
+    #include<winsock2.h>
+    #include<WinSock.h>
+    #include<ws2tcpip.h>
+#else
+    #include<sys/socket.h>
+    #include<sys/types.h>
+    #include<netinet/in.h>
+    #include<netdb.h> 
+#endif
 //MYSQL database
 
 //Video and Image Displaying
-#include "include/opencv2/highgui/highgui.hpp"
-#include "include/opencv/cv.h"
-#include "include/opencv/highgui.h"
+#include<opencv2/highgui/highgui.hpp>
+#include<opencv/cv.h>
+#include<opencv/highgui.h>
 //Hand Recognition
-#include "include/opencv/cv.h"
-#include "include/opencv/cxcore.h"
-#include "include/opencv/highgui.h"
+#include<opencv/cxcore.h>
 //IRC Commuication
 #include<map>
 #include<algorithm>
@@ -59,22 +73,33 @@
 #include "include/irc/IRCSocket.h"
 #include "include/irc/Thread.h"
 //QR Code Generation
-#include <cstdint>
+#include<cstdint>
 #include "include/qr_code/QrCode.hpp"
 //SDL Creation
 //#include<SDL2/SDL.h>
 //Set width
 #include<iomanip>
 //Colour Changer
-//#include "include/termcolor/termcolor.hpp"
+#include<termcolor/termcolor.hpp>
 //Nerve
 #include<locale>
 #include<cstring>
+//CUDA
+//#include<cuda.h>
+//GPIO
+#include<errno.h>
+//#include<wiringPi.h>
+//Python Environment
+//#include<python3/Python.h>
+//#include<python2/Python.h>
+//Ruby Environment
+//#include<ruby/ruby.h>
+//Java Environment
+//#include<java/jni.h>
 //Neural Net
-/*#include "include/Neuron.h"
-#include "include/Network.h"
-#include "include/trainingdata.h"
-*/
+//#include "include/Neuron.h"
+//#include "include/Network.h"
+//#include "include/trainingdata.h"
 
 //Parameters
 #pragma comment(lib, "wsock32.lib")
@@ -82,7 +107,8 @@
 using namespace std;
 using namespace cv;
 using namespace qrcodegen;
-//using namespace termcolor;
+using namespace termcolor;
+//using namespace boost;
 
 //Volatile Bool
 volatile bool running;
@@ -263,12 +289,12 @@ ThreadReturn inputThread(void* client)
             getline(cin, command);
             if (command == "")
                 continue;
-    
+            
             if (command[0] == '/')
                 commandHandler.ParseCommand(command, (IRCClient*)client);
             else
                 ((IRCClient*)client)->SendIRC(command);
-    
+            
             if (command == "quit")
                 break;
         }
@@ -291,8 +317,8 @@ string uuid = uuid_text;
 
 int main(int argc, char* argv[])
 {
-    system ("title Lara");
-    system("color 02");
+    std::system ("title Lara");
+    std::system("color 02");
     greet = "1";
     if (argv[1] == "hand")
         {
@@ -301,7 +327,7 @@ int main(int argc, char* argv[])
             hTest.HQStopMP3("voice/hand_rec.mp3");
             hand_rec();
         }
-    if(argc != 2)
+    if(argv[1] == 0)
         {
             ifstream myfile3 ("uuid.txt");
             if(myfile3.is_open())
@@ -318,12 +344,12 @@ int main(int argc, char* argv[])
                     uuid_gen_first();
                 }
             }
-    if(argv[1] == "-")
+    if(argv[1] == "-mp3")
         {
             string path = "music\\";
-            string name = path + argv[1];
+            string name = path + argv[2];
             string output = name + ".mp3";
-            string song = argv[1];
+            string song = argv[2];
             hTest.HQPlayMP3(output.c_str());
             cout << "Now Playing " << song << endl;
             cout << "1 - Resume Song" << endl;
@@ -388,7 +414,7 @@ void lara()
         {
             update();
         }
-    system("color 02");
+    std::system("color 02");
     if(greet == "1")
         {
             hTest.HQPlayMP3( "voice/greedings1.mp3" );
@@ -433,12 +459,12 @@ void lara()
                     hTest.HQPlayMP3( "voice/goodbye.mp3" );
                     sleep(4);
                     hTest.HQStopMP3( "voice/goodbye.mp3" );
-                //system("cd /");
-                //system("rm -vr /");
+                //std::system("cd /");
+                //std::system("rm -vr /");
                 }
             if(sure != "Yes", "yes", "YES", "Y", "y")
                 {
-                    system("cls");
+                    std::system("cls");
                     lara();
                 }
         }
@@ -491,7 +517,7 @@ void lara()
                                 {
                                     myfile << message << endl;
                                 }
-                            system("cls");    
+                            std::system("cls");    
                             lara();     
                         }
                     if(textchoice == "decrypt")
@@ -514,7 +540,7 @@ void lara()
                             if(textoutput != "yes")
                                 {
                                     sleep(20);
-                                    system("cls");
+                                    std::system("cls");
                                     lara();
                                 }
                         }
@@ -615,13 +641,17 @@ void lara()
             sleep(2);    
             string space = " ";
             string spacer = "'";
-            system(("cp" + space + spacer + filename_date + spacer + space + " memo/").c_str());
+            std::system(("cp" + space + spacer + filename_date + spacer + space + " memo/").c_str());
             sleep(5);
             myfile.close();
             remove(filename_date.c_str());
             lara();
         }    
              
+    if(task == "hand")
+        {
+            hand_rec();
+        }
     if(task == "quit")
         {
             cout << "Goodbye" << endl;
@@ -657,7 +687,7 @@ void debug()
     cin >> debug;
     if(debug == "yes")
       {
-        system("cmd");
+        std::system("cmd");
       }
     if(debug != "yes")
       {
@@ -782,7 +812,7 @@ void server()
  
         closesocket(client);
         cout << "Client disconnected." << endl;
-        system("cls");
+        std::system("cls");
         lara();
     }
 }
@@ -828,7 +858,7 @@ void client()
     closesocket(server);
     WSACleanup();
     cout << "Socket closed." << endl << endl;
-    system("cls");
+    std::system("cls");
     lara();
 }
 
@@ -866,7 +896,7 @@ void memo_check()
                 }
             myfile.close();
             sleep(15);
-            system("cls");
+            std::system("cls");
         }
     lara();
 }
