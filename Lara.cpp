@@ -96,6 +96,11 @@
 //#include<ruby/ruby.h>
 //Java Environment
 //#include<java/jni.h>
+//Encryption Headers
+//#include<cryptopp/osrng.h>
+//#include<cryptopp/modes.h>
+//#include<cryptopp/aes.h>
+//#include<cryptopp/filters.h>
 //Neural Net
 //#include "include/Neuron.h"
 //#include "include/Network.h"
@@ -108,6 +113,7 @@ using namespace std;
 using namespace cv;
 using namespace qrcodegen;
 using namespace termcolor;
+using namespace CryptoPP;
 //using namespace boost;
 
 //Volatile Bool
