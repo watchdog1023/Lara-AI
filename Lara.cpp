@@ -1,5 +1,5 @@
 //AI Designed for home use
-//Build using Mingw32 Build Mr Robot
+//Built using Mingw32 Build Mr Robot
 //Modded Lexa code
 #include<iostream>
 #include<sstream>
@@ -14,7 +14,9 @@
 //for date & time
 #include<ctime>
 #include<time.h>
-#include<dos.h>
+#ifdef WIN32
+    #include<dos.h>
+#endif
 //for sleep fuction
 #include<conio.h>
 #ifdef WIN32
@@ -102,9 +104,14 @@
 //#include<cryptopp/aes.h>
 //#include<cryptopp/filters.h>
 //Neural Net
+//ISO/ANSI C/C++
 //#include "include/Neuron.h"
 //#include "include/Network.h"
 //#include "include/trainingdata.h"
+//Tensorflow
+//#include<tensorflow/cc/client/client_session.h>
+//#include<tensorflow/cc/ops/standard_ops.h>
+//#include<tensorflow/core/framework/tensor.h>
 
 //Parameters
 #pragma comment(lib, "wsock32.lib")
@@ -113,8 +120,10 @@ using namespace std;
 using namespace cv;
 using namespace qrcodegen;
 using namespace termcolor;
-using namespace CryptoPP;
+//using namespace CryptoPP;
 //using namespace boost;
+//using namespace tensorflow;
+//using namespace tensorflow::ops;
 
 //Volatile Bool
 volatile bool running;
@@ -135,6 +144,14 @@ string decrypt(string const& msg, string const& key)
         return encrypt(msg, key); 
     }
     
+string ExePath()
+{
+    char buffer[MAX_PATH];
+    GetModuleFileName( NULL, buffer, MAX_PATH );
+    string::size_type pos = string( buffer ).find_last_of( "\\/" );
+    return string( buffer ).substr( 0, pos);
+}
+
 //Prototypes Functions
 void showprogress(unsigned long total, unsigned long part)//Displays the download progress as a percentage
     {
@@ -164,6 +181,7 @@ HQGL hTest;
 char Key;
 
 //Prototypes
+//C/C+
 void memo_check();
 void debug();
 void update();
@@ -176,6 +194,11 @@ void webcam_streaming();
 void vid_diplay();
 void irc();
 void hand_rec();
+//Python2
+
+//Python3
+void py_tensrflow();
+void py_spider();
 
 //global variables
 string task;
@@ -333,7 +356,7 @@ int main(int argc, char* argv[])
             hTest.HQStopMP3("voice/hand_rec.mp3");
             hand_rec();
         }
-    if(argv[1] == 0)
+    if(argc != 3)
         {
             ifstream myfile3 ("uuid.txt");
             if(myfile3.is_open())
@@ -1344,3 +1367,98 @@ void hand_rec()
 	cvDestroyAllWindows();
     lara();
 }
+/*
+void py_tensorflow_lstm()
+{
+    //Calling Interperter
+    Py_Initialize();
+    //Python Script body
+    PyRun_SimpleString( "from __future__ import absolute_import, division, print_function\n"
+                        "import os\n"
+                        "from six import moves\n"
+                        "import ssl\n"
+                        "import tflearn\n"
+                        "from tflearn.data_utils import *\n"
+                        "path = 'US_Cities.txt'\n"
+                        "if not os.path.isfile(path):\n"
+                        "context = ssl._create_unverified_context()\n"
+                        "moves.urllib.request.urlretrieve('https://raw.githubusercontent.com/tflearn/tflearn.github.io/master/resources/US_Cities.txt', path, context=context)\n"
+                        "maxlen = 20\n"
+                        "X, Y, char_idx = \\n"
+                        "textfile_to_semi_redundant_sequences(path, seq_maxlen=maxlen, redun_step=3)\n"
+                        "g = tflearn.input_data(shape=[None, maxlen, len(char_idx)])\n"
+                        "g = tflearn.lstm(g, 512, return_seq=True)\n"
+                        "g = tflearn.dropout(g, 0.5)\n"
+                        "g = tflearn.lstm(g, 512)\n"
+                        "g = tflearn.dropout(g, 0.5)\n"
+                        "g = tflearn.fully_connected(g, len(char_idx), activation='softmax')\n"
+                        "g = tflearn.regression(g, optimizer='adam', loss='categorical_crossentropy', learning_rate=0.001)\n"
+                        "m = tflearn.SequenceGenerator(g, dictionary=char_idx, seq_maxlen=maxlen, clip_gradients=5.0, checkpoint_path='model_us_cities')\n"
+                        "#training\n"
+                        "for i in range(40):\n"
+                        "seed = random_sequence_from_textfile(path, maxlen)\n"
+                        "m.fit(X, Y, validation_set=0.1, batch_size=128, n_epoch=1, run_id='us_cities')\n"
+                        "print('-- TESTING...')\n"
+                        "print('-- Test with temperature of 1.2 --')\n"
+                        "print(m.generate(30, temperature=1.2, seq_seed=seed))\n"
+                        "print('-- Test with temperature of 1.0 --')\n"
+                        "print(m.generate(30, temperature=1.0, seq_seed=seed))\n"
+                        "print('-- Test with temperature of 0.5 --')\n"
+                        "print(m.generate(30, temperature=0.5, seq_seed=seed))\n"
+                      );
+    //Killing Interperter
+    Py_Finalize();
+}*/
+/*
+void py_spider()
+{
+    //Calling Interperter
+    Py_Initialize();
+    PyRun_SimpleString( "from html.parser import HTMLParser\n" 
+                        "from urllib.request import urlopen  \n"
+                        "from urllib import parse\n"
+                        "\n"
+                        "class LinkParser(HTMLParser):\n"
+                        "def handle_starttag(self, tag, attrs):\n"
+                        "if tag =='a':\n"
+                        "for (key, value) in attrs:\n"
+                        "if key == 'href':\n"
+                        "newUrl = parse.urljoin(self.baseUrl, value)\n"
+                        "self.links = self.links + [newUrl]\n"
+                        "def getLinks(self, url):\n"
+                        "self.links = []\n"
+                        "self.baseUrl = url\n"
+                        "response = urlopen(url)\n"
+                        "if response.getheader('Content-Type')=='text/html':\n"
+                        "htmlBytes = response.read()\n"
+                        "htmlString = htmlBytes.decode("utf-8")\n"
+                        "self.feed(htmlString)\n"
+                        "return htmlString, self.links\n"
+                        "else:\n"
+                        "return "",[]\n"
+                        "def spider(url, word, maxPages):\n"  
+                        "pagesToVisit = [url]\n"
+                        "numberVisited = 0\n"
+                        "foundWord = False\n"
+                        "while numberVisited < maxPages and pagesToVisit != [] and not foundWord:\n"
+                        "numberVisited = numberVisited +1\n"
+                        "url = pagesToVisit[0]\n"
+                        "pagesToVisit = pagesToVisit[1:]\n"
+                        "try:\n"
+                        "print(numberVisited, "Visiting:", url)\n"
+                        "parser = LinkParser()\n"
+                        "data, links = parser.getLinks(url)\n"
+                        "if data.find(word)>-1:\n"
+                        "foundWord = True\n"
+                        "pagesToVisit = pagesToVisit + links\n"
+                        "print(' **Success!**')\n"
+                        "except:\n"
+                        "print(' **Failed!**')\n"
+                        "if foundWord:\n"
+                        "print('The word', word, 'was found at', url)\n"
+                        "else:\n"
+                        "print('Word never found')\n"
+                      );
+    //Killing Interperter
+    Py_Finalize();
+}*/
