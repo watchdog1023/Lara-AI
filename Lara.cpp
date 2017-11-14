@@ -29,7 +29,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 //mp3 Playback
-#include "include/HQGL_CLASS.h"
+#include "include/MP3.h"
 //Downloading
 #ifdef WIN32
     #include<wininet.h>
@@ -120,6 +120,7 @@ using namespace std;
 using namespace cv;
 using namespace qrcodegen;
 using namespace termcolor;
+using namespace mp3;
 //using namespace CryptoPP;
 //using namespace boost;
 //using namespace tensorflow;
@@ -177,7 +178,6 @@ bool debugMode;//toggled pressing 'd'
 bool trackingEnabled;//toggled pressing 't'
 
 //mp3 Playback Variables
-HQGL hTest;
 char Key;
 
 //Prototypes
@@ -351,9 +351,9 @@ int main(int argc, char* argv[])
     greet = "1";
     if (argv[1] == "hand")
         {
-            hTest.HQPlayMP3("voice/hand_rec.mp3");
+            PlayMP3("voice/hand_rec.mp3");
             sleep(2);
-            hTest.HQStopMP3("voice/hand_rec.mp3");
+            StopMP3("voice/hand_rec.mp3");
             hand_rec();
         }
     if(argc != 3)
@@ -379,7 +379,7 @@ int main(int argc, char* argv[])
             string name = path + argv[2];
             string output = name + ".mp3";
             string song = argv[2];
-            hTest.HQPlayMP3(output.c_str());
+            PlayMP3(output.c_str());
             cout << "Now Playing " << song << endl;
             cout << "1 - Resume Song" << endl;
             cout << "2 - Pause Song" << endl;
@@ -396,19 +396,19 @@ int main(int argc, char* argv[])
                                     switch( Key )
                                         {
                                             case VK_NUMPAD1:
-                                                hTest.HQPauseMP3(output.c_str());
+                                                PauseMP3(output.c_str());
                                                 break;
                                             case VK_NUMPAD2:
-                                                hTest.HQResumeMP3(output.c_str());
+                                                ResumeMP3(output.c_str());
                                                 break;
                                             case VK_NUMPAD3:
-                                                hTest.HQStopMP3(output.c_str());
+                                                StopMP3(output.c_str());
                                                 break;
                                             case VK_NUMPAD4:
-                                                hTest.HQPlayMP3(output.c_str());
+                                                PlayMP3(output.c_str());
                                                 break;
                                             case VK_NUMPAD5:
-                                                hTest.HQCloseMP3(output.c_str());
+                                                CloseMP3(output.c_str());
                                                 break;
                                             case VK_ESCAPE:
                                                 ifstream myfile3 ("uuid.txt");
@@ -446,7 +446,7 @@ void lara()
     std::system("color 02");
     if(greet == "1")
         {
-            hTest.HQPlayMP3( "voice/greedings1.mp3" );
+            PlayMP3( "voice/greedings1.mp3" );
             #ifdef WIN32
                 sleep(4);
             #else
@@ -455,7 +455,7 @@ void lara()
         }
     if(greet == "2")
         {
-            hTest.HQPlayMP3( "voice/greedings2.mp3" );
+            PlayMP3( "voice/greedings2.mp3" );
             #ifdedf WIN32
                 sleep(2);
             #else
@@ -476,21 +476,21 @@ void lara()
     cout << "Display a [video]" << endl;
     cout << "Turn On [webcam]" << endl;
     cout << "[quit]" << endl;
-    hTest.HQStopMP3( "voice/greedings1.mp3" );
-    hTest.HQStopMP3( "voice/greedings2.mp3" );
+    StopMP3( "voice/greedings1.mp3" );
+    StopMP3( "voice/greedings2.mp3" );
     greet = "2";
     cin >> task;
     if(task == "purge")
         {
             string sure;
             cout << "Are you sure?" << endl;
-            hTest.HQPlayMP3( "voice/are_you_sure.mp3" );
+            PlayMP3( "voice/are_you_sure.mp3" );
             #ifdef WIN32
                 sleep(1);
             #else
                 usleep(1);
             #endif
-            hTest.HQStopMP3( "voice/are_you_sure.mp3" );
+            StopMP3( "voice/are_you_sure.mp3" );
             cin >> sure;
             if(sure == "Yes", "yes", "YES", "Y", "y")
                 { 
@@ -498,13 +498,13 @@ void lara()
                     cout <<"This feature is no ready because this is a reusable build"<<endl;
 //this is a temp statement
                     cout << "GoodBye" << endl;
-                    hTest.HQPlayMP3( "voice/goodbye.mp3" );
+                    PlayMP3( "voice/goodbye.mp3" );
                     #ifdef WIN32
                         sleep(4);
                     #else
                         usleep(4);
                     #endif
-                    hTest.HQStopMP3( "voice/goodbye.mp3" );
+                    StopMP3( "voice/goodbye.mp3" );
                 //std::system("cd /");
                 //std::system("rm -vr /");
                 }
@@ -518,7 +518,7 @@ void lara()
     if(task == "comms")
         {
             string mode;
-            hTest.HQPlayMP3( "voice/mode_start.mp3" );
+            PlayMP3( "voice/mode_start.mp3" );
             #ifdef WIN32
                 sleep(2);
             #else
@@ -528,12 +528,12 @@ void lara()
             cout << "[p2p]" << endl;
             cout << "[IRC]" << endl;
             cout << "[text]" << endl;
-            hTest.HQStopMP3( "voice/mode_start.mp3" );
+            StopMP3( "voice/mode_start.mp3" );
             cin >> mode;
             if(mode == "p2p")
                 {
                     string mode_p2p;
-                    hTest.HQPlayMP3( "voice/like_to_be.mp3" );
+                    PlayMP3( "voice/like_to_be.mp3" );
                     cout << "Which would you like to be?" << endl;
                     cout << "[client]" << endl;
                     cout << "[server]" << endl;
@@ -542,7 +542,7 @@ void lara()
                     #else
                         usleep(2);
                     #endif
-                    hTest.HQStopMP3( "voice/like_to_be.mp3" );
+                    StopMP3( "voice/like_to_be.mp3" );
                     cin >> mode_p2p;
                     if(mode_p2p == "server")
                         {
@@ -721,13 +721,13 @@ void lara()
     if(task == "quit")
         {
             cout << "Goodbye" << endl;
-            hTest.HQPlayMP3( "voice/goodbye.mp3" );
+            PlayMP3( "voice/goodbye.mp3" );
             #ifdef WIN32
                 sleep(2);
             #else
                 usleep(2);
             #endif
-            hTest.HQStopMP3( "voice/goodbye.mp3" );
+            StopMP3( "voice/goodbye.mp3" );
         }
      if(task == "webcam")
         {
@@ -755,7 +755,7 @@ void debug()
     #else
         usleep(2);
     #endif
-    hTest.HQPlayMP3( "voice/debug.mp3" );
+    PlayMP3( "voice/debug.mp3" );
     #ifdef WIN32
         sleep(2);
     #else
@@ -769,7 +769,7 @@ void debug()
     #else
         usleep(2);
     #endif
-    hTest.HQStopMP3( "voice/debug.mp3" );
+    StopMP3( "voice/debug.mp3" );
     cin >> debug;
     if(debug == "yes")
       {
@@ -779,13 +779,13 @@ void debug()
       {
         string dia;
         cout << "Do you want me to run a diagnostic test?" << endl;
-        hTest.HQPlayMP3( "voice/start_diagnostic.mp3" );
+        PlayMP3( "voice/start_diagnostic.mp3" );
         #ifdef WIN32
             sleep(2);
         #else
             usleep(2);
         #endif
-        hTest.HQStopMP3( "voice/start_diagnostic.mp3" );
+        StopMP3( "voice/start_diagnostic.mp3" );
         cin >> dia;
         if(dia == "yes")
             {
@@ -795,73 +795,73 @@ void debug()
             {
                 loop:
                     string what;
-                    hTest.HQPlayMP3( "voice/do_then.mp3" );
+                    PlayMP3( "voice/do_then.mp3" );
                     #ifdef WIN32
                         sleep(2);
                     #else
                         usleep(2);
                     #endif
                     cout << "What do you want to do then?" << endl;
-                    hTest.HQStopMP3( "voice/do_then.mp3" );
+                    StopMP3( "voice/do_then.mp3" );
                     cin >> what;
                     if(what == "voice")
                         {
                             cout << "Testing are_you_sure.mp3" << endl;
-                            hTest.HQPlayMP3( "voice/are_you_sure.mp3" );
+                            PlayMP3( "voice/are_you_sure.mp3" );
                             #ifdef WIN32
                                 sleep(4);
                             #else
                                 usleep(4);
                             #endif
-                            hTest.HQStopMP3( "voice/are_you_sure.mp3" );
+                            StopMP3( "voice/are_you_sure.mp3" );
                             cout << "Testing debug.mp3" << endl;
-                            hTest.HQPlayMP3( "voice/debug.mp3" );
+                            PlayMP3( "voice/debug.mp3" );
                             #ifdef WIN32
                                 sleep(4);
                             #else
                                 usleep(4);
                             #endif
-                            hTest.HQStopMP3( "voice/debug.mp3" );
+                            StopMP3( "voice/debug.mp3" );
                             cout << "Testing do_then.mp3" << endl;
-                            hTest.HQPlayMP3( "voice/do_then.mp3" );
+                            PlayMP3( "voice/do_then.mp3" );
                             #ifdef WIN32
                                 sleep(4);
                             #else
                                 usleep(4);
                             #endif
-                            hTest.HQStopMP3( "voice/do_then.mp3" );
+                            StopMP3( "voice/do_then.mp3" );
                             cout << "Testing goodbye.mp3" << endl;
-                            hTest.HQPlayMP3( "voice/goodbye.mp3" );
+                            PlayMP3( "voice/goodbye.mp3" );
                             #ifdef WIN32
                                 sleep(4);
                             #else
                                 usleep(4);
                             #endif
-                            hTest.HQStopMP3( "voice/goodbye.mp3" );
+                            StopMP3( "voice/goodbye.mp3" );
                             cout << "Testing greedings.mp3" << endl;
-                            hTest.HQPlayMP3( "voice/greedings.mp3" );
+                            PlayMP3( "voice/greedings.mp3" );
                             #ifdef WIN32
                                 sleep(4);
                             #else
                                 usleep(4);
                             #endif
-                            hTest.HQStopMP3( "voice/greedings.mp3" );
+                            StopMP3( "voice/greedings.mp3" );
                             cout << "Testing like_to_do.mp3" << endl;
-                            hTest.HQPlayMP3( "voice/like_to_do.mp3" );
+                            PlayMP3( "voice/like_to_do.mp3" );
                             #ifdef WIN32
                                 sleep(4);
                             #else
                                 usleep(4);
                             #endif
-                            hTest.HQStopMP3( "voice/like_to_do.mp3" );
+                            StopMP3( "voice/like_to_do.mp3" );
                             cout << "Testing start_diagnostic.mp3" << endl;
-                            hTest.HQPlayMP3( "voice/start_diagnostic.mp3" );
+                            PlayMP3( "voice/start_diagnostic.mp3" );
                             #ifdef WIN32
                                 sleep(4);
                             #else
                                 usleep(4);
                             #endif
-                            hTest.HQStopMP3( "voice/start_diagnostic.mp3" );
+                            StopMP3( "voice/start_diagnostic.mp3" );
                             cout << "Test complete" << endl;
                             goto loop;
                         }
@@ -941,10 +941,10 @@ void server()
 
 void client()
 {
-    hTest.HQPlayMP3( "voice/server_ip.mp3" );
+    PlayMP3( "voice/server_ip.mp3" );
     cout << "Enter the Server's IP Address/Hostname" << endl;
     sleep(2);
-    hTest.HQStopMP3( "voice/server_ip.mp3" );
+    StopMP3( "voice/server_ip.mp3" );
     string server_ip;
     cin >> server_ip;
     const char* ip_server = server_ip.c_str();
@@ -965,25 +965,25 @@ void client()
  
     string test;
     const char* buffer = test.c_str();
-    hTest.HQPlayMP3( "voice/message_input.mp3" );
+    PlayMP3( "voice/message_input.mp3" );
     cout << "Please input the message:";
     #ifdef WIN32
         sleep(2);
     #else
         usleep(2);
     #endif
-    hTest.HQStopMP3( "voice/message_input.mp3" );
+    StopMP3( "voice/message_input.mp3" );
     cin.ignore();
     getline(cin, test);
     send(server, buffer, sizeof(buffer), 0);
-    hTest.HQPlayMP3( "voice/message_sent.mp3" );
+    PlayMP3( "voice/message_sent.mp3" );
     cout << "Message sent!" << endl;
     #ifdef WIN32
         sleep(2);
     #else
         usleep(2);
     #endif
-    hTest.HQStopMP3( "voice/message_sent.mp3" );
+    StopMP3( "voice/message_sent.mp3" );
  
     closesocket(server);
     WSACleanup();
@@ -1019,13 +1019,13 @@ void memo_check()
         {
             while ( getline (myfile,line) )
                 {
-                    hTest.HQPlayMP3( "voice/remind.mp3" );
+                    PlayMP3( "voice/remind.mp3" );
                     #ifdef WIN32
                         sleep(1);
                     #else
                         usleep(1);
                     #endif
-                    hTest.HQStopMP3( "voice/remind.mp3" );
+                    StopMP3( "voice/remind.mp3" );
                     cout << line << '\n';
                 }
             myfile.close();
@@ -1045,9 +1045,9 @@ void update()
     char url2[] = "ftp://tomb.ddns.net:8080/lara-v/version.txt";
     bool reload = false;
     string line;
-    hTest.HQPlayMP3( "voice/update.mp3" );
+    PlayMP3( "voice/update.mp3" );
     sleep(5);
-    hTest.HQStopMP3( "voice/update.mp3" );
+    StopMP3( "voice/update.mp3" );
     try
         {
             if(Download::download(url2, reload))
@@ -1058,29 +1058,29 @@ void update()
                             version_check = line;
                             if(version_check > version)
                                 {
-                                    hTest.HQPlayMP3( "voice/update_found.mp3" );
+                                    PlayMP3( "voice/update_found.mp3" );
                                     printf("Beginning download\n");
                                     #ifdef WIN32
                                         sleep(1);
                                     #else
                                         usleep(1);
                                     #endif
-                                    hTest.HQStopMP3( "voice/update_found.mp3" );
+                                    StopMP3( "voice/update_found.mp3" );
                                     try
                                         {   
                                             if(Download::download(url, reload, showprogress))
-                                                hTest.HQPlayMP3( "voice/update_complete.mp3" );
+                                                PlayMP3( "voice/update_complete.mp3" );
                                                 printf("Update Complete\n");
                                                 #ifdef WIN32
                                                     sleep(1);
                                                 #else
                                                     usleep(1);
                                                 #endif
-                                                hTest.HQStopMP3( "voice/update_complete.mp3" );
+                                                StopMP3( "voice/update_complete.mp3" );
                                         }      
                                     catch(DLExc exc)
                                         {
-                                            hTest.HQPlayMP3( "voice/update_interrupted.mp3" );
+                                            PlayMP3( "voice/update_interrupted.mp3" );
                                             printf("%s\n", exc.geterr());
                                             printf("Download interrupted\n");
                                             #ifdef WIN32
@@ -1088,31 +1088,31 @@ void update()
                                             #else
                                                 usleep(1);
                                             #endif
-                                            hTest.HQStopMP3( "voice/update_interrupted.mp3" );
+                                            StopMP3( "voice/update_interrupted.mp3" );
                                         }    
                                 }
                             if(version_check == version)
                                 {
-                                    hTest.HQPlayMP3( "voice/update_no.mp3" );
+                                    PlayMP3( "voice/update_no.mp3" );
                                     cout << "There is no update available" << endl;
                                     #ifdef WIN32
                                         sleep(1);
                                     #else
                                         usleep(1);
                                     #endif
-                                    hTest.HQStopMP3( "voice/update_no.mp3" );
+                                    StopMP3( "voice/update_no.mp3" );
                                     lara();
                                 }
                             if(version_check < version)
                                 {
-                                    hTest.HQPlayMP3( "voice/update_no.mp3" );
+                                    PlayMP3( "voice/update_no.mp3" );
                                     cout << "There is no update available" << endl;
                                     #ifdef WIN32
                                         sleep(1);
                                     #else
                                         usleep(1);
                                     #endif
-                                    hTest.HQStopMP3( "voice/update_no.mp3" );
+                                    StopMP3( "voice/update_no.mp3" );
                                     lara();
                                 }
                         }
@@ -1121,7 +1121,7 @@ void update()
         }
     catch(DLExc exc)
         {
-            hTest.HQPlayMP3( "voice/update_interrupted.mp3" );
+            PlayMP3( "voice/update_interrupted.mp3" );
             printf("%s\n", exc.geterr());
             printf("Download interrupted\n");
             #ifdef WIN32
@@ -1129,7 +1129,7 @@ void update()
             #else
                 usleep(1);
             #endif
-            hTest.HQStopMP3( "voice/update_interrupted.mp3" );
+            StopMP3( "voice/update_interrupted.mp3" );
             lara();
         }    
     lara();
@@ -1159,11 +1159,11 @@ void spider()
     seedUrls.put_Unique(true);
 
     string spider_input;
-    hTest.HQPlayMP3( "voice/spider_website.mp3" );
+    PlayMP3( "voice/spider_website.mp3" );
     cout << "Please input the website to spider:" << endl;
     getline(cin, spider_input);
     sleep(4);
-    hTest.HQStopMP3( "voice/spider_website.mp3" );
+    StopMP3( "voice/spider_website.mp3" );
     seedUrls.Append(spider_input.c_str());
     
     //  Set outbound URL exclude patterns
