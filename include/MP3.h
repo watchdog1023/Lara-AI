@@ -1,7 +1,10 @@
 #ifndef MP3                      
 #define MP3
-
+#ifdef WIN32
 #include <windows.h>
+#else
+#include<cstring>
+#endif
 #include <stdio.h>
 
 namespace mp3
