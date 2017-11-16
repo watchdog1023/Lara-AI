@@ -42,6 +42,16 @@
 //Spidering
 #include<chilkat/CkSpider.h>
 #include<chilkat/CkStringArray.h>
+//Twitter
+#include<chilkat/CkHttp.h>
+#include<chilkat/CkHttpRequest.h>
+#include<chilkat/CkHttpResponse.h>
+#include<chilkat/CkHashtable.h>
+#include<chilkat/CkStringBuilder.h>
+#include<chilkat/CkSocket.h>
+#include<chilkat/CkTask.h>
+#include<chilkat/CkJsonObject.h>
+#include<chilkat/CkFileAccess.h>
 //Threading
 #include<limits.h>
 /*#include<boost/thread.hpp>
@@ -194,6 +204,7 @@ void webcam_streaming();
 void vid_diplay();
 void irc();
 void hand_rec();
+void get_twitter_token();
 //Python2
 
 //Python3
@@ -1595,3 +1606,220 @@ void py_spider()
     //Killing Interperter
     Py_Finalize();
 }*/
+
+void get_twitter_token()
+{
+     const char *consumerKey = "TWITTER_CONSUMER_KEY";
+    const char *consumerSecret = "TWITTER_CONSUMER_SECRET";
+
+    const char *requestTokenUrl = "https://api.twitter.com/oauth/request_token";
+    const char *authorizeUrl = "https://api.twitter.com/oauth/authorize";
+    const char *accessTokenUrl = "https://api.twitter.com/oauth/access_token";
+
+    //  The port number is picked at random. It's some unused port that won't likely conflict with anything else..
+    const char *callbackUrl = "http://localhost:3017/";
+    int callbackLocalPort = 3017;
+
+    //  The 1st step in 3-legged OAuth1.0a is to send a POST to the request token URL to obtain an OAuth Request Token
+    CkHttp http;
+    bool success;
+
+    http.put_OAuth1(true);
+    http.put_OAuthConsumerKey(consumerKey);
+    http.put_OAuthConsumerSecret(consumerSecret);
+    http.put_OAuthCallback(callbackUrl);
+
+    CkHttpRequest req;
+    CkHttpResponse *resp = http.PostUrlEncoded(requestTokenUrl,req);
+    if (http.get_LastMethodSuccess() != true) {
+        std::cout << http.lastErrorText() << "\r\n";
+        return;
+    }
+
+    //  If successful, the resp.BodyStr contains something like this:
+    //  oauth_token=-Wa_KwAAAAAAxfEPAAABV8Qar4Q&oauth_token_secret=OfHY4tZBX2HK4f7yIw76WYdvnl99MVGB&oauth_callback_confirmed=true
+    std::cout << resp->bodyStr() << "\r\n";
+
+    CkHashtable hashTab;
+    hashTab.AddQueryParams(resp->bodyStr());
+
+    const char *requestToken = hashTab.lookupStr("oauth_token");
+    const char *requestTokenSecret = hashTab.lookupStr("oauth_token_secret");
+    http.put_OAuthTokenSecret(requestTokenSecret);
+
+    delete resp;
+
+    std::cout << "oauth_token = " << requestToken << "\r\n";
+    std::cout << "oauth_token_secret = " << requestTokenSecret << "\r\n";
+
+    //  ---------------------------------------------------------------------------
+    //  The next step is to form a URL to send to the authorizeUrl
+    //  This is an HTTP GET that we load into a popup browser.
+    CkStringBuilder sbUrlForBrowser;
+    sbUrlForBrowser.Append(authorizeUrl);
+    sbUrlForBrowser.Append("?oauth_token=");
+    sbUrlForBrowser.Append(requestToken);
+    const char *urlForBrowser = sbUrlForBrowser.getAsString();
+
+    //  When the urlForBrowser is loaded into a browser, the response from Twitter will redirect back to localhost:3017
+    //  We'll need to start a socket that is listening on port 3017 for the callback from the browser.
+    CkSocket listenSock;
+
+    int backLog = 5;
+    success = listenSock.BindAndListen(callbackLocalPort,backLog);
+    if (success != true) {
+        std::cout << listenSock.lastErrorText() << "\r\n";
+        return;
+    }
+
+    //  Wait for the browser's connection in a background thread.
+    //  (We'll send load the URL into the browser following this..)
+    //  Wait a max of 60 seconds before giving up.
+    int maxWaitMs = 60000;
+    CkTask *task = listenSock.AcceptNextConnectionAsync(maxWaitMs);
+    task->Run();
+
+    //   At this point, your application should load the URL in a browser.
+    //   For example,
+    //   in C#:  System.Diagnostics.Process.Start(urlForBrowser);
+    //   in Java: Desktop.getDesktop().browse(new URI(urlForBrowser));
+    //   in VBScript: Set wsh=WScript.CreateObject("WScript.Shell")
+    //                wsh.Run urlForBrowser
+    //   The Twitter account owner would interactively accept or deny the authorization request.
+
+    //   Add the code to load the url in a web browser here...
+    //   Add the code to load the url in a web browser here...
+    //   Add the code to load the url in a web browser here...
+    // System.Diagnostics.Process.Start(urlForBrowser);
+
+    //  Wait for the listenSock's task to complete.
+    success = task->Wait(maxWaitMs);
+    if (!success || (task->get_StatusInt() != 7) || (task->get_TaskSuccess() != true)) {
+        if (!success) {
+            //  The task.LastErrorText applies to the Wait method call.
+            std::cout << task->lastErrorText() << "\r\n";
+        }
+        else {
+            //  The ResultErrorText applies to the underlying task method call (i.e. the AcceptNextConnection)
+            std::cout << task->status() << "\r\n";
+            std::cout << task->resultErrorText() << "\r\n";
+        }
+
+        delete task;
+        return;
+    }
+
+    //  If we get to this point, the connection from the browser arrived and was accepted.
+
+    //  We no longer need the listen socket...
+    //  Stop listening on port 3017.
+    listenSock.Close(10);
+
+    //  First get the connected socket.
+    CkSocket sock;
+    sock.LoadTaskResult(*task);
+    delete task;
+
+    //  Read the start line of the request..
+    const char *startLine = sock.receiveUntilMatch("\r\n");
+    if (sock.get_LastMethodSuccess() != true) {
+        std::cout << sock.lastErrorText() << "\r\n";
+        return;
+    }
+
+    //  Read the request header.
+    const char *requestHeader = sock.receiveUntilMatch("\r\n\r\n");
+    if (sock.get_LastMethodSuccess() != true) {
+        std::cout << sock.lastErrorText() << "\r\n";
+        return;
+    }
+
+    //  The browser SHOULD be sending us a GET request, and therefore there is no body to the request.
+    //  Once the request header is received, we have all of it.
+    //  We can now send our HTTP response.
+    CkStringBuilder sbResponseHtml;
+    sbResponseHtml.Append("<html><body><p>Chilkat thanks you!</b></body</html>");
+
+    CkStringBuilder sbResponse;
+    sbResponse.Append("HTTP/1.1 200 OK\r\n");
+    sbResponse.Append("Content-Length: ");
+    sbResponse.AppendInt(sbResponseHtml.get_Length());
+    sbResponse.Append("\r\n");
+    sbResponse.Append("Content-Type: text/html\r\n");
+    sbResponse.Append("\r\n");
+    sbResponse.AppendSb(sbResponseHtml);
+
+    sock.SendString(sbResponse.getAsString());
+    sock.Close(50);
+
+    //  The information we need is in the startLine.
+    //  For example, the startLine will look like this:
+    //   GET /?oauth_token=abcdRQAAZZAAxfBBAAABVabcd_k&oauth_verifier=9rdOq5abcdCe6cn8M3jabcdj3Eabcd HTTP/1.1
+    CkStringBuilder sbStartLine;
+    sbStartLine.Append(startLine);
+    int numReplacements = sbStartLine.Replace("GET /?","");
+    numReplacements = sbStartLine.Replace(" HTTP/1.1","");
+    sbStartLine.Trim();
+
+    //  oauth_token=abcdRQAAZZAAxfBBAAABVabcd_k&oauth_verifier=9rdOq5abcdCe6cn8M3jabcdj3Eabcd
+    std::cout << "startline: " << sbStartLine.getAsString() << "\r\n";
+
+    hashTab.Clear();
+    hashTab.AddQueryParams(sbStartLine.getAsString());
+
+    requestToken = hashTab.lookupStr("oauth_token");
+    const char *authVerifier = hashTab.lookupStr("oauth_verifier");
+
+    //  ------------------------------------------------------------------------------
+    //  Finally , we must exchange the OAuth Request Token for an OAuth Access Token.
+
+    http.put_OAuthToken(requestToken);
+    http.put_OAuthVerifier(authVerifier);
+    resp = http.PostUrlEncoded(accessTokenUrl,req);
+    if (http.get_LastMethodSuccess() != true) {
+        std::cout << http.lastErrorText() << "\r\n";
+        return;
+    }
+
+    //  Make sure a successful response was received.
+    if (resp->get_StatusCode() != 200) {
+        std::cout << resp->statusLine() << "\r\n";
+        std::cout << resp->header() << "\r\n";
+        std::cout << resp->bodyStr() << "\r\n";
+        return;
+    }
+
+    //  If successful, the resp.BodyStr contains something like this:
+    //  oauth_token=85123455-fF41296Bi3daM8eCo9Y5vZabcdxXpRv864plYPOjr&oauth_token_secret=afiYJOgabcdSfGae7BDvJVVTwys8fUGpra5guZxbmFBZo&user_id=85612355&screen_name=chilkatsoft&x_auth_expires=0
+    std::cout << resp->bodyStr() << "\r\n";
+
+    hashTab.Clear();
+    hashTab.AddQueryParams(resp->bodyStr());
+
+    const char *accessToken = hashTab.lookupStr("oauth_token");
+    const char *accessTokenSecret = hashTab.lookupStr("oauth_token_secret");
+    const char *userId = hashTab.lookupStr("user_id");
+    const char *screenName = hashTab.lookupStr("screen_name");
+
+    delete resp;
+
+    //  The access token + secret is what should be saved and used for
+    //  subsequent REST API calls.
+    std::cout << "Access Token = " << accessToken << "\r\n";
+    std::cout << "Access Token Secret = " << accessTokenSecret << "\r\n";
+    std::cout << "user_id = " << userId << "\r\n";
+    std::cout << "screen_name  = " << screenName << "\r\n";
+
+    //  Save this access token for future calls.
+    //  Just in case we need user_id and screen_name, save those also..
+    CkJsonObject json;
+    json.AppendString("oauth_token",accessToken);
+    json.AppendString("oauth_token_secret",accessTokenSecret);
+    json.AppendString("user_id",userId);
+    json.AppendString("screen_name",screenName);
+
+    CkFileAccess fac;
+    fac.WriteEntireTextFile("qa_data/tokens/twitter.json",json.emit(),"utf-8",false);
+
+    std::cout << "Success." << "\r\n";
+}
