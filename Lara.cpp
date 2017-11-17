@@ -52,6 +52,10 @@
 #include<chilkat/CkTask.h>
 #include<chilkat/CkJsonObject.h>
 #include<chilkat/CkFileAccess.h>
+#include<chilkat/CkOAuth1.h>
+//Paypal
+#include<chilkat/CkRest.h>
+#include<chilkat/CkDateTime.h>
 //Threading
 #include<limits.h>
 /*#include<boost/thread.hpp>
@@ -204,7 +208,14 @@ void webcam_streaming();
 void vid_diplay();
 void irc();
 void hand_rec();
+void vid_diplay_holo();
+void init_start();
 void get_twitter_token();
+void get_paypal_token();
+void validate_paypal_token();
+void tweet();
+void tweet_with_image();
+void tweet_with_image_multi();
 //Python2
 
 //Python3
@@ -216,6 +227,7 @@ string task;
 string uuid_text;
 string version_check;
 ifstream myfile2 ("version.txt");
+int holovideo;
 
 //Bool fuctions
 
@@ -276,6 +288,7 @@ class ConsoleCommandHandler
         map<string, CommandEntry> _commands;
 };
 
+//Class Variables
 ConsoleCommandHandler commandHandler;
 
 //Voids
@@ -339,11 +352,11 @@ ThreadReturn inputThread(void* client)
                 break;
         }
 
-#ifdef _WIN32
-    _endthread();
-#else
-    pthread_exit(NULL);
-#endif
+    #ifdef _WIN32
+        _endthread();
+    #else
+        pthread_exit(NULL);
+    #endif
 }
 
 //Version Variable
@@ -381,7 +394,7 @@ int main(int argc, char* argv[])
                 }
             else
                 {
-                    uuid_gen_first();
+                    init_start();
                 }
             }
     if(argv[1] == "-mp3")
@@ -398,13 +411,13 @@ int main(int argc, char* argv[])
             cout << "4 - Play Song again" << endl;
             cout << "5 - Close Song" << endl;
             cout << "ESC - Exit MP3 Player" << endl;
-            while( 2013 )
+            while(2013)
                 {
-                    for( Key = 0;Key < 256;Key++ )
+                    for(Key = 0;Key < 256;Key++)
                         {
-                            if( GetAsyncKeyState( Key ) == -32767 )
+                            if(GetAsyncKeyState(Key) == -32767)
                                 {    
-                                    switch( Key )
+                                    switch(Key)
                                         {
                                             case VK_NUMPAD1:
                                                 PauseMP3(output.c_str());
@@ -425,7 +438,7 @@ int main(int argc, char* argv[])
                                                 ifstream myfile3 ("uuid.txt");
                                                 if(myfile3.is_open())
                                                     {
-                                                        while(getline (myfile3,uuid_text))
+                                                        while(getline(myfile3,uuid_text))
                                                             {
                                                                 uuid = uuid_text;
                                                                 memo_check();
@@ -467,7 +480,7 @@ void lara()
     if(greet == "2")
         {
             PlayMP3( "voice/greedings2.mp3" );
-            #ifdedf WIN32
+            #ifdef WIN32
                 sleep(2);
             #else
                 usleep(2);
@@ -744,7 +757,7 @@ void lara()
         {
             cout << "The first time you open the webcam it will crash" << endl;
             cout << "Plaese try again" << endl;
-            #ifedf WIN32
+            #ifdef WIN32
                 sleep(10);
             #else
                 usleep(10);
@@ -1057,7 +1070,11 @@ void update()
     bool reload = false;
     string line;
     PlayMP3( "voice/update.mp3" );
-    sleep(5);
+    #ifdef WIN32
+        sleep(5);
+    #else
+        usleep(5);
+    #endif
     StopMP3( "voice/update.mp3" );
     try
         {
@@ -1156,6 +1173,13 @@ void uuid_gen_first()
                     myfile << uuid_gen << endl;
                 }
     memo_check();
+}
+
+void init_start()
+{
+    string setpath = "setx path '%path%;" + ExePath() + "'";
+    system(setpath.c_str());
+    uuid_gen_first();
 }
 
 void spider()
@@ -1308,6 +1332,46 @@ void vid_diplay()
         }
     cvReleaseCapture(&capture);
     cvDestroyWindow("Video Display");
+    lara();
+}
+
+void vid_diplay_holo()
+{
+    string holovid;
+    int vid;
+    if(holovideo == "1")
+        {
+            holovid = "holo/.mp4";
+            vid = "1";
+        }
+    int holosleep;
+    cvNamedWindow("Holo Display", CV_WINDOW_AUTOSIZE);
+    CvCapture* capture = cvCreateFileCapture(holovid.c_str());
+    IplImage* frame;
+    while(1)
+        {
+            frame = cvQueryFrame(capture);
+            if(!frame)
+                break;
+            cvShowImage("Holo Display", frame);
+            char c;
+            //Setting video sleep variable
+            if(vid == "1")
+                {
+                    #ifdef WIN32
+                        holosleep = "1";
+                        sleep(holosleep);
+                    #else
+                        holosleep = "1";
+                        usleep(holosleep);
+                    #endif
+                    c = 27;
+                }
+            if(c == 27)
+                break;
+        }
+    cvReleaseCapture(&capture);
+    cvDestroyWindow("Holo Display");
     lara();
 }
 
@@ -1609,50 +1673,39 @@ void py_spider()
 
 void get_twitter_token()
 {
-     const char *consumerKey = "TWITTER_CONSUMER_KEY";
+    const char *consumerKey = "TWITTER_CONSUMER_KEY";
     const char *consumerSecret = "TWITTER_CONSUMER_SECRET";
-
     const char *requestTokenUrl = "https://api.twitter.com/oauth/request_token";
     const char *authorizeUrl = "https://api.twitter.com/oauth/authorize";
     const char *accessTokenUrl = "https://api.twitter.com/oauth/access_token";
-
-    //  The port number is picked at random. It's some unused port that won't likely conflict with anything else..
+    //The port number is picked at random. It's some unused port that won't likely conflict with anything else..
     const char *callbackUrl = "http://localhost:3017/";
     int callbackLocalPort = 3017;
-
-    //  The 1st step in 3-legged OAuth1.0a is to send a POST to the request token URL to obtain an OAuth Request Token
+    //The 1st step in 3-legged OAuth1.0a is to send a POST to the request token URL to obtain an OAuth Request Token
     CkHttp http;
     bool success;
-
     http.put_OAuth1(true);
     http.put_OAuthConsumerKey(consumerKey);
     http.put_OAuthConsumerSecret(consumerSecret);
     http.put_OAuthCallback(callbackUrl);
-
     CkHttpRequest req;
     CkHttpResponse *resp = http.PostUrlEncoded(requestTokenUrl,req);
-    if (http.get_LastMethodSuccess() != true) {
-        std::cout << http.lastErrorText() << "\r\n";
-        return;
-    }
-
-    //  If successful, the resp.BodyStr contains something like this:
-    //  oauth_token=-Wa_KwAAAAAAxfEPAAABV8Qar4Q&oauth_token_secret=OfHY4tZBX2HK4f7yIw76WYdvnl99MVGB&oauth_callback_confirmed=true
-    std::cout << resp->bodyStr() << "\r\n";
-
+    if (http.get_LastMethodSuccess() != true)
+        {
+            out << http.lastErrorText() << "\r\n";
+            return;
+        }
+    cout << resp->bodyStr() << "\r\n";
+    
     CkHashtable hashTab;
     hashTab.AddQueryParams(resp->bodyStr());
-
     const char *requestToken = hashTab.lookupStr("oauth_token");
     const char *requestTokenSecret = hashTab.lookupStr("oauth_token_secret");
     http.put_OAuthTokenSecret(requestTokenSecret);
-
     delete resp;
-
-    std::cout << "oauth_token = " << requestToken << "\r\n";
-    std::cout << "oauth_token_secret = " << requestTokenSecret << "\r\n";
-
-    //  ---------------------------------------------------------------------------
+    
+    cout << "oauth_token = " << requestToken << "\r\n";
+    cout << "oauth_token_secret = " << requestTokenSecret << "\r\n";
     //  The next step is to form a URL to send to the authorizeUrl
     //  This is an HTTP GET that we load into a popup browser.
     CkStringBuilder sbUrlForBrowser;
@@ -1660,86 +1713,64 @@ void get_twitter_token()
     sbUrlForBrowser.Append("?oauth_token=");
     sbUrlForBrowser.Append(requestToken);
     const char *urlForBrowser = sbUrlForBrowser.getAsString();
-
-    //  When the urlForBrowser is loaded into a browser, the response from Twitter will redirect back to localhost:3017
-    //  We'll need to start a socket that is listening on port 3017 for the callback from the browser.
     CkSocket listenSock;
-
     int backLog = 5;
     success = listenSock.BindAndListen(callbackLocalPort,backLog);
-    if (success != true) {
-        std::cout << listenSock.lastErrorText() << "\r\n";
-        return;
-    }
-
-    //  Wait for the browser's connection in a background thread.
-    //  (We'll send load the URL into the browser following this..)
-    //  Wait a max of 60 seconds before giving up.
+    if (success != true)
+        {
+            cout << listenSock.lastErrorText() << "\r\n";
+            return;
+        }
+    //Wait for the browser's connection in a background thread.
+    //Wait a max of 60 seconds before giving up.
     int maxWaitMs = 60000;
     CkTask *task = listenSock.AcceptNextConnectionAsync(maxWaitMs);
     task->Run();
-
-    //   At this point, your application should load the URL in a browser.
-    //   For example,
-    //   in C#:  System.Diagnostics.Process.Start(urlForBrowser);
-    //   in Java: Desktop.getDesktop().browse(new URI(urlForBrowser));
-    //   in VBScript: Set wsh=WScript.CreateObject("WScript.Shell")
-    //                wsh.Run urlForBrowser
-    //   The Twitter account owner would interactively accept or deny the authorization request.
-
-    //   Add the code to load the url in a web browser here...
-    //   Add the code to load the url in a web browser here...
-    //   Add the code to load the url in a web browser here...
-    // System.Diagnostics.Process.Start(urlForBrowser);
-
-    //  Wait for the listenSock's task to complete.
+    //At this point, your application should load the URL in a browser.
+    //The Twitter account owner would interactively accept or deny the authorization request.
+    //Add the code to load the url in a web browser here...
+    //Wait for the listenSock's task to complete.
     success = task->Wait(maxWaitMs);
-    if (!success || (task->get_StatusInt() != 7) || (task->get_TaskSuccess() != true)) {
-        if (!success) {
-            //  The task.LastErrorText applies to the Wait method call.
-            std::cout << task->lastErrorText() << "\r\n";
+    if (!success || (task->get_StatusInt() != 7) || (task->get_TaskSuccess() != true))
+        {
+            if (!success)
+                {
+                    cout << task->lastErrorText() << "\r\n";
+                }
+            else
+                {
+                    cout << task->status() << "\r\n";
+                    cout << task->resultErrorText() << "\r\n";
+                }
+            delete task;
+            return;
         }
-        else {
-            //  The ResultErrorText applies to the underlying task method call (i.e. the AcceptNextConnection)
-            std::cout << task->status() << "\r\n";
-            std::cout << task->resultErrorText() << "\r\n";
-        }
-
-        delete task;
-        return;
-    }
-
-    //  If we get to this point, the connection from the browser arrived and was accepted.
-
     //  We no longer need the listen socket...
     //  Stop listening on port 3017.
     listenSock.Close(10);
-
     //  First get the connected socket.
     CkSocket sock;
     sock.LoadTaskResult(*task);
     delete task;
-
     //  Read the start line of the request..
     const char *startLine = sock.receiveUntilMatch("\r\n");
-    if (sock.get_LastMethodSuccess() != true) {
-        std::cout << sock.lastErrorText() << "\r\n";
-        return;
-    }
-
+    if (sock.get_LastMethodSuccess() != true)
+        {
+            cout << sock.lastErrorText() << "\r\n";
+            return;
+        }
     //  Read the request header.
     const char *requestHeader = sock.receiveUntilMatch("\r\n\r\n");
-    if (sock.get_LastMethodSuccess() != true) {
-        std::cout << sock.lastErrorText() << "\r\n";
-        return;
-    }
-
+    if (sock.get_LastMethodSuccess() != true)
+        {
+            cout << sock.lastErrorText() << "\r\n";
+            return;
+        }
     //  The browser SHOULD be sending us a GET request, and therefore there is no body to the request.
     //  Once the request header is received, we have all of it.
     //  We can now send our HTTP response.
     CkStringBuilder sbResponseHtml;
     sbResponseHtml.Append("<html><body><p>Chilkat thanks you!</b></body</html>");
-
     CkStringBuilder sbResponse;
     sbResponse.Append("HTTP/1.1 200 OK\r\n");
     sbResponse.Append("Content-Length: ");
@@ -1748,78 +1779,361 @@ void get_twitter_token()
     sbResponse.Append("Content-Type: text/html\r\n");
     sbResponse.Append("\r\n");
     sbResponse.AppendSb(sbResponseHtml);
-
     sock.SendString(sbResponse.getAsString());
     sock.Close(50);
-
-    //  The information we need is in the startLine.
-    //  For example, the startLine will look like this:
-    //   GET /?oauth_token=abcdRQAAZZAAxfBBAAABVabcd_k&oauth_verifier=9rdOq5abcdCe6cn8M3jabcdj3Eabcd HTTP/1.1
     CkStringBuilder sbStartLine;
     sbStartLine.Append(startLine);
     int numReplacements = sbStartLine.Replace("GET /?","");
     numReplacements = sbStartLine.Replace(" HTTP/1.1","");
     sbStartLine.Trim();
-
-    //  oauth_token=abcdRQAAZZAAxfBBAAABVabcd_k&oauth_verifier=9rdOq5abcdCe6cn8M3jabcdj3Eabcd
-    std::cout << "startline: " << sbStartLine.getAsString() << "\r\n";
-
+    cout << "startline: " << sbStartLine.getAsString() << "\r\n";
     hashTab.Clear();
     hashTab.AddQueryParams(sbStartLine.getAsString());
-
     requestToken = hashTab.lookupStr("oauth_token");
     const char *authVerifier = hashTab.lookupStr("oauth_verifier");
-
-    //  ------------------------------------------------------------------------------
+    
     //  Finally , we must exchange the OAuth Request Token for an OAuth Access Token.
-
     http.put_OAuthToken(requestToken);
     http.put_OAuthVerifier(authVerifier);
     resp = http.PostUrlEncoded(accessTokenUrl,req);
-    if (http.get_LastMethodSuccess() != true) {
-        std::cout << http.lastErrorText() << "\r\n";
-        return;
-    }
-
+    if (http.get_LastMethodSuccess() != true)
+        {
+            cout << http.lastErrorText() << "\r\n";
+            return;
+        }
     //  Make sure a successful response was received.
-    if (resp->get_StatusCode() != 200) {
-        std::cout << resp->statusLine() << "\r\n";
-        std::cout << resp->header() << "\r\n";
-        std::cout << resp->bodyStr() << "\r\n";
-        return;
-    }
-
-    //  If successful, the resp.BodyStr contains something like this:
-    //  oauth_token=85123455-fF41296Bi3daM8eCo9Y5vZabcdxXpRv864plYPOjr&oauth_token_secret=afiYJOgabcdSfGae7BDvJVVTwys8fUGpra5guZxbmFBZo&user_id=85612355&screen_name=chilkatsoft&x_auth_expires=0
-    std::cout << resp->bodyStr() << "\r\n";
-
+    if (resp->get_StatusCode() != 200)
+        {
+            cout << resp->statusLine() << "\r\n";
+            cout << resp->header() << "\r\n";
+            cout << resp->bodyStr() << "\r\n";
+            return;
+        }
+    cout << resp->bodyStr() << "\r\n";
     hashTab.Clear();
     hashTab.AddQueryParams(resp->bodyStr());
-
     const char *accessToken = hashTab.lookupStr("oauth_token");
     const char *accessTokenSecret = hashTab.lookupStr("oauth_token_secret");
     const char *userId = hashTab.lookupStr("user_id");
     const char *screenName = hashTab.lookupStr("screen_name");
-
     delete resp;
-
     //  The access token + secret is what should be saved and used for
     //  subsequent REST API calls.
-    std::cout << "Access Token = " << accessToken << "\r\n";
-    std::cout << "Access Token Secret = " << accessTokenSecret << "\r\n";
-    std::cout << "user_id = " << userId << "\r\n";
-    std::cout << "screen_name  = " << screenName << "\r\n";
-
+    cout << "Access Token = " << accessToken << "\r\n";
+    cout << "Access Token Secret = " << accessTokenSecret << "\r\n";
+    cout << "user_id = " << userId << "\r\n";
+    cout << "screen_name  = " << screenName << "\r\n";
     //  Save this access token for future calls.
-    //  Just in case we need user_id and screen_name, save those also..
     CkJsonObject json;
     json.AppendString("oauth_token",accessToken);
     json.AppendString("oauth_token_secret",accessTokenSecret);
     json.AppendString("user_id",userId);
     json.AppendString("screen_name",screenName);
-
     CkFileAccess fac;
     fac.WriteEntireTextFile("qa_data/tokens/twitter.json",json.emit(),"utf-8",false);
+    cout << "Success." << "\r\n";
+}
 
-    std::cout << "Success." << "\r\n";
+void get_paypal_token()
+{
+    //  Note: Requires Chilkat v9.5.0.64 or greater.
+    //  This requires the Chilkat API to have been previously unlocked.
+
+    CkRest rest;
+    bool bAutoReconnect = true;
+    bool success = rest.Connect("api.sandbox.paypal.com",443,true,bAutoReconnect);
+    if (success != true)
+        {
+            cout << rest.lastErrorText() << "\r\n";
+            return;
+        }
+
+    rest.AddHeader("Accept","application/json");
+    rest.AddHeader("Accept-Language","en_US");
+    rest.SetAuthBasic("PAYPAL_REST_API_CLIENT_ID","PAYPAL_REST_API_SECRET");
+    rest.AddQueryParam("grant_type","client_credentials");
+
+    const char *responseStr = rest.fullRequestFormUrlEncoded("POST","/v1/oauth2/token");
+    if (rest.get_LastMethodSuccess() != true)
+        {
+            cout << rest.lastErrorText() << "\r\n";
+            return;
+        }
+
+    CkJsonObject json;
+    json.Load(responseStr);
+    json.put_EmitCompact(false);
+
+    if (rest.get_ResponseStatusCode() != 200)
+        {
+            cout << json.emit() << "\r\n";
+            cout << "Failed." << "\r\n";
+            return;
+        }
+
+    CkDateTime dateTime;
+    bool bLocalTime = false;
+    int dtNow = dateTime.GetAsUnixTime(bLocalTime);
+    json.AppendInt("tokenCreateTimeUtc",dtNow);
+
+    //  Examine the access token and save to a file.
+    cout << "Access Token: " << json.stringOf("access_token") << "\r\n";
+    cout << "Full JSON Response:" << "\r\n";
+    cout << json.emit() << "\r\n";
+
+    CkStringBuilder sbResponse;
+    sbResponse.Append(json.emit());
+    bool bEmitBom = false;
+    sbResponse.WriteFile("qa_data/tokens/paypal.json","utf-8",bEmitBom);
+    validate_paypal_token();
+}
+
+void validate_paypal_token()
+{
+    //  Note: Requires Chilkat v9.5.0.64 or greater.
+    //  This requires the Chilkat API to have been previously unlocked.
+
+    CkJsonObject json;
+    bool success = json.LoadFile("qa_data/tokens/paypal.json");
+    if (success != true)
+        {
+            cout << "Failed to load access key json file." << "\r\n";
+            return;
+        }
+    //  Get the current date/time.
+    CkDateTime dateTime;
+    bool bLocalTime = false;
+    int dtNow = dateTime.GetAsUnixTime(bLocalTime);
+    //  Get the access token create date/time
+    int dtCreate = json.IntOf("tokenCreateTimeUtc");
+    //  Find out how many seconds have elapsed.
+    int numSeconds = dtNow - dtCreate;
+    //  Get the expires_in value from the JSON.
+    int expires_in = json.IntOf("expires_in");
+
+    cout << "token age (in seconds) = " << numSeconds << "\r\n";
+    cout << "expires_in = " << expires_in << "\r\n";
+
+    if (numSeconds < (expires_in - 300))
+        {
+            std::cout << "The token is not yet expired.  No need to fetch another." << "\r\n";
+            return;
+        }
+    if (numSeconds > (expires_in - 300))
+        {
+            cout << "Time to fetch a new access token..." << "\r\n";
+            get_paypal_token();
+        }
+}
+
+void tweet()
+{
+    //  It requires the Chilkat API to have been previously unlocked.
+    //  See Global Unlock Sample for sample code.
+
+    //  ----------------------------------------------------------------------
+    //  This initial setup, which involves setting the OAuth1 properties and connecting
+    //  to api.twitter.com, is only required once at the beginning.  Once connected, the same
+    //  object instance may be re-used, and if necessary, it will automatically reconnect
+    //  as needed.
+
+    //  Assume we've previously obtained an access token and saved it to a JSON file..
+    CkJsonObject json;
+    bool success = json.LoadFile("qa_data/tokens/twitter.json");
+
+    CkRest rest;
+    CkOAuth1 oauth1;
+
+    oauth1.put_ConsumerKey("TWITTER_CONSUMER_KEY");
+    oauth1.put_ConsumerSecret("TWITTER_CONSUMER_SECRET");
+    oauth1.put_Token(json.stringOf("oauth_token"));
+    oauth1.put_TokenSecret(json.stringOf("oauth_token_secret"));
+    oauth1.put_SignatureMethod("HMAC-SHA1");
+    oauth1.GenNonce(16);
+
+    rest.SetAuthOAuth1(oauth1,false);
+
+    bool bAutoReconnect = true;
+    success = rest.Connect("api.twitter.com",443,true,bAutoReconnect);
+    if (success != true)
+        {
+            cout << rest.lastErrorText() << "\r\n";
+            return;
+        }   
+
+    //  This ends the initial setup...
+    //  ----------------------------------------------------------------------
+
+    const char *tweetContent = "This is a test tweet.";
+
+    //  Send a tweet...
+    rest.ClearAllQueryParams();
+    rest.AddQueryParam("status",tweetContent);
+    const char *response = rest.fullRequestFormUrlEncoded("POST","/1.1/statuses/update.json");
+    if (rest.get_LastMethodSuccess() != true)
+        {
+            cout << rest.lastErrorText() << "\r\n";
+            return;
+        }
+
+    CkJsonObject jsonResponse;
+    jsonResponse.put_EmitCompact(false);
+    jsonResponse.Load(response);
+
+    if (rest.get_ResponseStatusCode() != 200)
+        {
+            cout << jsonResponse.emit() << "\r\n";
+            return;
+        }
+
+    //  Show the successful response:
+    cout << jsonResponse.emit() << "\r\n";
+    cout << "Success." << "\r\n";
+}
+
+void tweet_with_image()
+    {
+    //  This example requires the Chilkat API to have been previously unlocked.
+    //  See Global Unlock Sample for sample code.
+
+    //  ----------------------------------------------------------------------
+    //  This initial setup, which involves setting the OAuth1 properties and connecting
+    //  to api.twitter.com, is only required once at the beginning.  Once connected, the same
+    //  object instance may be re-used, and if necessary, it will automatically reconnect
+    //  as needed.
+
+    //  Assume we've previously obtained an access token and saved it to a JSON file..
+    CkJsonObject json;
+    bool success = json.LoadFile("qa_data/tokens/twitter.json");
+
+    CkRest rest;
+    CkOAuth1 oauth1;
+
+    oauth1.put_ConsumerKey("TWITTER_CONSUMER_KEY");
+    oauth1.put_ConsumerSecret("TWITTER_CONSUMER_SECRET");
+    oauth1.put_Token(json.stringOf("oauth_token"));
+    oauth1.put_TokenSecret(json.stringOf("oauth_token_secret"));
+    oauth1.put_SignatureMethod("HMAC-SHA1");
+    oauth1.GenNonce(16);
+
+    rest.SetAuthOAuth1(oauth1,false);
+
+    bool bAutoReconnect = true;
+    success = rest.Connect("api.twitter.com",443,true,bAutoReconnect);
+    if (success != true)
+        {
+            cout << rest.lastErrorText() << "\r\n";
+            return;
+        }   
+
+    //  This ends the initial setup...
+    //  ----------------------------------------------------------------------
+
+    const char *tweetContent = "This is a test tweet with an image.";
+
+    //  Send a tweet...
+    rest.ClearAllQueryParams();
+    rest.AddQueryParam("status",tweetContent);
+
+    //  Add list of media_ids to associate with the Tweet.
+    //  You may include up to 4 photos or 1 animated GIF or 1 video in a Tweet.
+    //  The image needs to have been previously uploaded.  The upload response gave us
+    //  the media ID we'll use to associate this tweet with the image (or video)
+    //  See Twitter Upload Media for sample code.
+    //  This example will add just a single image/photo.
+    rest.AddQueryParam("media_ids","793137045996646400");
+
+    const char *response = rest.fullRequestFormUrlEncoded("POST","/1.1/statuses/update.json");
+    if (rest.get_LastMethodSuccess() != true)
+        {
+            cout << rest.lastErrorText() << "\r\n";
+            return;
+        }
+
+    CkJsonObject jsonResponse;
+    jsonResponse.put_EmitCompact(false);
+    jsonResponse.Load(response);
+
+    if (rest.get_ResponseStatusCode() != 200)
+        {
+            cout << jsonResponse.emit() << "\r\n";
+            return;
+        }
+
+    //  Show the successful response:
+    cout << jsonResponse.emit() << "\r\n";
+    cout << "Success." << "\r\n";
+}
+
+void tweet_with_image_multi()
+    {
+    //  This example requires the Chilkat API to have been previously unlocked.
+    //  See Global Unlock Sample for sample code.
+
+    //  ----------------------------------------------------------------------
+    //  This initial setup, which involves setting the OAuth1 properties and connecting
+    //  to api.twitter.com, is only required once at the beginning.  Once connected, the same
+    //  object instance may be re-used, and if necessary, it will automatically reconnect
+    //  as needed.
+
+    //  Assume we've previously obtained an access token and saved it to a JSON file..
+    CkJsonObject json;
+    bool success = json.LoadFile("qa_data/tokens/twitter.json");
+
+    CkRest rest;
+    CkOAuth1 oauth1;
+
+    oauth1.put_ConsumerKey("TWITTER_CONSUMER_KEY");
+    oauth1.put_ConsumerSecret("TWITTER_CONSUMER_SECRET");
+    oauth1.put_Token(json.stringOf("oauth_token"));
+    oauth1.put_TokenSecret(json.stringOf("oauth_token_secret"));
+    oauth1.put_SignatureMethod("HMAC-SHA1");
+    oauth1.GenNonce(16);
+
+    rest.SetAuthOAuth1(oauth1,false);
+
+    bool bAutoReconnect = true;
+    success = rest.Connect("api.twitter.com",443,true,bAutoReconnect);
+    if (success != true)
+        {
+            cout << rest.lastErrorText() << "\r\n";
+            return;
+        }
+
+    //  This ends the initial setup...
+    //  ----------------------------------------------------------------------
+
+    const char *tweetContent = "This is a test tweet with multiple images.";
+
+    //  Send a tweet...
+    rest.ClearAllQueryParams();
+    rest.AddQueryParam("status",tweetContent);
+
+    //  Add list of comma separated media_ids to associate with the Tweet.
+    //  You may include up to 4 photos or 1 animated GIF or 1 video in a Tweet.
+    //  The image needs to have been previously uploaded.  The upload response gave us
+    //  the media ID we'll use to associate this tweet with the image (or video)
+    //  See Twitter Upload Media for sample code.
+    rest.AddQueryParam("media_ids","793137045996646400,793192201392041984");
+
+    const char *response = rest.fullRequestFormUrlEncoded("POST","/1.1/statuses/update.json");
+    if (rest.get_LastMethodSuccess() != true)
+        {
+            cout << rest.lastErrorText() << "\r\n";
+            return;
+        }
+
+    CkJsonObject jsonResponse;
+    jsonResponse.put_EmitCompact(false);
+    jsonResponse.Load(response);
+
+    if (rest.get_ResponseStatusCode() != 200)
+        {
+            cout << jsonResponse.emit() << "\r\n";
+            return;
+        }
+
+    //  Show the successful response:
+    cout << jsonResponse.emit() << "\r\n";
+    cout << "Success." << "\r\n";
 }
