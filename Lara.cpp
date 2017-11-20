@@ -102,7 +102,9 @@
 //#include<cuda.h>
 //GPIO
 #include<cerrno>
-//#include<wiringPi.h>
+#ifdef UNIX
+    #include<wiringPi.h>
+#endif
 //Python Environment
 #include<python3/Python.h>
 //#include<python2/Python.h>
@@ -111,22 +113,24 @@
 //Java Environment
 //#include<java/jni.h>
 //Encryption Headers
-//#include<crypto++/osrng.h>
-//#include<crypto++/modes.h>
-//#include<crypto++/aes.h>
-//#include<crypto++/filters.h>
+#include<crypto++/osrng.h>
+#include<crypto++/modes.h>
+#include<crypto++/aes.h>
+#include<crypto++/filters.h>
 //Neural Net
 //ISO/ANSI C/C++
 //#include "include/Neuron.h"
 //#include "include/Network.h"
 //#include "include/trainingdata.h"
 //Tensorflow
-//#include<tensorflow/cc/client/client_session.h>
-//#include<tensorflow/cc/ops/standard_ops.h>
-//#include<tensorflow/core/framework/tensor.h>
+#ifdef UNIX
+    #include<tensorflow/cc/client/client_session.h>
+    #include<tensorflow/cc/ops/standard_ops.h>
+    #include<tensorflow/core/framework/tensor.h>
+#else
 //OpenNN
-#include<opennn/opennn.h>
-
+    #include<opennn/opennn.h>
+#endif
 
 //Parameters
 #pragma comment(lib, "wsock32.lib")
