@@ -8,12 +8,10 @@
 #include<string>
 #include<vector>
 #include<cmath>
-#include<cstdlib>
+#include<math.h>
 #include<cassert>
-#include<cstdio>
 //for date & time
 #include<ctime>
-#include<time.h>
 #ifdef WIN32
     #include<dos.h>
 #endif
@@ -26,8 +24,8 @@
     #include<unistd.h>
 #endif
 //C libs to use system function
-#include<stdio.h>
-#include<stdlib.h>
+#include<cstdio>
+#include<cstdlib>
 //mp3 Playback
 #include "include/MP3.h"
 //Downloading
@@ -103,10 +101,10 @@
 //CUDA
 //#include<cuda.h>
 //GPIO
-#include<errno.h>
+#include<cerrno>
 //#include<wiringPi.h>
 //Python Environment
-//#include<python3/Python.h>
+#include<python3/Python.h>
 //#include<python2/Python.h>
 //Ruby Environment
 //#include<ruby/ruby.h>
@@ -126,6 +124,9 @@
 //#include<tensorflow/cc/client/client_session.h>
 //#include<tensorflow/cc/ops/standard_ops.h>
 //#include<tensorflow/core/framework/tensor.h>
+//OpenNN
+#include<opennn/opennn.h>
+
 
 //Parameters
 #pragma comment(lib, "wsock32.lib")
@@ -139,6 +140,7 @@ using namespace mp3;
 //using namespace boost;
 //using namespace tensorflow;
 //using namespace tensorflow::ops;
+using namespace OpenNN;
 
 //Volatile Bool
 volatile bool running;
@@ -1177,8 +1179,19 @@ void uuid_gen_first()
 
 void init_start()
 {
-    string setpath = "setx path '%path%;" + ExePath() + "'";
-    system(setpath.c_str());
+    #ifdef WIN32
+        //Windows Set PATH
+        string setpath = "setx path '%path%;" + ExePath() + "'";
+        system(setpath.c_str());
+    #else
+        //Bash Set PATH
+        char cwd[1024];
+        getcwd(cwd, sizeof(cwd));
+        string setpath = "export PATH=$PATH:" + cwd;
+        string setpathper = "echo '" + setpath + "'  >> ~/.bash_profile"
+        system(setpath.c_str());
+        system(setpathper.c_str());
+    #endif
     uuid_gen_first();
 }
 
@@ -1692,7 +1705,7 @@ void get_twitter_token()
     CkHttpResponse *resp = http.PostUrlEncoded(requestTokenUrl,req);
     if (http.get_LastMethodSuccess() != true)
         {
-            out << http.lastErrorText() << "\r\n";
+            cout << http.lastErrorText() << "\r\n";
             return;
         }
     cout << resp->bodyStr() << "\r\n";
