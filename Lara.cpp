@@ -515,6 +515,7 @@ void lara()
     cout << "[spider] a website" << endl;
     cout << "Display a [video]" << endl;
     cout << "Turn On [webcam]" << endl;
+    cout << "Activate [qr scanner]" << endl;
     cout << "[quit]" << endl;
     StopMP3( "voice/greedings1.mp3" );
     StopMP3( "voice/greedings2.mp3" );
@@ -662,6 +663,10 @@ void lara()
         {
             spider();
         }
+    if()
+    	{
+    	    qr_scanner();
+    	}
     if(task == "memo")
         {
             string date_remind_num;
