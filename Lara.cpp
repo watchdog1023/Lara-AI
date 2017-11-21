@@ -89,6 +89,9 @@
 //QR Code Generation
 #include<cstdint>
 #include "include/qr_code/QrCode.hpp"
+//QR code Scanner
+#include<zbar.h>
+#include<opencv2/imgproc/imgproc.hpp>
 //SDL Creation
 //#include<SDL2/SDL.h>
 //Set width
@@ -140,11 +143,15 @@ using namespace cv;
 using namespace qrcodegen;
 using namespace termcolor;
 using namespace mp3;
-//using namespace CryptoPP;
+using namespace CryptoPP;
 //using namespace boost;
-//using namespace tensorflow;
-//using namespace tensorflow::ops;
-using namespace OpenNN;
+#ifdef UNIX
+	using namespace tensorflow;
+	using namespace tensorflow::ops;
+#else
+	using namespace OpenNN;
+#endif
+using namespace zbar;
 
 //Volatile Bool
 volatile bool running;
@@ -164,14 +171,16 @@ string decrypt(string const& msg, string const& key)
     {
         return encrypt(msg, key); 
     }
-    
-string ExePath()
-{
-    char buffer[MAX_PATH];
-    GetModuleFileName( NULL, buffer, MAX_PATH );
-    string::size_type pos = string( buffer ).find_last_of( "\\/" );
-    return string( buffer ).substr( 0, pos);
-}
+
+#ifdef WIN32  
+	string ExePath()
+		{
+    			char buffer[MAX_PATH];
+    			GetModuleFileName( NULL, buffer, MAX_PATH );
+    			string::size_type pos = string( buffer ).find_last_of( "\\/" );
+    			return string( buffer ).substr( 0, pos);
+		}
+#endif
 
 //Prototypes Functions
 void showprogress(unsigned long total, unsigned long part)//Displays the download progress as a percentage
@@ -222,6 +231,7 @@ void validate_paypal_token();
 void tweet();
 void tweet_with_image();
 void tweet_with_image_multi();
+void qr_scanner();
 //Python2
 
 //Python3
@@ -366,7 +376,7 @@ ThreadReturn inputThread(void* client)
 }
 
 //Version Variable
-string version = "1.0.0";
+string version = "5.0.0";
 
 //Greeting Variable
 string greet;
@@ -2153,4 +2163,88 @@ void tweet_with_image_multi()
     //  Show the successful response:
     cout << jsonResponse.emit() << "\r\n";
     cout << "Success." << "\r\n";
+}
+
+void qr_scanner()
+{
+    string camera;
+    int type_camera;
+    cout << "Which Camera do you want to activate?" << endl;
+    cout << "[external]" << endl;
+    cout << "[internal]" << endl;
+    getlin(cin, camera);
+    if(camera == "external")
+        {
+            type_camera = "1";    
+        }
+    if(camera == "internal")
+        {
+            type_camera = "0";    
+        }
+    VideoCapture cap(type_camera);
+   // cap.set(CV_CAP_PROP_FRAME_WIDTH,800);
+   // cap.set(CV_CAP_PROP_FRAME_HEIGHT,640);
+   //if not success, return to lara
+    if (!cap.isOpened())
+        {
+            cout << "Cannot open the video cam" << endl;
+            lara();
+        }
+    ImageScanner scanner;  
+/*      scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 1);  
+*/
+    //get the width of frames of the video
+    double dWidth = cap.get(CV_CAP_PROP_FRAME_WIDTH); 
+    //get the height of frames of the video
+    double dHeight = cap.get(CV_CAP_PROP_FRAME_HEIGHT); 
+    cout << "Frame size : " << dWidth << " x " << dHeight << endl;
+    //create a window called "QR Scanner"
+    namedWindow("QR Scanner",CV_WINDOW_AUTOSIZE); 
+    while (1)
+        {
+            Mat frame;
+            bool bSuccess = cap.read(frame); // read a new frame from video
+            if (!bSuccess) //if not success, break loop
+                {
+                    cout << "Cannot read a frame from video stream" << endl;
+                    lara();
+                }
+            Mat grey;
+            cvtColor(frame,grey,CV_BGR2GRAY);
+            int width = frame.cols;  
+            int height = frame.rows;  
+            uchar *raw = (uchar *)grey.data;  
+            // wrap image data  
+            Image image(width, height, "Y800", raw, width * height);  
+            // scan the image for barcodes  
+            int n = scanner.scan(image);  
+            // extract results  
+            for(Image::SymbolIterator symbol = image.symbol_begin();symbol != image.symbol_end();++symbol)
+                {  
+                    vector<Point> vp;  
+                    //do something useful with results  
+                    cout << "decoded " << symbol->get_type_name()  << " symbol \"" << symbol->get_data() << '"' <<" "<< endl;  
+                    int n = symbol->get_location_size();  
+                    for(int i=0;i<n;i++)
+                        {  
+                            vp.push_back(Point(symbol->get_location_x(i),symbol->get_location_y(i))); 
+                        }  
+                    RotatedRect r = minAreaRect(vp);  
+                    Point2f pts[4];  
+                    r.points(pts);  
+                    for(int i=0;i<4;i++)
+                        {  
+                            line(frame,pts[i],pts[(i+1)%4],Scalar(255,0,0),3);  
+                        }  
+                    //cout<<"Angle: "<<r.angle<<endl;  
+                }
+            //show the frame in "QR Scanner" window
+            imshow("QR Scanner", frame);
+            //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
+            if (waitKey(30) == 27) 
+                {
+                    cout << "esc key is pressed by user" << endl;
+                    lara(); 
+                }
+        }
 }
