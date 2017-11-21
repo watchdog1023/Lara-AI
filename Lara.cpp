@@ -2172,7 +2172,7 @@ void qr_scanner()
     cout << "Which Camera do you want to activate?" << endl;
     cout << "[external]" << endl;
     cout << "[internal]" << endl;
-    getlin(cin, camera);
+    getline(cin, camera);
     if(camera == "external")
         {
             type_camera = "1";    
