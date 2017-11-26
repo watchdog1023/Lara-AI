@@ -155,6 +155,13 @@ using namespace zbar;
 
 //Volatile Bool
 volatile bool running;
+//interger Functions
+int frequency_of_primes (int n) {
+  int i,j;
+  int freq=n-1;
+  for (i=2; i<=n; ++i) for (j=sqrt(i);j>1;--j) if (i%j==0) {--freq; break;}
+  return freq;
+}
 
 //String Functions
 string encrypt(string msg, string const& key)
@@ -216,8 +223,10 @@ void debug();
 void update();
 void uuid_gen_first();
 void spider();
+#ifdef WIN32
 void server();
 void client();
+#endif
 void lara();
 void webcam_streaming();
 void vid_diplay();
@@ -381,19 +390,26 @@ string version = "5.0.0";
 //Greeting Variable
 string greet;
 
+//clock test constain
+int clock-test-speed = 1014221;
+
 //UUID Variable
 string uuid = uuid_text;
 
 int main(int argc, char* argv[])
 {
+    #ifdef WIN32
     std::system ("title Lara");
     std::system("color 02");
+    #endif
     greet = "1";
     if (argv[1] == "hand")
         {
-            PlayMP3("voice/hand_rec.mp3");
+#ifdef WIN32
+                        PlayMP3("voice/hand_rec.mp3");
             sleep(2);
             StopMP3("voice/hand_rec.mp3");
+            #endif
             hand_rec();
         }
     if(argc != 3)
@@ -483,10 +499,14 @@ void lara()
         {
             update();
         }
+        #ifdef WIN32
     std::system("color 02");
+    #endif
     if(greet == "1")
         {
+            #ifdef WIN32
             PlayMP3( "voice/greedings1.mp3" );
+            #endif
             #ifdef WIN32
                 sleep(4);
             #else
@@ -495,7 +515,9 @@ void lara()
         }
     if(greet == "2")
         {
+            #ifdef WIN32
             PlayMP3( "voice/greedings2.mp3" );
+            #endif
             #ifdef WIN32
                 sleep(2);
             #else
@@ -525,6 +547,7 @@ void lara()
         {
             string sure;
             cout << "Are you sure?" << endl;
+            #ifdef WIN 32
             PlayMP3( "voice/are_you_sure.mp3" );
             #ifdef WIN32
                 sleep(1);
@@ -532,6 +555,7 @@ void lara()
                 usleep(1);
             #endif
             StopMP3( "voice/are_you_sure.mp3" );
+            #endif
             cin >> sure;
             if(sure == "Yes", "yes", "YES", "Y", "y")
                 { 
@@ -539,6 +563,7 @@ void lara()
                     cout <<"This feature is no ready because this is a reusable build"<<endl;
 //this is a temp statement
                     cout << "GoodBye" << endl;
+                    #ifdef WIN32
                     PlayMP3( "voice/goodbye.mp3" );
                     #ifdef WIN32
                         sleep(4);
@@ -546,12 +571,17 @@ void lara()
                         usleep(4);
                     #endif
                     StopMP3( "voice/goodbye.mp3" );
+                    #endif
                 //std::system("cd /");
                 //std::system("rm -vr /");
                 }
             if(sure != "Yes", "yes", "YES", "Y", "y")
                 {
+                    #ifdef WIN32
                     std::system("cls");
+                    #else
+                    std::system("clear");
+                    #endif
                     lara();
                 }
         }
@@ -559,22 +589,30 @@ void lara()
     if(task == "comms")
         {
             string mode;
+            #ifdef WIN32
             PlayMP3( "voice/mode_start.mp3" );
             #ifdef WIN32
                 sleep(2);
             #else
                 usleep(2);
             #endif
+            #endif
             cout << "Which mode do you want to start?" << endl;
+            #ifdef WIN32
             cout << "[p2p]" << endl;
+            #endif
             cout << "[IRC]" << endl;
             cout << "[text]" << endl;
+            #ifdef WIN32
             StopMP3( "voice/mode_start.mp3" );
+            #endif
             cin >> mode;
             if(mode == "p2p")
                 {
                     string mode_p2p;
+                    #ifdef WIN32
                     PlayMP3( "voice/like_to_be.mp3" );
+                    #endif
                     cout << "Which would you like to be?" << endl;
                     cout << "[client]" << endl;
                     cout << "[server]" << endl;
@@ -583,7 +621,9 @@ void lara()
                     #else
                         usleep(2);
                     #endif
+                    #ifdef WIN32
                     StopMP3( "voice/like_to_be.mp3" );
+                    #endif
                     cin >> mode_p2p;
                     if(mode_p2p == "server")
                         {
@@ -612,7 +652,11 @@ void lara()
                                 {
                                     myfile << message << endl;
                                 }
-                            std::system("cls");    
+                                #ifdef WIN32
+                            std::system("cls"); 
+                            #else
+                            std::system("clear");
+                            #endif
                             lara();     
                         }
                     if(textchoice == "decrypt")
@@ -639,7 +683,11 @@ void lara()
                                     #else
                                         usleep(20);
                                     #endif
-                                    std::system("cls");
+                        #ifdef WIN32
+                        std::system("cls");
+                        #else
+                        std::system("clear");
+                        #endif
                                     lara();
                                 }
                         }
@@ -766,6 +814,7 @@ void lara()
     if(task == "quit")
         {
             cout << "Goodbye" << endl;
+            #ifdef WIN32
             PlayMP3( "voice/goodbye.mp3" );
             #ifdef WIN32
                 sleep(2);
@@ -773,6 +822,7 @@ void lara()
                 usleep(2);
             #endif
             StopMP3( "voice/goodbye.mp3" );
+            #endif
         }
      if(task == "webcam")
         {
@@ -818,12 +868,17 @@ void debug()
     cin >> debug;
     if(debug == "yes")
       {
+          #ifdef WIN32
         std::system("cmd");
+        #else
+        std::system("bash");
+        #endif
       }
     if(debug != "yes")
       {
         string dia;
         cout << "Do you want me to run a diagnostic test?" << endl;
+        #ifdef WIN32
         PlayMP3( "voice/start_diagnostic.mp3" );
         #ifdef WIN32
             sleep(2);
@@ -831,6 +886,7 @@ void debug()
             usleep(2);
         #endif
         StopMP3( "voice/start_diagnostic.mp3" );
+        #endif
         cin >> dia;
         if(dia == "yes")
             {
@@ -910,9 +966,17 @@ void debug()
                             cout << "Test complete" << endl;
                             goto loop;
                         }
-                    if(what == "")
+                    if(what == "clock test")
                         {   
-                
+                        cout << "The expected output should be " + clock-test-speed + " clicks"  << endl;
+                          clock_t t;
+  int f;
+  t = clock();
+  printf ("Calculating...\n");
+  f = frequency_of_primes (99999);
+  printf ("The number of primes lower than 100,000 is: %d\n",f);
+  t = clock() - t;
+  printf ("It took me %d clicks (%f seconds).\n",t,((float)t)/CLOCKS_PER_SEC);
                         }   
                     if(what == "")
                         {   
@@ -925,7 +989,7 @@ void debug()
             }
       }
 }
-
+#ifdef WIN32
 void server()
 {
     //Creating the server vars
@@ -1036,7 +1100,7 @@ void client()
     std::system("cls");
     lara();
 }
-
+#endif
 void memo_check()
 {
     //get date variables
@@ -1090,6 +1154,7 @@ void update()
     char url2[] = "ftp://tomb.ddns.net:8080/lara-v/version.txt";
     bool reload = false;
     string line;
+    #ifdef WIN32
     PlayMP3( "voice/update.mp3" );
     #ifdef WIN32
         sleep(5);
@@ -1097,6 +1162,7 @@ void update()
         usleep(5);
     #endif
     StopMP3( "voice/update.mp3" );
+    #endif
     try
         {
             if(Download::download(url2, reload))
@@ -2187,8 +2253,6 @@ void qr_scanner()
             type_camera = "0";    
         }
     VideoCapture cap(type_camera);
-   // cap.set(CV_CAP_PROP_FRAME_WIDTH,800);
-   // cap.set(CV_CAP_PROP_FRAME_HEIGHT,640);
    //if not success, return to lara
     if (!cap.isOpened())
         {
@@ -2196,8 +2260,6 @@ void qr_scanner()
             lara();
         }
     ImageScanner scanner;  
-/*      scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 1);  
-*/
     //get the width of frames of the video
     double dWidth = cap.get(CV_CAP_PROP_FRAME_WIDTH); 
     //get the height of frames of the video
