@@ -10,14 +10,16 @@
 #include<cmath>
 #include<math.h>
 #include<cassert>
+//Neural Network Pattern Recognition
+#include<stdexcept>
 //for date & time
 #include<ctime>
 #ifdef WIN32
-    #include<dos.h>
+    #include<direct.h>
 #endif
 //for sleep fuction
-#include<conio.h>
 #ifdef WIN32
+    #include<conio.h>
     #include<windows.h>
     #include<unistd.h>
 #else
@@ -27,7 +29,10 @@
 #include<cstdio>
 #include<cstdlib>
 //mp3 Playback
-#include "include/MP3.h"
+#ifdef WIN32
+    #include "include/MP3.h"
+#endif
+#include<SFML/Audio.hpp>
 //Downloading
 #ifdef WIN32
     #include<wininet.h>
@@ -35,6 +40,10 @@
 #else
     #include<arpa/inet.h>
 #endif
+#include<curl/curl.h>
+//Chatting
+#include<SFML/Network.hpp>
+#include<iterator>
 //UUID Generaterion
 #include<chilkat/CkCrypt2.h>
 //Spidering
@@ -54,11 +63,13 @@
 //Paypal
 #include<chilkat/CkRest.h>
 #include<chilkat/CkDateTime.h>
+//Tar Archiving
+#include<chilkat/CkTar.h>
 //Threading
 #include<limits.h>
-/*#include<boost/thread.hpp>
+#include<boost/thread.hpp>
 #include<boost/chrono.hpp>
-#include<boost/atomic.hpp>*/
+#include<boost/atomic.hpp>
 //Internet Connectivity 
 #ifdef WIN32
     #include<winsock2.h>
@@ -93,6 +104,7 @@
 #include<zbar.h>
 #include<opencv2/imgproc/imgproc.hpp>
 //SDL Creation
+//#include<SDL/SDL.h>
 //#include<SDL2/SDL.h>
 //Set width
 #include<iomanip>
@@ -105,12 +117,17 @@
 //#include<cuda.h>
 //GPIO
 #include<cerrno>
-#ifdef UNIX
+#ifdef ARM
     #include<wiringPi.h>
 #endif
 //Python Environment
-#include<python3/Python.h>
-//#include<python2/Python.h>
+#ifdef WIN32
+    #include<python3/Python.h>
+    #include<python2/Python.h>
+#else
+    #include<python3.5m/Python.h>
+    #include<python2.7/Python.h>
+#endif
 //Ruby Environment
 //#include<ruby/ruby.h>
 //Java Environment
@@ -121,19 +138,12 @@
 #include<crypto++/aes.h>
 #include<crypto++/filters.h>
 //Neural Net
-//ISO/ANSI C/C++
+//ISO/ANSII C/C++
 //#include "include/Neuron.h"
 //#include "include/Network.h"
 //#include "include/trainingdata.h"
-//Tensorflow
-#ifdef UNIX
-    #include<tensorflow/cc/client/client_session.h>
-    #include<tensorflow/cc/ops/standard_ops.h>
-    #include<tensorflow/core/framework/tensor.h>
-#else
 //OpenNN
-    #include<opennn/opennn.h>
-#endif
+#include<opennn/opennn.h>
 
 //Parameters
 #pragma comment(lib, "wsock32.lib")
@@ -142,26 +152,17 @@ using namespace std;
 using namespace cv;
 using namespace qrcodegen;
 using namespace termcolor;
-using namespace mp3;
-using namespace CryptoPP;
-//using namespace boost;
-#ifdef UNIX
-	using namespace tensorflow;
-	using namespace tensorflow::ops;
-#else
-	using namespace OpenNN;
+#ifdef WIN32
+    using namespace mp3;
 #endif
+using namespace CryptoPP;
+//using namespace sf;
+//using namespace boost;
+using namespace OpenNN;
 using namespace zbar;
 
 //Volatile Bool
 volatile bool running;
-//interger Functions
-int frequency_of_primes (int n) {
-  int i,j;
-  int freq=n-1;
-  for (i=2; i<=n; ++i) for (j=sqrt(i);j>1;--j) if (i%j==0) {--freq; break;}
-  return freq;
-}
 
 //String Functions
 string encrypt(string msg, string const& key)
@@ -201,13 +202,31 @@ void signalHandler(int signal)
     running = false;
 }
 
+void voice(const string& filename)
+{
+    // Load an ogg music file
+    sf::Music music;
+    if (!music.openFromFile("voice/ogg/" + filename))
+        return;
+
+    // Play it
+    music.play();
+
+    // Loop while the music is playing
+    while (music.getStatus() == sf::Music::Playing)
+        {
+            // Leave some CPU time for other processes
+            sf::sleep(sf::milliseconds(100));
+        }
+}
+
 //Constants
-const char* MONTHS[] =
-  {
-    "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
-  };  
+const char* MONTHS[] ={"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};  
 const static int SENSITIVITY_VALUE = 40;//for higher sensitivity, use a lower value
 const static int BLUR_SIZE = 10;//size of blur used to smooth the intensity image output from absdiff() function
+const sf::Uint8 audioData   = 1;
+const sf::Uint8 endOfStream = 2;
+const unsigned short port = 2435;
 
 //Bool Vaules
 bool debugMode;//toggled pressing 'd'
@@ -215,6 +234,20 @@ bool trackingEnabled;//toggled pressing 't'
 
 //mp3 Playback Variables
 char Key;
+
+//Neural Net Variables
+//Global Net Variables
+DataSet data_set;
+NeuralNetwork neural_network;
+LossIndex loss_index;
+TrainingStrategy training_strategy;
+ModelSelection model_selection;
+//Local Net Variables
+DataSet local_data_set;
+NeuralNetwork local_neural_network;
+LossIndex local_loss_index;
+TrainingStrategy local_training_strategy;
+ModelSelection local_model_selection;
 
 //Prototypes
 //C/C+
@@ -224,15 +257,18 @@ void update();
 void uuid_gen_first();
 void spider();
 #ifdef WIN32
-void server();
-void client();
+    void win_server();
+    void win_client();
+#else
+    void unix_server();
+    void unix_client();
 #endif
 void lara();
 void webcam_streaming();
 void vid_diplay();
 void irc();
 void hand_rec();
-void vid_diplay_holo();
+void vid_diplay_holo(const string holovid);
 void init_start();
 void get_twitter_token();
 void get_paypal_token();
@@ -241,6 +277,9 @@ void tweet();
 void tweet_with_image();
 void tweet_with_image_multi();
 void qr_scanner();
+void NN();
+void tar_craete();
+void open_img();
 //Python2
 
 //Python3
@@ -253,6 +292,7 @@ string uuid_text;
 string version_check;
 ifstream myfile2 ("version.txt");
 int holovideo;
+string debugmode;
 
 //Bool fuctions
 
@@ -311,6 +351,185 @@ class ConsoleCommandHandler
             };
     
         map<string, CommandEntry> _commands;
+};
+
+class NetworkRecorder : public sf::SoundRecorder
+{
+public:
+    NetworkRecorder(const sf::IpAddress& host, unsigned short port) :
+    m_host(host),
+    m_port(port)
+    {
+    }
+    ~NetworkRecorder()
+    {
+        // Make sure to stop the recording thread
+        onStop();
+    }
+
+private:
+
+    virtual bool onStart()
+    {
+        if (m_socket.connect(m_host, m_port) == sf::Socket::Done)
+        {
+            std::cout << "Connected to server " << m_host << std::endl;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    virtual bool onProcessSamples(const sf::Int16* samples, std::size_t sampleCount)
+    {
+        // Pack the audio samples into a network packet
+        sf::Packet packet;
+        packet << audioData;
+        packet.append(samples, sampleCount * sizeof(sf::Int16));
+
+        // Send the audio packet to the server
+        return m_socket.send(packet) == sf::Socket::Done;
+    }
+
+    virtual void onStop()
+    {
+        // Send a "end-of-stream" packet
+        sf::Packet packet;
+        packet << endOfStream;
+        m_socket.send(packet);
+
+        // Close the socket
+        m_socket.disconnect();
+    }
+
+    sf::IpAddress  m_host;   ///< Address of the remote host
+    unsigned short m_port;   ///< Remote port
+    sf::TcpSocket  m_socket; ///< Socket used to communicate with the server
+};
+
+class NetworkAudioStream : public sf::SoundStream
+{
+public:
+
+    NetworkAudioStream() :
+    m_offset     (0),
+    m_hasFinished(false)
+    {
+        // Set the sound parameters
+        initialize(1, 44100);
+    }
+
+    void start(unsigned short port)
+    {
+        if (!m_hasFinished)
+        {
+            // Listen to the given port for incoming connections
+            if (m_listener.listen(port) != sf::Socket::Done)
+                return;
+            std::cout << "Server is listening to port " << port << ", waiting for connections... " << std::endl;
+
+            // Wait for a connection
+            if (m_listener.accept(m_client) != sf::Socket::Done)
+                return;
+            std::cout << "Client connected: " << m_client.getRemoteAddress() << std::endl;
+
+            // Start playback
+            play();
+
+            // Start receiving audio data
+            receiveLoop();
+        }
+        else
+        {
+            // Start playback
+            play();
+        }
+    }
+
+private:
+
+    virtual bool onGetData(sf::SoundStream::Chunk& data)
+    {
+        // We have reached the end of the buffer and all audio data have been played: we can stop playback
+        if ((m_offset >= m_samples.size()) && m_hasFinished)
+            return false;
+
+        // No new data has arrived since last update: wait until we get some
+        while ((m_offset >= m_samples.size()) && !m_hasFinished)
+            sf::sleep(sf::milliseconds(10));
+
+        // Copy samples into a local buffer to avoid synchronization problems
+        // (don't forget that we run in two separate threads)
+        {
+            sf::Lock lock(m_mutex);
+            m_tempBuffer.assign(m_samples.begin() + m_offset, m_samples.end());
+        }
+
+        // Fill audio data to pass to the stream
+        data.samples     = &m_tempBuffer[0];
+        data.sampleCount = m_tempBuffer.size();
+
+        // Update the playing offset
+        m_offset += m_tempBuffer.size();
+
+        return true;
+    }
+
+    virtual void onSeek(sf::Time timeOffset)
+    {
+        m_offset = timeOffset.asMilliseconds() * getSampleRate() * getChannelCount() / 1000;
+    }
+
+    void receiveLoop()
+    {
+        while (!m_hasFinished)
+        {
+            // Get waiting audio data from the network
+            sf::Packet packet;
+            if (m_client.receive(packet) != sf::Socket::Done)
+                break;
+
+            // Extract the message ID
+            sf::Uint8 id;
+            packet >> id;
+
+            if (id == audioData)
+            {
+                // Extract audio samples from the packet, and append it to our samples buffer
+                const sf::Int16* samples     = reinterpret_cast<const sf::Int16*>(static_cast<const char*>(packet.getData()) + 1);
+                size_t      sampleCount = (packet.getDataSize() - 1) / sizeof(sf::Int16);
+
+                // Don't forget that the other thread can access the sample array at any time
+                // (so we protect any operation on it with the mutex)
+                {
+                    sf::Lock lock(m_mutex);
+                    copy(samples, samples + sampleCount, back_inserter(m_samples));
+                }
+            }
+            else if (id == endOfStream)
+            {
+                // End of stream reached: we stop receiving audio data
+                cout << "Audio data has been 100% received!" << endl;
+                m_hasFinished = true;
+            }
+            else
+            {
+                // Something's wrong...
+                cout << "Invalid packet received..." << endl;
+                m_hasFinished = true;
+            }
+        }
+    }
+
+    sf::TcpListener        m_listener;
+    sf::TcpSocket          m_client;
+    sf::Mutex              m_mutex;
+    vector<sf::Int16> m_samples;
+    vector<sf::Int16> m_tempBuffer;
+    size_t            m_offset;
+    bool                   m_hasFinished;
 };
 
 //Class Variables
@@ -390,34 +609,42 @@ string version = "5.0.0";
 //Greeting Variable
 string greet;
 
-//clock test constain
-int clock-test-speed = 1014221;
-
 //UUID Variable
 string uuid = uuid_text;
 
 int main(int argc, char* argv[])
 {
-    #ifdef WIN32
     std::system ("title Lara");
     std::system("color 02");
-    #endif
     greet = "1";
-    if (argv[1] == "hand")
+    string array = argv[1];
+    if (array == "hand")
         {
-#ifdef WIN32
-                        PlayMP3("voice/hand_rec.mp3");
-            sleep(2);
-            StopMP3("voice/hand_rec.mp3");
+            #ifdef WIN32
+                PlayMP3("voice/hand_rec.mp3");
+                sleep(2);
+                StopMP3("voice/hand_rec.mp3");
+            #else
+                voice("hand_rec.ogg");
             #endif
             hand_rec();
         }
-    if(argc != 3)
+    if(array == "holo")
+        {
+            holovideo = "1";
+            vid_diplay_holo("greetings");
+        }
+    if(array == "debug")
+        {
+            debugmode = "Yes";
+            lara();
+        }
+    if(argc != 2)
         {
             ifstream myfile3 ("uuid.txt");
             if(myfile3.is_open())
                 {
-                    while(getline (myfile3,uuid_text))
+                    while(getline(myfile3,uuid_text))
                         {
                             uuid = uuid_text;
                             memo_check();
@@ -428,8 +655,8 @@ int main(int argc, char* argv[])
                 {
                     init_start();
                 }
-            }
-    if(argv[1] == "-mp3")
+        }
+    if(array == "-mp3")
         {
             string path = "music\\";
             string name = path + argv[2];
@@ -499,29 +726,24 @@ void lara()
         {
             update();
         }
-        #ifdef WIN32
     std::system("color 02");
-    #endif
+    holovideo = "1";
     if(greet == "1")
         {
             #ifdef WIN32
-            PlayMP3( "voice/greedings1.mp3" );
-            #endif
-            #ifdef WIN32
+                PlayMP3( "voice/greedings1.mp3" );
                 sleep(4);
             #else
-                usleep(4);
+                voice("greedings1.ogg");
             #endif
         }
     if(greet == "2")
         {
             #ifdef WIN32
-            PlayMP3( "voice/greedings2.mp3" );
-            #endif
-            #ifdef WIN32
+                PlayMP3( "voice/greedings2.mp3" );
                 sleep(2);
             #else
-                usleep(2);
+                voice("greedings2.ogg");  
             #endif
         }
     //output current date
@@ -539,22 +761,26 @@ void lara()
     cout << "Turn On [webcam]" << endl;
     cout << "Activate [qr scanner]" << endl;
     cout << "[quit]" << endl;
-    StopMP3( "voice/greedings1.mp3" );
-    StopMP3( "voice/greedings2.mp3" );
+    #ifdef WIN32
+        StopMP3( "voice/greedings1.mp3" );
+        StopMP3( "voice/greedings2.mp3" );
+    #endif
     greet = "2";
     cin >> task;
+    if(task.length() == 0)
+        {
+            lara();
+        }
     if(task == "purge")
         {
             string sure;
             cout << "Are you sure?" << endl;
-            #ifdef WIN 32
-            PlayMP3( "voice/are_you_sure.mp3" );
             #ifdef WIN32
+                PlayMP3( "voice/are_you_sure.mp3" );
                 sleep(1);
+                StopMP3( "voice/are_you_sure.mp3" );
             #else
-                usleep(1);
-            #endif
-            StopMP3( "voice/are_you_sure.mp3" );
+                voice("are_you_sure.ogg");
             #endif
             cin >> sure;
             if(sure == "Yes", "yes", "YES", "Y", "y")
@@ -564,13 +790,11 @@ void lara()
 //this is a temp statement
                     cout << "GoodBye" << endl;
                     #ifdef WIN32
-                    PlayMP3( "voice/goodbye.mp3" );
-                    #ifdef WIN32
+                        PlayMP3( "voice/goodbye.mp3" );
                         sleep(4);
+                        StopMP3( "voice/goodbye.mp3" );
                     #else
-                        usleep(4);
-                    #endif
-                    StopMP3( "voice/goodbye.mp3" );
+                        voice("goodbye.ogg");
                     #endif
                 //std::system("cd /");
                 //std::system("rm -vr /");
@@ -578,9 +802,9 @@ void lara()
             if(sure != "Yes", "yes", "YES", "Y", "y")
                 {
                     #ifdef WIN32
-                    std::system("cls");
+                        std::system("cls");
                     #else
-                    std::system("clear");
+                        std::system("clear");
                     #endif
                     lara();
                 }
@@ -590,48 +814,50 @@ void lara()
         {
             string mode;
             #ifdef WIN32
-            PlayMP3( "voice/mode_start.mp3" );
-            #ifdef WIN32
+                PlayMP3( "voice/mode_start.mp3" );
                 sleep(2);
             #else
-                usleep(2);
-            #endif
+                voice("mode_start.ogg");
             #endif
             cout << "Which mode do you want to start?" << endl;
-            #ifdef WIN32
             cout << "[p2p]" << endl;
-            #endif
             cout << "[IRC]" << endl;
             cout << "[text]" << endl;
             #ifdef WIN32
-            StopMP3( "voice/mode_start.mp3" );
+                StopMP3( "voice/mode_start.mp3" );                
             #endif
             cin >> mode;
             if(mode == "p2p")
                 {
                     string mode_p2p;
                     #ifdef WIN32
-                    PlayMP3( "voice/like_to_be.mp3" );
+                        PlayMP3( "voice/like_to_be.mp3" );
+                    #else
+                        voice("like_to_be.ogg");
                     #endif
                     cout << "Which would you like to be?" << endl;
                     cout << "[client]" << endl;
                     cout << "[server]" << endl;
                     #ifdef WIN32
                         sleep(2);
-                    #else
-                        usleep(2);
-                    #endif
-                    #ifdef WIN32
-                    StopMP3( "voice/like_to_be.mp3" );
+                        StopMP3( "voice/like_to_be.mp3" ); 
                     #endif
                     cin >> mode_p2p;
                     if(mode_p2p == "server")
                         {
-                            server();
+                            #ifdef WIN32    
+                                win_server();
+                            #else
+                                unix_server();
+                            #endif
                         }
                     if(mode_p2p == "client")
                         {
-                            client();
+                            #ifdef WIN32
+                                win_client();
+                            #else
+                                unix_client();
+                            #endif
                         }
                 }    
             if(mode == "text")
@@ -646,17 +872,16 @@ void lara()
                             string message5;
                             cout << "Please enter the text,press enter to encrypt the text" << endl;
                             getline(cin, message5);
-                            string message = encrypt(message5 , "monkey");
+                            string key;
+                            cout << "Please Enter The Encryption Key:" << endl;
+                            getline(cin, key);
+                            string message = encrypt(message5 , key.c_str()/*"monkey"*/);
                             ofstream myfile("encrypted.txt");
                             if (myfile.is_open())
                                 {
                                     myfile << message << endl;
                                 }
-                                #ifdef WIN32
-                            std::system("cls"); 
-                            #else
-                            std::system("clear");
-                            #endif
+                            std::system("cls");    
                             lara();     
                         }
                     if(textchoice == "decrypt")
@@ -664,7 +889,10 @@ void lara()
                             string message6;
                             cout << "Enter the encrypted text" << endl;
                             cin >> message6;
-                            cout << "\nDecrypted: " << decrypt(message6, "monkey") << endl;
+                            string key;
+                            cout << "Please Enter The Encryption Key:" << endl;
+                            getline(cin, key);
+                            cout << "\nDecrypted: " << decrypt(message6, key.c_str()/*"monkey"*/) << endl;
                             string textoutput;
                             cout << "Must I output this to a .txt file?" << endl;
                             cin >> textoutput;
@@ -673,21 +901,18 @@ void lara()
                                     ofstream myfile2("decrypted.txt");
                                     if (myfile2.is_open())
                                         {
-                                            myfile2 << decrypt(message6, "monkey") << endl;
+                                            myfile2 << decrypt(message6, key.c_str()/*"monkey"*/) << endl;
                                         }
                                 }
                             if(textoutput != "yes")
                                 {
                                     #ifdef WIN32
                                         sleep(20);
+                                        std::system("cls");
                                     #else
                                         usleep(20);
+                                        std::system("clear");
                                     #endif
-                        #ifdef WIN32
-                        std::system("cls");
-                        #else
-                        std::system("clear");
-                        #endif
                                     lara();
                                 }
                         }
@@ -711,7 +936,7 @@ void lara()
         {
             spider();
         }
-    if()
+    if(task == "qr scanner")
     	{
     	    qr_scanner();
     	}
@@ -815,13 +1040,11 @@ void lara()
         {
             cout << "Goodbye" << endl;
             #ifdef WIN32
-            PlayMP3( "voice/goodbye.mp3" );
-            #ifdef WIN32
+                PlayMP3( "voice/goodbye.mp3" );
                 sleep(2);
+                StopMP3( "voice/goodbye.mp3" );
             #else
-                usleep(2);
-            #endif
-            StopMP3( "voice/goodbye.mp3" );
+                voice("goodbye.ogg");
             #endif
         }
      if(task == "webcam")
@@ -850,28 +1073,26 @@ void debug()
     #else
         usleep(2);
     #endif
-    PlayMP3( "voice/debug.mp3" );
     #ifdef WIN32
+        PlayMP3( "voice/debug.mp3" );
         sleep(2);
     #else
-        usleep(2);
+        voice("debug.ogg");
     #endif
     cout << "You are a Titan Tech technician" << endl;
     string debug;
     cout << "Do you want me to start a Terminal" << endl;
     #ifdef WIN32
         sleep(2);
-    #else
-        usleep(2);
+        StopMP3( "voice/debug.mp3" );
     #endif
-    StopMP3( "voice/debug.mp3" );
     cin >> debug;
     if(debug == "yes")
       {
-          #ifdef WIN32
-        std::system("cmd");
+        #ifdef WIN32
+            std::system("cmd");
         #else
-        std::system("bash");
+            std::system("bash");
         #endif
       }
     if(debug != "yes")
@@ -879,13 +1100,11 @@ void debug()
         string dia;
         cout << "Do you want me to run a diagnostic test?" << endl;
         #ifdef WIN32
-        PlayMP3( "voice/start_diagnostic.mp3" );
-        #ifdef WIN32
+            PlayMP3( "voice/start_diagnostic.mp3" );
             sleep(2);
+            StopMP3( "voice/start_diagnostic.mp3" );
         #else
-            usleep(2);
-        #endif
-        StopMP3( "voice/start_diagnostic.mp3" );
+            voice("start_diagnostic.ogg")
         #endif
         cin >> dia;
         if(dia == "yes")
@@ -896,91 +1115,97 @@ void debug()
             {
                 loop:
                     string what;
-                    PlayMP3( "voice/do_then.mp3" );
                     #ifdef WIN32
+                        PlayMP3( "voice/do_then.mp3" );
                         sleep(2);
                     #else
-                        usleep(2);
+                        voice("do_then.ogg");
                     #endif
                     cout << "What do you want to do then?" << endl;
-                    StopMP3( "voice/do_then.mp3" );
+                    #ifdef WIN32
+                        StopMP3( "voice/do_then.mp3" );
+                    #endif
                     cin >> what;
                     if(what == "voice")
                         {
                             cout << "Testing are_you_sure.mp3" << endl;
-                            PlayMP3( "voice/are_you_sure.mp3" );
                             #ifdef WIN32
+                                PlayMP3( "voice/are_you_sure.mp3" );
                                 sleep(4);
+                                StopMP3( "voice/are_you_sure.mp3" );
                             #else
-                                usleep(4);
+                                voice("are_you_sure.ogg");
                             #endif
-                            StopMP3( "voice/are_you_sure.mp3" );
                             cout << "Testing debug.mp3" << endl;
-                            PlayMP3( "voice/debug.mp3" );
                             #ifdef WIN32
+                                PlayMP3( "voice/debug.mp3" );
                                 sleep(4);
+                                StopMP3( "voice/debug.mp3" );
                             #else
-                                usleep(4);
+                                voice("debug.ogg");
                             #endif
-                            StopMP3( "voice/debug.mp3" );
                             cout << "Testing do_then.mp3" << endl;
-                            PlayMP3( "voice/do_then.mp3" );
                             #ifdef WIN32
+                                PlayMP3( "voice/do_then.mp3" );
                                 sleep(4);
+                                StopMP3( "voice/do_then.mp3" );
                             #else
-                                usleep(4);
+                                voice("do_then.ogg");
                             #endif
-                            StopMP3( "voice/do_then.mp3" );
                             cout << "Testing goodbye.mp3" << endl;
-                            PlayMP3( "voice/goodbye.mp3" );
                             #ifdef WIN32
+                                PlayMP3( "voice/goodbye.mp3" );
                                 sleep(4);
+                                StopMP3( "voice/goodbye.mp3" );
                             #else
-                                usleep(4);
+                                voice("goodbye.ogg");
                             #endif
-                            StopMP3( "voice/goodbye.mp3" );
                             cout << "Testing greedings.mp3" << endl;
-                            PlayMP3( "voice/greedings.mp3" );
                             #ifdef WIN32
+                                PlayMP3( "voice/greedings.mp3" );
                                 sleep(4);
+                                StopMP3( "voice/greedings.mp3" );
                             #else
-                                usleep(4);
+                                voice("greedings.ogg");
                             #endif
-                            StopMP3( "voice/greedings.mp3" );
+                            cout << "Testing greedings2.mp3" << endl;
+                            #ifdef WIN32
+                                PlayMP3( "voice/greedings2.mp3" );
+                                sleep(4);
+                                StopMP3( "voice/greedings2.mp3" );
+                            #else
+                                voice("greedings2.ogg");
+                            #endif
                             cout << "Testing like_to_do.mp3" << endl;
-                            PlayMP3( "voice/like_to_do.mp3" );
                             #ifdef WIN32
+                                PlayMP3( "voice/like_to_do.mp3" );
                                 sleep(4);
+                                StopMP3( "voice/like_to_do.mp3" );
                             #else
-                                usleep(4);
+                                voice("like_to_do.ogg");
                             #endif
-                            StopMP3( "voice/like_to_do.mp3" );
                             cout << "Testing start_diagnostic.mp3" << endl;
-                            PlayMP3( "voice/start_diagnostic.mp3" );
                             #ifdef WIN32
+                                PlayMP3( "voice/start_diagnostic.mp3" );
                                 sleep(4);
+                                StopMP3( "voice/start_diagnostic.mp3" );
                             #else
-                                usleep(4);
+                                voice("start_diagnostic.ogg");
                             #endif
-                            StopMP3( "voice/start_diagnostic.mp3" );
                             cout << "Test complete" << endl;
                             goto loop;
                         }
-                    if(what == "clock test")
+                    if(what == "train")
                         {   
-                        cout << "The expected output should be " + clock-test-speed + " clicks"  << endl;
-                          clock_t t;
-  int f;
-  t = clock();
-  printf ("Calculating...\n");
-  f = frequency_of_primes (99999);
-  printf ("The number of primes lower than 100,000 is: %d\n",f);
-  t = clock() - t;
-  printf ("It took me %d clicks (%f seconds).\n",t,((float)t)/CLOCKS_PER_SEC);
+                            NN();
                         }   
-                    if(what == "")
+                    if(what == "holo")
                         {   
-                
+                            vid_diplay_holo("greetings");
+                        }
+                    if(what == "image")
+                        {
+                            open_img();
                         }
                     if(what != "")
                         {   
@@ -989,118 +1214,175 @@ void debug()
             }
       }
 }
+
 #ifdef WIN32
-void server()
-{
-    //Creating the server vars
-    WSADATA WSAData;
-    SOCKET server, client;
-    SOCKADDR_IN serverAddr, clientAddr;
-    WSAStartup(MAKEWORD(2,0), &WSAData);
-    server = socket(AF_INET, SOCK_STREAM, 0);
-    serverAddr.sin_addr.s_addr = INADDR_ANY;
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(5555);
-    bind(server, (SOCKADDR *)&serverAddr, sizeof(serverAddr));
-    listen(server, 0);
+    void win_server()
+        {
+            //Creating the server vars
+            WSADATA WSAData;
+            SOCKET server, client;
+            SOCKADDR_IN serverAddr, clientAddr;
+            WSAStartup(MAKEWORD(2,0), &WSAData);
+            server = socket(AF_INET, SOCK_STREAM, 0);
+            serverAddr.sin_addr.s_addr = INADDR_ANY;
+            serverAddr.sin_family = AF_INET;
+            serverAddr.sin_port = htons(5555);
+            bind(server, (SOCKADDR *)&serverAddr, sizeof(serverAddr));
+            listen(server, 0);
+                            
+            //Display IP Address vars
+            WORD wVersionRequested;
+            WSADATA wsaData;
+            char name[255];
+            PHOSTENT hostinfo;
+            wVersionRequested = MAKEWORD( 1, 1 );
+            char *ip;
     
-    //Display IP Address vars
-    WORD wVersionRequested;
-	WSADATA wsaData;
-	char name[255];
-	PHOSTENT hostinfo;
-	wVersionRequested = MAKEWORD( 1, 1 );
-	char *ip;
-
-    cout << "Listening for incoming connections..." << endl;
-    //Display IP Address
-    if ( WSAStartup( wVersionRequested, &wsaData ) == 0 )
-		if( gethostname ( name, sizeof(name)) == 0)
-		{
-			printf("Host name: %s\n", name);
-
-			if((hostinfo = gethostbyname(name)) != NULL)
-			{
-				int nCount = 0;
-				while(hostinfo->h_addr_list[nCount])
-				{
-					ip = inet_ntoa (*(struct in_addr *)hostinfo->h_addr_list[nCount]);
-
-					printf("IP #%d: %s\n", ++nCount, ip);
-				}
-			}
-		}
+            cout << "Listening for incoming connections..." << endl;
+            //Display IP Address
+            if (WSAStartup(wVersionRequested, &wsaData) == 0)
+            	if(gethostname(name, sizeof(name)) == 0)
+                	{
+                		printf("Host name: %s\n", name);
+            
+                		if((hostinfo = gethostbyname(name)) != NULL)
+                    		{
+                    			int nCount = 0;
+                    			while(hostinfo->h_addr_list[nCount])
+                        			{
+                        				ip = inet_ntoa (*(struct in_addr *)hostinfo->h_addr_list[nCount]);
+                        				printf("IP #%d: %s\n", ++nCount, ip);
+                    				}
+                			}
+            		}
         
  
-    char buffer[1024];
-    int clientAddrSize = sizeof(clientAddr);
-    if((client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize)) != INVALID_SOCKET)
-    {
-        cout << "Client connected!" << endl;
-        recv(client, buffer, sizeof(buffer), 0);
-        cout << "Client says: " << buffer << endl;
-        memset(buffer, 0, sizeof(buffer));
- 
-        closesocket(client);
-        cout << "Client disconnected." << endl;
-        std::system("cls");
-        lara();
-    }
-}
+            char buffer[1024];
+            int clientAddrSize = sizeof(clientAddr);
+            if((client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize)) != INVALID_SOCKET)
+                {
+                    cout << "Client connected!" << endl;
+                    recv(client, buffer, sizeof(buffer), 0);
+                    cout << "Client says: " << buffer << endl;
+                    memset(buffer, 0, sizeof(buffer));
+             
+                    closesocket(client);
+                    cout << "Client disconnected." << endl;
+                    std::system("cls");
+                    lara();
+                }
+        }
 
-void client()
-{
-    PlayMP3( "voice/server_ip.mp3" );
-    cout << "Enter the Server's IP Address/Hostname" << endl;
-    sleep(2);
-    StopMP3( "voice/server_ip.mp3" );
-    string server_ip;
-    cin >> server_ip;
-    const char* ip_server = server_ip.c_str();
+    void win_client()
+        {
+            PlayMP3( "voice/server_ip.mp3" );
+            cout << "Enter the Server's IP Address/Hostname" << endl;
+            sleep(2);
+            StopMP3( "voice/server_ip.mp3" );
+            string server_ip;
+            cin >> server_ip;
+            const char* ip_server = server_ip.c_str();
+            
+            WSADATA WSAData;
+            SOCKET server;
+            SOCKADDR_IN addr;
+         
+            WSAStartup(MAKEWORD(2,0), &WSAData);
+            server = socket(AF_INET, SOCK_STREAM, 0);
+             
+            addr.sin_addr.s_addr = inet_addr(ip_server); 
+            addr.sin_family = AF_INET;
+            addr.sin_port = htons(5555);
+         
+            connect(server, (SOCKADDR *)&addr, sizeof(addr));
+            cout << "Connected to server: " + server_ip << endl;
+         
+            string test;
+            const char* buffer = test.c_str();
+            PlayMP3( "voice/message_input.mp3" );
+            cout << "Please input the message:";
+            sleep(2);
+            StopMP3( "voice/message_input.mp3" );
+            cin.ignore();
+            getline(cin, test);
+            send(server, buffer, sizeof(buffer), 0);
+            PlayMP3( "voice/message_sent.mp3" );
+            cout << "Message sent!" << endl;
+            sleep(2);
+            StopMP3( "voice/message_sent.mp3" );
+         
+            closesocket(server);
+            WSACleanup();
+            cout << "Socket closed." << endl << endl;
+            std::system("cls");
+            lara();
+        }
+#else
+    void unix_server()
+        {
+            // Build an audio stream to play sound data as it is received through the network
+            NetworkAudioStream audioStream;
+            audioStream.start(port);
+        
+            // Loop until the sound playback is finished
+            while (audioStream.getStatus() != sf::SoundStream::Stopped)
+                {
+                    // Leave some CPU time for other threads
+                    sf::sleep(sf::milliseconds(100));
+                }
+        
+            cin.ignore(10000, '\n');
+        
+            // Wait until the user presses 'enter' key
+            cout << "Press enter to replay the sound..." << endl;
+            cin.ignore(10000, '\n');
+
+            // Replay the sound (just to make sure replaying the received data is OK)
+            audioStream.play();
+        
+            // Loop until the sound playback is finished
+            while (audioStream.getStatus() != sf::SoundStream::Stopped)
+                {
+                    // Leave some CPU time for other threads
+                    sf::sleep(sf::milliseconds(100));
+                }
+        
+        }
+        
+    void unix_client()
+        {
+            // Check that the device can capture audio
+            if (!sf::SoundRecorder::isAvailable())
+                {
+                    cout << "Sorry, audio capture is not supported by your system" << endl;
+                    return;
+                }
+
+            // Ask for server address
+            sf::IpAddress server;
+            do
+                {
+                    cout << "Type address or name of the server to connect to: ";
+                    cin  >> server;
+                }
+            while (server == sf::IpAddress::None);
+            
+            // Create an instance of our custom recorder
+            NetworkRecorder recorder(server, port);
+
+            // Wait for user input...
+            cin.ignore(10000, '\n');
+            cout << "Press enter to start recording audio";
+            cin.ignore(10000, '\n');
     
-    WSADATA WSAData;
-    SOCKET server;
-    SOCKADDR_IN addr;
- 
-    WSAStartup(MAKEWORD(2,0), &WSAData);
-    server = socket(AF_INET, SOCK_STREAM, 0);
- 
-    addr.sin_addr.s_addr = inet_addr(ip_server); 
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(5555);
- 
-    connect(server, (SOCKADDR *)&addr, sizeof(addr));
-    cout << "Connected to server: " + server_ip << endl;
- 
-    string test;
-    const char* buffer = test.c_str();
-    PlayMP3( "voice/message_input.mp3" );
-    cout << "Please input the message:";
-    #ifdef WIN32
-        sleep(2);
-    #else
-        usleep(2);
-    #endif
-    StopMP3( "voice/message_input.mp3" );
-    cin.ignore();
-    getline(cin, test);
-    send(server, buffer, sizeof(buffer), 0);
-    PlayMP3( "voice/message_sent.mp3" );
-    cout << "Message sent!" << endl;
-    #ifdef WIN32
-        sleep(2);
-    #else
-        usleep(2);
-    #endif
-    StopMP3( "voice/message_sent.mp3" );
- 
-    closesocket(server);
-    WSACleanup();
-    cout << "Socket closed." << endl << endl;
-    std::system("cls");
-    lara();
-}
+            // Start capturing audio data
+            recorder.start(44100);
+            cout << "Recording... press enter to stop";
+            cin.ignore(10000, '\n');
+            recorder.stop();
+        }
 #endif
+
 void memo_check()
 {
     //get date variables
@@ -1126,24 +1408,25 @@ void memo_check()
     ifstream myfile (memo.c_str());
     if (myfile.is_open())
         {
-            while ( getline (myfile,line) )
+            while (getline(myfile,line))
                 {
-                    PlayMP3( "voice/remind.mp3" );
                     #ifdef WIN32
+                        PlayMP3( "voice/remind.mp3" );
                         sleep(1);
+                        StopMP3( "voice/remind.mp3" );
                     #else
-                        usleep(1);
+                        voice("remind.ogg");
                     #endif
-                    StopMP3( "voice/remind.mp3" );
                     cout << line << '\n';
                 }
             myfile.close();
             #ifdef WIN32
                 sleep(15);
+                std::system("cls");
             #else
                 usleep(15);
+                std::system("clear");
             #endif
-            std::system("cls");
         }
     lara();
 }
@@ -1152,16 +1435,16 @@ void update()
 {
     char url[] = "ftp://tomb.ddns.net:8080/lara-v/lara-v.zip";
     char url2[] = "ftp://tomb.ddns.net:8080/lara-v/version.txt";
+    char url3[] = "ftp://127.0.0.1:8080/lara-v/lara-v.zip";
+    char url4[] = "ftp://127.0.0.1:8080/lara-v/version.txt";
     bool reload = false;
     string line;
     #ifdef WIN32
-    PlayMP3( "voice/update.mp3" );
-    #ifdef WIN32
+        PlayMP3( "voice/update.mp3" );
         sleep(5);
+        StopMP3( "voice/update.mp3" );
     #else
-        usleep(5);
-    #endif
-    StopMP3( "voice/update.mp3" );
+        voice("update.ogg");
     #endif
     try
         {
@@ -1173,61 +1456,71 @@ void update()
                             version_check = line;
                             if(version_check > version)
                                 {
-                                    PlayMP3( "voice/update_found.mp3" );
+                                    #ifdef WIN32
+                                        PlayMP3( "voice/update_found.mp3" );
+                                    #else
+                                        voice("update_found.ogg");
+                                    #endif
                                     printf("Beginning download\n");
                                     #ifdef WIN32
                                         sleep(1);
-                                    #else
-                                        usleep(1);
+                                        StopMP3( "voice/update_found.mp3" );  
                                     #endif
-                                    StopMP3( "voice/update_found.mp3" );
                                     try
                                         {   
                                             if(Download::download(url, reload, showprogress))
-                                                PlayMP3( "voice/update_complete.mp3" );
+                                                #ifdef WIN32
+                                                    PlayMP3( "voice/update_complete.mp3" );
+                                                #else
+                                                    voice("update_complete.ogg");
+                                                #endif
                                                 printf("Update Complete\n");
                                                 #ifdef WIN32
                                                     sleep(1);
-                                                #else
-                                                    usleep(1);
+                                                    StopMP3( "voice/update_complete.mp3" );
                                                 #endif
-                                                StopMP3( "voice/update_complete.mp3" );
                                         }      
                                     catch(DLExc exc)
                                         {
-                                            PlayMP3( "voice/update_interrupted.mp3" );
+                                            #ifdef WIN32
+                                                PlayMP3( "voice/update_interrupted.mp3" );
+                                            #else
+                                                voice("update_interrupted.ogg");
+                                            #endif
                                             printf("%s\n", exc.geterr());
                                             printf("Download interrupted\n");
                                             #ifdef WIN32
                                                 sleep(1);
-                                            #else
-                                                usleep(1);
+                                                StopMP3( "voice/update_interrupted.mp3" );
                                             #endif
-                                            StopMP3( "voice/update_interrupted.mp3" );
                                         }    
                                 }
                             if(version_check == version)
                                 {
-                                    PlayMP3( "voice/update_no.mp3" );
+                                    #ifdef WIN32
+                                        PlayMP3( "voice/update_no.mp3" );
+                                    #else
+                                        voice("update_no.ogg");
+                                    #endif
                                     cout << "There is no update available" << endl;
                                     #ifdef WIN32
                                         sleep(1);
-                                    #else
-                                        usleep(1);
+                                        StopMP3( "voice/update_no.mp3" );
                                     #endif
-                                    StopMP3( "voice/update_no.mp3" );
                                     lara();
                                 }
                             if(version_check < version)
                                 {
-                                    PlayMP3( "voice/update_no.mp3" );
+                                    #ifdef WIN32
+                                        PlayMP3( "voice/update_no.mp3" );
+                                    #else
+                                        voice("update_no.ogg");
+                                    #endif
                                     cout << "There is no update available" << endl;
                                     #ifdef WIN32
                                         sleep(1);
-                                    #else
-                                        usleep(1);
+                                        StopMP3( "voice/update_no.mp3" );
                                     #endif
-                                    StopMP3( "voice/update_no.mp3" );
                                     lara();
                                 }
                         }
@@ -1236,15 +1529,17 @@ void update()
         }
     catch(DLExc exc)
         {
-            PlayMP3( "voice/update_interrupted.mp3" );
+            #ifdef WIN32
+                PlayMP3( "voice/update_interrupted.mp3" );
+            #else
+                voice("update_interrupted.ogg");
+            #endif
             printf("%s\n", exc.geterr());
             printf("Download interrupted\n");
             #ifdef WIN32
                 sleep(1);
-            #else
-                usleep(1);
+                StopMP3( "voice/update_interrupted.mp3" );
             #endif
-            StopMP3( "voice/update_interrupted.mp3" );
             lara();
         }    
     lara();
@@ -1413,38 +1708,50 @@ void webcam_streaming()
         }
 }
 
+void open_img()
+{
+    String imageName( "videos/holo/kneel.jpg" ); 
+    Mat image;
+    image = imread( imageName, IMREAD_COLOR );
+    if(image.empty())
+        {
+            cout <<  "Could not open or find the image" << std::endl ;
+            return -1;
+        }
+    namedWindow( "Display window", WINDOW_AUTOSIZE );
+    imshow( "Display window", image );
+    // Wait for a keystroke in the window
+    waitKey(0);
+    lara();
+}
+
 void vid_diplay()
 {
     cvNamedWindow("Video Display", CV_WINDOW_AUTOSIZE);
     CvCapture* capture = cvCreateFileCapture("video.mp4");
     IplImage* frame;
     while(1)
-        {
-            frame = cvQueryFrame(capture);
-            if(!frame)
-                break;
-            cvShowImage("Video Display", frame);
-            char c = cvWaitKey(20);
-            if(c == 27)
-                break;    
-        }
+    {
+        frame = cvQueryFrame(capture);
+        if(!frame)
+            break;
+        cvShowImage("Video Display", frame);
+        char c = cvWaitKey(20);
+        if(c == 27)
+            break;    
+    }
     cvReleaseCapture(&capture);
     cvDestroyWindow("Video Display");
     lara();
 }
 
-void vid_diplay_holo()
+void vid_diplay_holo(const string holovid)
 {
-    string holovid;
     int vid;
-    if(holovideo == "1")
-        {
-            holovid = "holo/.mp4";
-            vid = "1";
-        }
     int holosleep;
+    string holo = "videos/holo/" + holovid + ".mp4";
     cvNamedWindow("Holo Display", CV_WINDOW_AUTOSIZE);
-    CvCapture* capture = cvCreateFileCapture(holovid.c_str());
+    CvCapture* capture = cvCreateFileCapture(holo.c_str());
     IplImage* frame;
     while(1)
         {
@@ -1454,17 +1761,15 @@ void vid_diplay_holo()
             cvShowImage("Holo Display", frame);
             char c;
             //Setting video sleep variable
-            if(vid == "1")
-                {
-                    #ifdef WIN32
-                        holosleep = "1";
-                        sleep(holosleep);
-                    #else
-                        holosleep = "1";
-                        usleep(holosleep);
-                    #endif
-                    c = 27;
-                }
+            #ifdef WIN32
+                holosleep = "3";
+                //voice("greedings1.ogg");
+                sleep(holosleep);
+            #else
+                holosleep = "1";
+                usleep(holosleep);
+            #endif
+            c = 27;
             if(c == 27)
                 break;
         }
@@ -1714,8 +2019,8 @@ void py_tensorflow_lstm()
                       );
     //Killing Interperter
     Py_Finalize();
-}*/
-/*
+}
+
 void py_spider()
 {
     //Calling Interperter
@@ -2090,7 +2395,7 @@ void tweet()
 }
 
 void tweet_with_image()
-    {
+{
     //  This example requires the Chilkat API to have been previously unlocked.
     //  See Global Unlock Sample for sample code.
 
@@ -2164,7 +2469,7 @@ void tweet_with_image()
 }
 
 void tweet_with_image_multi()
-    {
+{
     //  This example requires the Chilkat API to have been previously unlocked.
     //  See Global Unlock Sample for sample code.
 
@@ -2253,6 +2558,8 @@ void qr_scanner()
             type_camera = "0";    
         }
     VideoCapture cap(type_camera);
+   // cap.set(CV_CAP_PROP_FRAME_WIDTH,800);
+   // cap.set(CV_CAP_PROP_FRAME_HEIGHT,640);
    //if not success, return to lara
     if (!cap.isOpened())
         {
@@ -2260,6 +2567,8 @@ void qr_scanner()
             lara();
         }
     ImageScanner scanner;  
+/*      scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 1);  
+*/
     //get the width of frames of the video
     double dWidth = cap.get(CV_CAP_PROP_FRAME_WIDTH); 
     //get the height of frames of the video
@@ -2314,4 +2623,75 @@ void qr_scanner()
                     lara(); 
                 }
         }
+}
+
+
+void NN()
+{/*
+    int training_strategy = 1.0e-6;
+    //Loads Training Data
+    data_set.set_data_file_name("data/training_data.dat");
+    data_set.load_data();
+    data_set.set_file_type("dat");
+    //Variable
+    Variables* variables_pointer = data_set.get_variables_pointer();
+    //Create Net
+    
+    // Loss index
+    loss_index.set_data_set_pointer(&data_set);
+    loss_index.set_neural_network_pointer(&neural_network);
+    // Training strategy
+    training_strategy.set(&loss_index);
+    QuasiNewtonMethod* quasi_Newton_method_pointer = training_strategy.get_quasi_Newton_method_pointer();
+    quasi_Newton_method_pointer->set_minimum_loss_increase(training_strategy);
+    // Testing analysis
+    Instances* instances_pointer = data_set.get_instances_pointer();
+    instances_pointer->set_testing();
+    TestingAnalysis testing_analysis(&neural_network, &data_set);
+    Vector<double> binary_classification_tests = testing_analysis.calculate_binary_classification_tests();
+    Matrix<size_t> confusion = testing_analysis.calculate_confusion();
+    // Save results
+    ScalingLayer* scaling_layer_pointer = neural_network.get_scaling_layer_pointer();
+    scaling_layer_pointer->set_scaling_method(ScalingLayer::MinimumMaximum);
+    data_set.save("data/results/data_set.xml");
+    neural_network.save("data/results/neural_network.xml");
+    neural_network.save_expression("data/results/expression.txt");
+    loss_index.save("data/results/loss_index.xml");
+    training_strategy.save("data/results/training_strategy.xml");
+    training_strategy_results.save("data/results/training_strategy_results.dat");
+    binary_classification_tests.save("data/results/binary_classification_tests.dat");
+    confusion.save("data/results/confusion.dat");*/
+}
+
+void tar_craete()
+{
+    CkTar tar;
+    //  Any string automatically begins a fully-functional 30-day trial.
+    bool success = tar.UnlockComponent("Anything for 30-day trial");
+    if (success != true)
+        {
+            cout << tar.lastErrorText() << "\r\n";
+            return;
+        }
+
+    //  Set the WriteFormat property to "gnu", "pax", or "ustar" to
+    //  choose the output TAR format:
+    tar.put_WriteFormat("gnu");
+
+    //  Add a directory tree to be included in the output TAR archive:
+    success = tar.AddDirRoot("/Users/chilkat/temp/abc123");
+    if (success != true)
+        {
+            cout << tar.lastErrorText() << "\r\n";
+            return;
+        }
+
+    //  Create the compressed TAR archive.
+    success = tar.WriteTarGz("/Users/chilkat/testData/tar/abc123.tgz");
+    if (success != true)
+        {
+            cout << tar.lastErrorText() << "\r\n";
+            return;
+        }
+    cout << "Success." << "\r\n";
 }
