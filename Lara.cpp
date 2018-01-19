@@ -79,7 +79,9 @@
     #include<sys/socket.h>
     #include<sys/types.h>
     #include<netinet/in.h>
-    #include<netdb.h> 
+    #include<netdb.h>
+    #include<arpa/inet.h>
+    #include<unistd.h>
 #endif
 //MYSQL database
 
@@ -93,10 +95,10 @@
 #include<map>
 #include<algorithm>
 #include<signal.h>
-#include "include/irc/IRCClient.h"
-#include "include/irc/IRCHandler.h"
-#include "include/irc/IRCSocket.h"
-#include "include/irc/Thread.h"
+#include "include/IRC/IRCClient.h"
+#include "include/IRC/IRCHandler.h"
+#include "include/IRC/IRCSocket.h"
+#include "include/IRC/Thread.h"
 //QR Code Generation
 #include<cstdint>
 #include "include/qr_code/QrCode.hpp"
@@ -133,10 +135,10 @@
 //Java Environment
 //#include<java/jni.h>
 //Encryption Headers
-#include<crypto++/osrng.h>
-#include<crypto++/modes.h>
-#include<crypto++/aes.h>
-#include<crypto++/filters.h>
+#include<cryptopp/osrng.h>
+#include<cryptopp/modes.h>
+#include<cryptopp/aes.h>
+#include<cryptopp/filters.h>
 //Neural Net
 //ISO/ANSII C/C++
 //#include "include/Neuron.h"
@@ -192,10 +194,10 @@ string decrypt(string const& msg, string const& key)
 
 //Prototypes Functions
 void showprogress(unsigned long total, unsigned long part)//Displays the download progress as a percentage
-    {
-        int val = (int) ((double)part / total * 100);
-        printf("progress: %i%%\n", val);
-    }
+{
+    int val = (int) ((double)part / total * 100);
+    printf("progress: %i%%\n", val);
+}
     
 void signalHandler(int signal)
 {
