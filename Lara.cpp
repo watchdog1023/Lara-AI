@@ -135,10 +135,12 @@
 //Java Environment
 //#include<java/jni.h>
 //Encryption Headers
-#include<cryptopp/osrng.h>
+/*#include<cryptopp/osrng.h>
 #include<cryptopp/modes.h>
 #include<cryptopp/aes.h>
-#include<cryptopp/filters.h>
+#include<cryptopp/filters.h>*/
+//Bitcoin Balance
+//#include<bitcoinapi/bitcoinapi.h>
 //Neural Net
 //ISO/ANSII C/C++
 //#include "include/Neuron.h"
@@ -157,7 +159,7 @@ using namespace termcolor;
 #ifdef WIN32
     using namespace mp3;
 #endif
-using namespace CryptoPP;
+//using namespace CryptoPP;
 //using namespace sf;
 //using namespace boost;
 using namespace OpenNN;
@@ -270,7 +272,7 @@ void webcam_streaming();
 void vid_diplay();
 void irc();
 void hand_rec();
-void vid_diplay_holo(const string holovid);
+void vid_diplay_holo(string holovid);
 void init_start();
 void get_twitter_token();
 void get_paypal_token();
@@ -634,31 +636,14 @@ int main(int argc, char* argv[])
     if(array == "holo")
         {
             holovideo = "1";
-            vid_diplay_holo("greetings");
+            vid_diplay_holo("greeting");
         }
     if(array == "debug")
         {
             debugmode = "Yes";
             lara();
         }
-    if(argc != 2)
-        {
-            ifstream myfile3 ("uuid.txt");
-            if(myfile3.is_open())
-                {
-                    while(getline(myfile3,uuid_text))
-                        {
-                            uuid = uuid_text;
-                            memo_check();
-                        }
-                    myfile3.close();
-                }
-            else
-                {
-                    init_start();
-                }
-        }
-    if(array == "-mp3")
+    if(array == "mp3")
         {
             string path = "music\\";
             string name = path + argv[2];
@@ -709,6 +694,23 @@ int main(int argc, char* argv[])
                                         }
                                 }         
                         }
+                }
+        }
+    if(argc != 2)
+        {
+            ifstream myfile3 ("uuid.txt");
+            if(myfile3.is_open())
+                {
+                    while(getline(myfile3,uuid_text))
+                        {
+                            uuid = uuid_text;
+                            memo_check();
+                        }
+                    myfile3.close();
+                }
+            else
+                {
+                    init_start();
                 }
         }
 }
@@ -1747,36 +1749,36 @@ void vid_diplay()
     lara();
 }
 
-void vid_diplay_holo(const string holovid)
+void vid_diplay_holo(string holovid)
 {
-    int vid;
-    int holosleep;
-    string holo = "videos/holo/" + holovid + ".mp4";
-    cvNamedWindow("Holo Display", CV_WINDOW_AUTOSIZE);
-    CvCapture* capture = cvCreateFileCapture(holo.c_str());
-    IplImage* frame;
+    VideoCapture cap(("videos/holo/" + holovid + ".mp4").c_str());
+    if(!cap.isOpened())
+    {
+      cout << "Error opening video stream or file" << endl;
+      lara();
+    }
     while(1)
         {
-            frame = cvQueryFrame(capture);
-            if(!frame)
+            Mat frame;
+            // Capture frame-by-frame
+            cap >> frame;
+ 
+            // If the frame is empty, break immediately
+            if (frame.empty())
                 break;
-            cvShowImage("Holo Display", frame);
-            char c;
-            //Setting video sleep variable
-            #ifdef WIN32
-                holosleep = "3";
-                //voice("greedings1.ogg");
-                sleep(holosleep);
-            #else
-                holosleep = "1";
-                usleep(holosleep);
-            #endif
-            c = 27;
+
+            // Display the resulting frame
+            imshow("Holo Video", frame);
+
+            // Press  ESC on keyboard to exit
+            char c=(char)waitKey(25);
             if(c == 27)
                 break;
         }
-    cvReleaseCapture(&capture);
-    cvDestroyWindow("Holo Display");
+    // When everything done, release the video capture object
+    cap.release();
+    // Closes all the frames
+    destroyAllWindows();
     lara();
 }
 
