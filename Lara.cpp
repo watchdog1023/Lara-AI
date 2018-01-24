@@ -70,6 +70,9 @@
 #include<boost/thread.hpp>
 #include<boost/chrono.hpp>
 #include<boost/atomic.hpp>
+#include<boost/bind.hpp>
+//MPI
+//#include<boost/mpi.hpp>
 //Internet Connectivity 
 #ifdef WIN32
     #include<winsock2.h>
@@ -161,7 +164,10 @@ using namespace termcolor;
 #endif
 //using namespace CryptoPP;
 //using namespace sf;
+//Boost Namespaces
 //using namespace boost;
+//using namespace boost::mpi;
+//using namespace boost::this_thread;
 using namespace OpenNN;
 using namespace zbar;
 
@@ -256,6 +262,7 @@ ModelSelection local_model_selection;
 //Prototypes
 //C/C+
 void memo_check();
+void start();
 void debug();
 void update();
 void uuid_gen_first();
@@ -297,6 +304,12 @@ string version_check;
 ifstream myfile2 ("version.txt");
 int holovideo;
 string debugmode;
+
+//Threading Variables
+boost::mutex mutex;
+
+//Thread Group
+boost::thread_group tgroup;
 
 //Bool fuctions
 
@@ -621,8 +634,8 @@ int main(int argc, char* argv[])
     std::system ("title Lara");
     std::system("color 02");
     greet = "1";
-    string array = argv[1];
-    if (array == "hand")
+//    string array = argv[1];
+    if (string(argv[1]) == "hand")
         {
             #ifdef WIN32
                 PlayMP3("voice/hand_rec.mp3");
@@ -633,17 +646,17 @@ int main(int argc, char* argv[])
             #endif
             hand_rec();
         }
-    if(array == "holo")
+    if(string(argv[1]) == "holo")
         {
             holovideo = "1";
             vid_diplay_holo("greeting");
         }
-    if(array == "debug")
+    if(string(argv[1]) == "debug")
         {
             debugmode = "Yes";
-            lara();
+            start();
         }
-    if(array == "mp3")
+    if(string(argv[1]) == "-mp3")
         {
             string path = "music\\";
             string name = path + argv[2];
@@ -681,6 +694,7 @@ int main(int argc, char* argv[])
                                                 CloseMP3(output.c_str());
                                                 break;
                                             case VK_ESCAPE:
+                                                CloseMP3(output.c_str());
                                                 ifstream myfile3 ("uuid.txt");
                                                 if(myfile3.is_open())
                                                     {
@@ -715,6 +729,14 @@ int main(int argc, char* argv[])
         }
 }
 
+void start()
+{
+    tgroup.create_thread(boost::bind(&vid_diplay_holo, "greeting"));
+    tgroup.create_thread(boost::bind(&lara));
+    tgroup.join_all();
+    std::system("exit");  
+}
+
 void lara()
 {
     //Get Time Variables
@@ -731,7 +753,6 @@ void lara()
             update();
         }
     std::system("color 02");
-    holovideo = "1";
     if(greet == "1")
         {
             #ifdef WIN32
@@ -773,7 +794,7 @@ void lara()
     cin >> task;
     if(task.length() == 0)
         {
-            lara();
+            start();
         }
     if(task == "purge")
         {
@@ -1050,6 +1071,7 @@ void lara()
             #else
                 voice("goodbye.ogg");
             #endif
+            std::system("exit");
         }
      if(task == "webcam")
         {
@@ -1432,7 +1454,7 @@ void memo_check()
                 std::system("clear");
             #endif
         }
-    lara();
+    start();
 }
 
 void update()
@@ -1544,9 +1566,9 @@ void update()
                 sleep(1);
                 StopMP3( "voice/update_interrupted.mp3" );
             #endif
-            lara();
+            start();
         }    
-    lara();
+    start();
 }
 
 void uuid_gen_first()
@@ -1572,7 +1594,7 @@ void init_start()
         char cwd[1024];
         getcwd(cwd, sizeof(cwd));
         string setpath = "export PATH=$PATH:" + cwd;
-        string setpathper = "echo '" + setpath + "'  >> ~/.bash_profile"
+        string setpathper = "echo '" + setpath + "'  >> /etc/profile"
         system(setpath.c_str());
         system(setpathper.c_str());
     #endif
@@ -1714,7 +1736,7 @@ void webcam_streaming()
 
 void open_img()
 {
-    String imageName( "videos/holo/kneel.jpg" ); 
+    string imageName( "videos/holo/kneel.jpg" ); 
     Mat image;
     image = imread( imageName, IMREAD_COLOR );
     if(image.empty())
@@ -1779,7 +1801,6 @@ void vid_diplay_holo(string holovid)
     cap.release();
     // Closes all the frames
     destroyAllWindows();
-    lara();
 }
 
 void irc()
