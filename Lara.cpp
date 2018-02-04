@@ -21,10 +21,11 @@
 #ifdef WIN32
     #include<conio.h>
     #include<windows.h>
-    #include<unistd.h>
 #else
-    #include<unistd.h>
+    #include<ncurses.h>
+    #include<curses.h>
 #endif
+#include<unistd.h>
 //C libs to use system function
 #include<cstdio>
 #include<cstdlib>
@@ -71,6 +72,9 @@
 #include<boost/chrono.hpp>
 #include<boost/atomic.hpp>
 #include<boost/bind.hpp>
+#ifdef UNIX
+   #include<pthread.h>
+#endif
 //MPI
 //#include<boost/mpi.hpp>
 //Internet Connectivity 
@@ -106,7 +110,9 @@
 #include<cstdint>
 #include "include/qr_code/QrCode.hpp"
 //QR code Scanner
-#include<zbar.h>
+#ifdef WIN32
+    #include<zbar.h>
+#endif
 #include<opencv2/imgproc/imgproc.hpp>
 //SDL Creation
 //#include<SDL/SDL.h>
@@ -149,8 +155,13 @@
 //#include "include/Neuron.h"
 //#include "include/Network.h"
 //#include "include/trainingdata.h"
-//OpenNN
-#include<opennn/opennn.h>
+#ifdef UNIX
+    //Tensorflow
+    #include<tensorflow/c/c_api.h>
+#else
+    //OpenNN
+    #include<opennn/opennn.h>
+#endif
 
 //Parameters
 #pragma comment(lib, "wsock32.lib")
@@ -169,7 +180,9 @@ using namespace termcolor;
 //using namespace boost::mpi;
 //using namespace boost::this_thread;
 using namespace OpenNN;
-using namespace zbar;
+#ifdef WIN32
+    using namespace zbar;
+#endif
 
 //Volatile Bool
 volatile bool running;
@@ -287,10 +300,16 @@ void validate_paypal_token();
 void tweet();
 void tweet_with_image();
 void tweet_with_image_multi();
-void qr_scanner();
+#ifdef WIN32
+    void qr_scanner();
+#endif
 void NN();
 void tar_craete();
 void open_img();
+void BTC();
+void holo_logo();
+void wait();
+void timer();
 //Python2
 
 //Python3
@@ -634,7 +653,23 @@ int main(int argc, char* argv[])
     std::system ("title Lara");
     std::system("color 02");
     greet = "1";
-//    string array = argv[1];
+    if(argv[1] == NULL)
+        {
+            ifstream myfile3 ("uuid.txt");
+            if(myfile3.is_open())
+                {
+                    while(getline(myfile3,uuid_text))
+                        {
+                            uuid = uuid_text;
+                            memo_check();
+                        }
+                    myfile3.close();
+                }
+            else
+                {
+                    init_start();
+                }
+        }
     if (string(argv[1]) == "hand")
         {
             #ifdef WIN32
@@ -710,31 +745,53 @@ int main(int argc, char* argv[])
                         }
                 }
         }
-    if(argc != 2)
-        {
-            ifstream myfile3 ("uuid.txt");
-            if(myfile3.is_open())
-                {
-                    while(getline(myfile3,uuid_text))
-                        {
-                            uuid = uuid_text;
-                            memo_check();
-                        }
-                    myfile3.close();
-                }
-            else
-                {
-                    init_start();
-                }
-        }
 }
 
 void start()
 {
-    tgroup.create_thread(boost::bind(&vid_diplay_holo, "greeting"));
-    tgroup.create_thread(boost::bind(&lara));
+    if(greet == "1")
+        {
+            sleep(1);
+            tgroup.create_thread(boost::bind(&vid_diplay_holo, "greeting"));
+        }
+    if(greet == "2")
+        {
+            tgroup.create_thread(boost::bind(&vid_diplay_holo, "greeting2"));
+        }
+    timer();
     tgroup.join_all();
-    std::system("exit");  
+//    std::system("exit");  
+}
+
+void timer()
+{
+    boost::thread t{&lara};
+    tgroup.join_all();
+    //Start timer
+    clock_t startTime = clock();
+    int secondsPassed;
+    int secondsToDelay = 120;
+    bool flag = true;
+    while(flag)
+        {
+            secondsPassed = (clock() - startTime) / CLOCKS_PER_SEC;
+            if(secondsPassed >= secondsToDelay)
+                {
+                    #ifdef WIN32
+                        std::system("cls");
+                    #else
+                        std::system("clear");
+                    #endif
+                    #ifdef WIN32
+                        TerminateThread(t.native_handle(), 0);
+                    #else
+                        pthread_cancel(t.native_handle());
+                    #endif
+                    wait();
+                    flag = false;
+                }
+        }
+
 }
 
 void lara()
@@ -784,7 +841,9 @@ void lara()
     cout << "[spider] a website" << endl;
     cout << "Display a [video]" << endl;
     cout << "Turn On [webcam]" << endl;
-    cout << "Activate [qr scanner]" << endl;
+    #ifdef WIN32
+        cout << "Activate [qr scanner]" << endl;
+    #endif
     cout << "[quit]" << endl;
     #ifdef WIN32
         StopMP3( "voice/greedings1.mp3" );
@@ -938,7 +997,7 @@ void lara()
                                         usleep(20);
                                         std::system("clear");
                                     #endif
-                                    lara();
+                                    start();
                                 }
                         }
                 }
@@ -961,10 +1020,12 @@ void lara()
         {
             spider();
         }
-    if(task == "qr scanner")
-    	{
-    	    qr_scanner();
-    	}
+    #ifdef WIN32
+        if(task == "qr scanner")
+        	{
+        	    qr_scanner();
+        	}
+    #endif
     if(task == "memo")
         {
             string date_remind_num;
@@ -1748,12 +1809,12 @@ void open_img()
     imshow( "Display window", image );
     // Wait for a keystroke in the window
     waitKey(0);
-    lara();
+    start();
 }
 
 void vid_diplay()
 {
-    cvNamedWindow("Video Display", CV_WINDOW_AUTOSIZE);
+    cvNamedWindow("Holo Video Display", CV_WINDOW_AUTOSIZE);
     CvCapture* capture = cvCreateFileCapture("video.mp4");
     IplImage* frame;
     while(1)
@@ -1767,8 +1828,41 @@ void vid_diplay()
             break;    
     }
     cvReleaseCapture(&capture);
-    cvDestroyWindow("Video Display");
-    lara();
+    cvDestroyWindow("Holo Video Display");
+    start();
+}
+
+void wait()
+{
+    boost::thread t{&holo_logo};
+    getch();
+    #ifdef WIN32
+       TerminateThread(t.native_handle(),0);
+    #else
+       pthread_cancel(t.native_handle());
+    #endif
+    start();
+}
+
+void holo_logo()
+{
+   while(1)
+   {
+      int c = 0;
+      cvNamedWindow("Holo Display", CV_WINDOW_AUTOSIZE);
+      CvCapture* capture = cvCreateFileCapture("videos/holo/logo.mp4");
+      IplImage* frame;
+      while(c != 1)
+         {
+            frame = cvQueryFrame(capture);
+            if(!frame)
+                break;
+            cvShowImage("Holo Display", frame);
+            cvWaitKey(25);
+         }
+        cvReleaseImage(&frame);
+        cvReleaseCapture(&capture);
+   }
 }
 
 void vid_diplay_holo(string holovid)
@@ -2566,6 +2660,7 @@ void tweet_with_image_multi()
     cout << "Success." << "\r\n";
 }
 
+#ifdef WIN32
 void qr_scanner()
 {
     string camera;
@@ -2649,7 +2744,7 @@ void qr_scanner()
                 }
         }
 }
-
+#endif
 
 void NN()
 {/*
