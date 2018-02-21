@@ -66,6 +66,9 @@
 #include<chilkat/CkDateTime.h>
 //Tar Archiving
 #include<chilkat/CkTar.h>
+//Tesseract-OCR
+#include <tesseract/baseapi.h>
+#include <leptonica/allheaders.h>
 //Threading
 #include<limits.h>
 #include<boost/thread.hpp>
@@ -76,7 +79,8 @@
    #include<pthread.h>
 #endif
 //MPI
-//#include<boost/mpi.hpp>
+#include<mpi.h>
+#include<boost/mpi.hpp>
 //Internet Connectivity 
 #ifdef WIN32
     #include<winsock2.h>
@@ -122,10 +126,18 @@
 //Colour Changer
 #include<termcolor/termcolor.hpp>
 //Nerve
+#define BUF_LEN 65540
 #include<locale>
 #include<cstring>
-//CUDA
-//#include<cuda.h>
+//For UDPSocket and SocketException
+#include "include/PracticalSocket/PracticalSocket.h"
+//Configuration
+#include "include/webcam_comm/config.h"
+//CUDA Functions
+#ifdef CUDA
+	//This is Customs CUDA Functions
+	#include<cuda_functions.h>
+#endif
 //GPIO
 #include<cerrno>
 #ifdef ARM
@@ -179,7 +191,14 @@ using namespace termcolor;
 //using namespace boost;
 //using namespace boost::mpi;
 //using namespace boost::this_thread;
-using namespace OpenNN;
+//using namespace MPI;
+//Tesseract-OCR Namespcaes
+using namespace tesseract;
+#ifdef UNIX
+    using namespace tensorflow;
+#else
+    using namespace OpenNN;
+#endif
 #ifdef WIN32
     using namespace zbar;
 #endif
@@ -310,8 +329,7 @@ void BTC();
 void holo_logo();
 void wait();
 void timer();
-//Python2
-
+void generate_random_number(int lowest,int highest);
 //Python3
 void py_tensrflow_lstm();
 void py_spider();
@@ -840,10 +858,13 @@ void lara()
     cout << "Activate [hand] Recognition" << endl;
     cout << "[spider] a website" << endl;
     cout << "Display a [video]" << endl;
+	cout << "[play] a song" << endl;
     cout << "Turn On [webcam]" << endl;
     #ifdef WIN32
         cout << "Activate [qr scanner]" << endl;
     #endif
+    cout << "Roll a [dice]" << endl;
+    cout << "Generate a [random] number" << endl;
     cout << "[quit]" << endl;
     #ifdef WIN32
         StopMP3( "voice/greedings1.mp3" );
@@ -854,6 +875,60 @@ void lara()
     if(task.length() == 0)
         {
             start();
+        }
+	if(task == "play")
+		{
+			#ifdef WIN32
+				PlayMP3("voice/what_song.mp3");
+			#else
+				voice("what_song.ogg");
+			#endif
+			cout << "What song do you want me to play" << endl;
+			#ifdef WIN32
+				sleep(2);
+				StopMP3("voice/what_song.mp3");
+			#endif
+		}
+    if(task == "dice")
+        {
+            loop:
+                int int_many_dice;
+				stringstream ss_many_dice;
+				ss_many_dice >> int_many_dice;
+				string many_dice = ss_many_dice.str();
+                #ifdef WIN32
+                    PlayMP3("voice/how_many_dice.mp3");
+                #else
+                    voice("how_many_dice.ogg");
+                #endif
+                cout << "How many dice must I roll?" << endl;
+                #ifdef WIN32
+                    sleep(2);
+                    StopMP3("voice/how_many_dice.mp3");
+                #endif
+                getline(cin,many_dice);
+                if(many_dice > "2")
+                    {
+                        #ifdef WIN32
+                            PlayMP3("voice/roll_2_only.mp3");
+                        #else
+                            voice("roll_2_only.ogg");
+                        #endif
+                        cout << "I can Only roll two dice" << endl;
+                        #ifdef WIN32
+                            sleep(2);
+                            StopMP3("voice/roll_2_only.mp3");
+                        #endif
+                        goto loop;
+                    }
+                if(many_dice < "2")
+                    {
+                        generate_random_number(1,int_many_dice * 6);
+                    }
+        }
+    if(task == "random")
+        {
+            
         }
     if(task == "purge")
         {
@@ -1155,6 +1230,8 @@ void debug()
 {
     cout << "I am Lara" << endl;
     cout << uuid << endl;
+	printf("Tesseract-ocr version: %s\n",tesseract::TessBaseAPI::Version());
+    printf("Leptonica version: %s\n",getLeptonicaVersion());
     #ifdef WIN32
         sleep(2);
     #else
@@ -2814,4 +2891,183 @@ void tar_craete()
             return;
         }
     cout << "Success." << "\r\n";
+}
+
+void generate_random_number(int lowest,int highest)
+{
+    srand((unsigned)time(0));
+    int random_integer;
+    int range = (highest - lowest) + 1;
+    for(int index = 0;index < 20;index++)
+        {
+            random_integer = lowest + int(range* rand()/(RAND_MAX + 1.0));
+        }
+    if(random_integer == 1)
+        {
+            #ifdef WIN32
+                PlayMP3("voice/1.mp3");
+            #else
+                voice("1.ogg")
+            #endif
+            cout << random_integer << endl;
+            #ifdef WIN32
+                sleep(2);
+                StopMP3("voice/1.mp3");
+            #endif
+            start();
+        }
+    if(random_integer == 2)
+        {
+            #ifdef WIN32
+                PlayMP3("voice/2.mp3");
+            #else
+                voice("2.ogg")
+            #endif
+            cout << random_integer << endl;
+            #ifdef WIN32
+                sleep(2);
+                StopMP3("voice/2.mp3");
+            #endif
+            start();
+        }
+    if(random_integer == 3)
+        {
+            #ifdef WIN32
+                PlayMP3("voice/3.mp3");
+            #else
+                voice("3.ogg")
+            #endif
+            cout << random_integer << endl;
+            #ifdef WIN32
+                sleep(2);
+                StopMP3("voice/3.mp3");
+            #endif
+            start();
+        }
+    if(random_integer == 4)
+        {
+            #ifdef WIN32
+                PlayMP3("voice/4.mp3");
+            #else
+                voice("4.ogg")
+            #endif
+            cout << random_integer << endl;
+            #ifdef WIN32
+                sleep(2);
+                StopMP3("voice/4.mp3");
+            #endif
+            start();
+        }
+    if(random_integer == 5)
+        {
+            #ifdef WIN32
+                PlayMP3("voice/5.mp3");
+            #else
+                voice("5.ogg")
+            #endif
+            cout << random_integer << endl;
+            #ifdef WIN32
+                sleep(2);
+                StopMP3("voice/5.mp3");
+            #endif
+            start();
+        }
+    if(random_integer == 6)
+        {
+            #ifdef WIN32
+                PlayMP3("voice/6.mp3");
+            #else
+                voice("6.ogg")
+            #endif
+            cout << random_integer << endl;
+            #ifdef WIN32
+                sleep(2);
+                StopMP3("voice/6.mp3");
+            #endif
+            start();
+        }
+    if(random_integer == 7)
+        {
+            #ifdef WIN32
+                PlayMP3("voice/7.mp3");
+            #else
+                voice("7.ogg")
+            #endif
+            cout << random_integer << endl;
+            #ifdef WIN32
+                sleep(2);
+                StopMP3("voice/7.mp3");
+            #endif
+            start();
+        }
+    if(random_integer == 8)
+        {
+            #ifdef WIN32
+                PlayMP3("voice/8.mp3");
+            #else
+                voice("8.ogg")
+            #endif
+            cout << random_integer << endl;
+            #ifdef WIN32
+                sleep(2);
+                StopMP3("voice/8.mp3");
+            #endif
+            start();
+        }
+    if(random_integer == 9)
+        {
+            #ifdef WIN32
+                PlayMP3("voice/9.mp3");
+            #else
+                voice("9.ogg")
+            #endif
+            cout << random_integer << endl;
+            #ifdef WIN32
+                sleep(2);
+                StopMP3("voice/9.mp3");
+            #endif
+            start();
+        }
+    if(random_integer == 10)
+        {
+            #ifdef WIN32
+                PlayMP3("voice/10.mp3");
+            #else
+                voice("10.ogg")
+            #endif
+            cout << random_integer << endl;
+            #ifdef WIN32
+                sleep(2);
+                StopMP3("voice/10.mp3");
+            #endif
+            start();
+        }
+    if(random_integer == 11)
+        {
+            #ifdef WIN32
+                PlayMP3("voice/11.mp3");
+            #else
+                voice("11.ogg")
+            #endif
+            cout << random_integer << endl;
+            #ifdef WIN32
+                sleep(2);
+                StopMP3("voice/11.mp3");
+            #endif
+            start();
+        }
+    if(random_integer == 12)
+        {
+            #ifdef WIN32
+                PlayMP3("voice/12.mp3");
+            #else
+                voice("12.ogg")
+            #endif
+            cout << random_integer << endl;
+            #ifdef WIN32
+                sleep(2);
+                StopMP3("voice/12.mp3");
+            #endif
+            start();
+        }
 }
