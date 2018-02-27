@@ -15,3 +15,7 @@ https://drive.google.com/open?id=0ByLm512z8MOiZURjcEJxazc3YWM
 Windows:PASS
 
 Linux:FAILED
+
+#NOTE
+JRE 32-bit is needed to run Lara-AI
+(JREx.x.x/bin/client/ should be in your path)
