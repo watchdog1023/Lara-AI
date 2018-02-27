@@ -67,8 +67,8 @@
 //Tar Archiving
 #include<chilkat/CkTar.h>
 //Tesseract-OCR
-//#include<tesseract/baseapi.h>
-//#include<leptonica/allheaders.h>
+#include<tesseract/baseapi.h>
+#include<leptonica/allheaders.h>
 //Threading
 #include<limits.h>
 #include<boost/thread.hpp>
@@ -157,7 +157,7 @@
 //Ruby Environment
 //#include<ruby/ruby.h>
 //Java Environment
-//#include<java/jni.h>
+#include<java/jni.h>
 //Encryption Headers
 /*#include<cryptopp/osrng.h>
 #include<cryptopp/modes.h>
@@ -203,7 +203,7 @@ using namespace termcolor;
 //MPI Protocol Handling
 //using namespace MPI;
 //Tesseract-OCR Namespcaes
-//using namespace tesseract;
+using namespace tesseract;
 //For Voice Recognition and Voice Synthesis
 using namespace voce;
 //MYSQL Connection
