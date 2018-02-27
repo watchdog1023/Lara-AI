@@ -20,6 +20,7 @@ mkdir Lara-AI/music
 mkdir Lara-AI/memo
 mkdir Lara-AI/Cache
 mkdir Lara-AI/Cache/spider
-mv -v Lara.exe Lara-AI
-mv -v voice/*.mp3 Lara-AI/voice
+mv -v Lara.exe Lara-AI/
+mv -v voice/*.mp3 Lara-AI/voice/
+mv -v voce/ Lara-AI/
 REM wget -c <THIS IS A PLACEHOLDER FOR NOW>
