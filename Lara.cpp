@@ -67,8 +67,8 @@
 //Tar Archiving
 #include<chilkat/CkTar.h>
 //Tesseract-OCR
-#include <tesseract/baseapi.h>
-#include <leptonica/allheaders.h>
+//#include<tesseract/baseapi.h>
+//#include<leptonica/allheaders.h>
 //Threading
 #include<limits.h>
 #include<boost/thread.hpp>
@@ -95,7 +95,10 @@
     #include<unistd.h>
 #endif
 //MYSQL database
-
+#include<cppconn/driver.h>
+#include<cppconn/exception.h>
+#include<cppconn/resultset.h>
+#include<cppconn/statement.h>
 //Video and Image Displaying
 #include<opencv2/highgui/highgui.hpp>
 #include<opencv/cv.h>
@@ -174,6 +177,12 @@
     //OpenNN
     #include<opennn/opennn.h>
 #endif
+//For Voice Recognition and Voice Synthesis
+#include<voce.h>
+//Websocket
+#include <websocketpp/config/asio_no_tls.hpp>
+#include <websocketpp/server.hpp>
+#include <websocketpp/client.hpp>
 
 //Parameters
 #pragma comment(lib, "wsock32.lib")
@@ -191,9 +200,16 @@ using namespace termcolor;
 //using namespace boost;
 //using namespace boost::mpi;
 //using namespace boost::this_thread;
+//MPI Protocol Handling
 //using namespace MPI;
 //Tesseract-OCR Namespcaes
-using namespace tesseract;
+//using namespace tesseract;
+//For Voice Recognition and Voice Synthesis
+using namespace voce;
+//MYSQL Connection
+using namespace sql;
+//Websocket
+using namespace websocketpp;
 #ifdef UNIX
     using namespace tensorflow;
 #else
@@ -274,6 +290,10 @@ const unsigned short port = 2435;
 bool debugMode;//toggled pressing 'd'
 bool trackingEnabled;//toggled pressing 't'
 
+//Timer
+bool flag = true;
+
+
 //mp3 Playback Variables
 char Key;
 
@@ -328,8 +348,9 @@ void open_img();
 void BTC();
 void holo_logo();
 void wait();
-void timer();
+void timer(string quit);
 void generate_random_number(int lowest,int highest);
+void voice_rec();
 //Python3
 void py_tensrflow_lstm();
 void py_spider();
@@ -699,6 +720,10 @@ int main(int argc, char* argv[])
             #endif
             hand_rec();
         }
+    if(string(argv[1]) == "voice")
+        {
+            voice_rec();
+        }
     if(string(argv[1]) == "holo")
         {
             holovideo = "1";
@@ -776,20 +801,33 @@ void start()
         {
             tgroup.create_thread(boost::bind(&vid_diplay_holo, "greeting2"));
         }
-    timer();
+    timer("NO");
     tgroup.join_all();
 //    std::system("exit");  
 }
 
-void timer()
+void timer(string quit)
 {
+    if(quit == "YES")
+        {
+           goto end; 
+        }
     boost::thread t{&lara};
     tgroup.join_all();
+    end:
+        if(quit == "YES")
+                {
+                    #ifdef WIN32
+                        TerminateThread(t.native_handle(), 0);
+                    #else
+                        pthread_cancel(t.native_handle());
+                    #endif
+                    std::system("exit");
+                }
     //Start timer
     clock_t startTime = clock();
     int secondsPassed;
     int secondsToDelay = 120;
-    bool flag = true;
     while(flag)
         {
             secondsPassed = (clock() - startTime) / CLOCKS_PER_SEC;
@@ -809,7 +847,7 @@ void timer()
                     flag = false;
                 }
         }
-
+        
 }
 
 void lara()
@@ -1207,7 +1245,8 @@ void lara()
             #else
                 voice("goodbye.ogg");
             #endif
-            std::system("exit");
+            timer("YES");
+            //std::system("exit");
         }
      if(task == "webcam")
         {
@@ -1230,8 +1269,8 @@ void debug()
 {
     cout << "I am Lara" << endl;
     cout << uuid << endl;
-	printf("Tesseract-ocr version: %s\n",tesseract::TessBaseAPI::Version());
-    printf("Leptonica version: %s\n",getLeptonicaVersion());
+	//printf("Tesseract-ocr version: %s\n",tesseract::TessBaseAPI::Version());
+    //printf("Leptonica version: %s\n",getLeptonicaVersion());
     #ifdef WIN32
         sleep(2);
     #else
@@ -3070,4 +3109,39 @@ void generate_random_number(int lowest,int highest)
             #endif
             start();
         }
+}
+
+void voice_rec()
+{
+	init("./lib", false, true, "./grammar", "digits");
+
+	cout << "This is a speech recognition test. " << "Speak digits from 0-9 into the microphone. " << "Speak 'quit' to quit." << endl;
+
+	bool quit = false;
+	while (!quit)
+	{
+		// Normally, applications would do application-specific things 
+		// here.  For this sample, we'll just sleep for a little bit.
+        #ifdef WIN32
+        	sleep(200);
+        #else
+    		usleep(200);
+        #endif
+
+		while (getRecognizerQueueSize() > 0)
+		{
+			string s = popRecognizedString();
+
+			// Check if the string contains 'quit'.
+			if (string::npos != s.rfind("quit"))
+			{
+				quit = true;
+			}
+
+			cout << "You said: " << s << endl;
+			//voce::synthesize(s);
+		}
+	}
+
+	destroy();
 }
