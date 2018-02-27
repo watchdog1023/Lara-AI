@@ -12,4 +12,14 @@ windres icon.rc icon.o
 g++ -v -static -static-libgcc -static-libstdc++ -L"C:\Program Files (x86)\Java\jdk1.8.0_162\lib -o Lara.exe Lara.o download.o Thread.o IRCHandler.o IRCSocket.o IRCClient.o Bitbuffer.o QrCode.o QrSegment.o icon.o -lchilkat-9.5.0 -lgdi32 -lcrypt32 -lws2_32 -lwsock32 -ldnsapi -lwinmm -lwininet -lmingw32 -lopencv_core340.dll -lopencv_highgui340.dll -lopencv_imgproc340.dll -lopencv_imgcodecs340.dll -lopencv_videoio340.dll -lopencv_video340.dll -lboost_system -lboost_serialization -lboost_atomic -lboost_chrono -lboost_thread -lopennn -ltinyxml2 -lpython36 -lpython27 -lzbar.dll -lsfml-audio -lsfml-network -lsfml-main -lsfml-system -lcurl -lbitcoinapi -lcryptopp -ljsoncpp -ljvm -ltesseract400.dll -lleptonica-1.75.0.dll
 PAUSE
 rm -v *.o
-cd "C:\Users\Cameron\Desktop\code projects\C Programming\C++\WIP\AI(Home use)"
+mkdir Lara-AI
+mkdir Lara-AI/voice
+mkdir Lara-AI/videos
+mkdir Lara-AI/videos/holo
+mkdir Lara-AI/music
+mkdir Lara-AI/memo
+mkdir Lara-AI/Cache
+mkdir Lara-AI/Cache/spider
+mv -v Lara.exe Lara-AI
+mv -v voice/*.mp3 Lara-AI/voice
+REM wget -c <THIS IS A PLACEHOLDER FOR NOW>
