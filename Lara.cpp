@@ -68,7 +68,7 @@
 #include<chilkat/CkTar.h>
 //Tesseract-OCR
 #include<tesseract/baseapi.h>
-#include<leptonica/allheaders.h>
+//#include<leptonica/allheaders.h>
 //Threading
 #include<limits.h>
 #include<boost/thread.hpp>
@@ -79,7 +79,11 @@
    #include<pthread.h>
 #endif
 //MPI
-#include<mpi.h>
+#ifdef WIN32
+    #include<mpi.h>
+#else
+    #include<mpi/mpi.h>
+#endif
 #include<boost/mpi.hpp>
 //Internet Connectivity 
 #ifdef WIN32
@@ -99,6 +103,11 @@
 #include<cppconn/exception.h>
 #include<cppconn/resultset.h>
 #include<cppconn/statement.h>
+#ifdef WIN32
+    #include<mysql.h>
+#else
+    #include<mysql/mysql.h>
+#endif
 //Video and Image Displaying
 #include<opencv2/highgui/highgui.hpp>
 #include<opencv/cv.h>
@@ -117,9 +126,9 @@
 #include<cstdint>
 #include "include/qr_code/QrCode.hpp"
 //QR code Scanner
-#ifdef WIN32
+//#ifdef WIN32
     #include<zbar.h>
-#endif
+//#endif
 #include<opencv2/imgproc/imgproc.hpp>
 //SDL Creation
 //#include<SDL/SDL.h>
@@ -157,12 +166,12 @@
 //Ruby Environment
 //#include<ruby/ruby.h>
 //Java Environment
-#include<java/jni.h>
+#include<jni.h>
 //Encryption Headers
-/*#include<cryptopp/osrng.h>
+#include<cryptopp/osrng.h>
 #include<cryptopp/modes.h>
 #include<cryptopp/aes.h>
-#include<cryptopp/filters.h>*/
+#include<cryptopp/filters.h>
 //Bitcoin Balance
 //#include<bitcoinapi/bitcoinapi.h>
 //Neural Net
@@ -170,19 +179,22 @@
 //#include "include/Neuron.h"
 //#include "include/Network.h"
 //#include "include/trainingdata.h"
-#ifdef UNIX
-    //Tensorflow
-    #include<tensorflow/c/c_api.h>
-#else
+#ifdef WIN32
     //OpenNN
     #include<opennn/opennn.h>
+#else
+    //Tensorflow
+    #include<tensorflow/c/c_api.h>
 #endif
 //For Voice Recognition and Voice Synthesis
 #include<voce.h>
 //Websocket
-#include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/server.hpp>
-#include <websocketpp/client.hpp>
+#include<websocketpp/config/asio_no_tls.hpp>
+#include<websocketpp/server.hpp>
+#include<websocketpp/config/asio_no_tls_client.hpp>
+#include<websocketpp/client.hpp>
+//Hostname Getting
+#include <boost/asio/ip/host_name.hpp>
 
 //Parameters
 #pragma comment(lib, "wsock32.lib")
@@ -194,7 +206,7 @@ using namespace termcolor;
 #ifdef WIN32
     using namespace mp3;
 #endif
-//using namespace CryptoPP;
+using namespace CryptoPP;
 //using namespace sf;
 //Boost Namespaces
 //using namespace boost;
@@ -203,21 +215,19 @@ using namespace termcolor;
 //MPI Protocol Handling
 //using namespace MPI;
 //Tesseract-OCR Namespcaes
-using namespace tesseract;
+//using namespace tesseract;
 //For Voice Recognition and Voice Synthesis
 using namespace voce;
 //MYSQL Connection
 using namespace sql;
 //Websocket
 using namespace websocketpp;
-#ifdef UNIX
-    using namespace tensorflow;
-#else
+#ifdef WIN32    
     using namespace OpenNN;
+#else
+    using namespace tensorflow;
 #endif
-#ifdef WIN32
-    using namespace zbar;
-#endif
+using namespace zbar;
 
 //Volatile Bool
 volatile bool running;
@@ -339,9 +349,7 @@ void validate_paypal_token();
 void tweet();
 void tweet_with_image();
 void tweet_with_image_multi();
-#ifdef WIN32
-    void qr_scanner();
-#endif
+void qr_scanner();
 void NN();
 void tar_craete();
 void open_img();
@@ -351,8 +359,8 @@ void wait();
 void timer(string quit);
 void generate_random_number(int lowest,int highest);
 void voice_rec();
+void websocket_server();
 //Python3
-void py_tensrflow_lstm();
 void py_spider();
 
 //global variables
@@ -689,8 +697,12 @@ string uuid = uuid_text;
 
 int main(int argc, char* argv[])
 {
-    std::system ("title Lara");
-    std::system("color 02");
+    #ifdef WIN32
+        std::system ("title Lara");
+        std::system("color 02");
+    #else
+        cout << termcolor::green;
+    #endif
     greet = "1";
     if(argv[1] == NULL)
         {
@@ -810,7 +822,7 @@ void timer(string quit)
 {
     if(quit == "YES")
         {
-           goto end; 
+            goto end;
         }
     boost::thread t{&lara};
     tgroup.join_all();
@@ -865,7 +877,11 @@ void lara()
         {
             update();
         }
-    std::system("color 02");
+    #ifdef WIN32
+        std::system("color 02");
+    #else
+        cout << termcolor::green;
+    #endif
     if(greet == "1")
         {
             #ifdef WIN32
@@ -897,10 +913,8 @@ void lara()
     cout << "[spider] a website" << endl;
     cout << "Display a [video]" << endl;
 	cout << "[play] a song" << endl;
-    cout << "Turn On [webcam]" << endl;
-    #ifdef WIN32
-        cout << "Activate [qr scanner]" << endl;
-    #endif
+    cout << "Turn On [webcam]" << endl; 
+    cout << "Activate [qr scanner]" << endl;
     cout << "Roll a [dice]" << endl;
     cout << "Generate a [random] number" << endl;
     cout << "[quit]" << endl;
@@ -1246,7 +1260,7 @@ void lara()
                 voice("goodbye.ogg");
             #endif
             timer("YES");
-            //std::system("exit");
+            std::system("exit");
         }
      if(task == "webcam")
         {
@@ -2214,48 +2228,6 @@ void hand_rec()
     lara();
 }
 /*
-void py_tensorflow_lstm()
-{
-    //Calling Interperter
-    Py_Initialize();
-    //Python Script body
-    PyRun_SimpleString( "from __future__ import absolute_import, division, print_function\n"
-                        "import os\n"
-                        "from six import moves\n"
-                        "import ssl\n"
-                        "import tflearn\n"
-                        "from tflearn.data_utils import *\n"
-                        "path = 'US_Cities.txt'\n"
-                        "if not os.path.isfile(path):\n"
-                        "context = ssl._create_unverified_context()\n"
-                        "moves.urllib.request.urlretrieve('https://raw.githubusercontent.com/tflearn/tflearn.github.io/master/resources/US_Cities.txt', path, context=context)\n"
-                        "maxlen = 20\n"
-                        "X, Y, char_idx = \\n"
-                        "textfile_to_semi_redundant_sequences(path, seq_maxlen=maxlen, redun_step=3)\n"
-                        "g = tflearn.input_data(shape=[None, maxlen, len(char_idx)])\n"
-                        "g = tflearn.lstm(g, 512, return_seq=True)\n"
-                        "g = tflearn.dropout(g, 0.5)\n"
-                        "g = tflearn.lstm(g, 512)\n"
-                        "g = tflearn.dropout(g, 0.5)\n"
-                        "g = tflearn.fully_connected(g, len(char_idx), activation='softmax')\n"
-                        "g = tflearn.regression(g, optimizer='adam', loss='categorical_crossentropy', learning_rate=0.001)\n"
-                        "m = tflearn.SequenceGenerator(g, dictionary=char_idx, seq_maxlen=maxlen, clip_gradients=5.0, checkpoint_path='model_us_cities')\n"
-                        "#training\n"
-                        "for i in range(40):\n"
-                        "seed = random_sequence_from_textfile(path, maxlen)\n"
-                        "m.fit(X, Y, validation_set=0.1, batch_size=128, n_epoch=1, run_id='us_cities')\n"
-                        "print('-- TESTING...')\n"
-                        "print('-- Test with temperature of 1.2 --')\n"
-                        "print(m.generate(30, temperature=1.2, seq_seed=seed))\n"
-                        "print('-- Test with temperature of 1.0 --')\n"
-                        "print(m.generate(30, temperature=1.0, seq_seed=seed))\n"
-                        "print('-- Test with temperature of 0.5 --')\n"
-                        "print(m.generate(30, temperature=0.5, seq_seed=seed))\n"
-                      );
-    //Killing Interperter
-    Py_Finalize();
-}
-
 void py_spider()
 {
     //Calling Interperter
@@ -2776,7 +2748,6 @@ void tweet_with_image_multi()
     cout << "Success." << "\r\n";
 }
 
-#ifdef WIN32
 void qr_scanner()
 {
     string camera;
@@ -2860,7 +2831,6 @@ void qr_scanner()
                 }
         }
 }
-#endif
 
 void NN()
 {/*
@@ -3113,35 +3083,40 @@ void generate_random_number(int lowest,int highest)
 
 void voice_rec()
 {
-	init("./lib", false, true, "./grammar", "digits");
-
+	init("./voice/voce", false, true, "./voice/voce/grammar", "digits");
 	cout << "This is a speech recognition test. " << "Speak digits from 0-9 into the microphone. " << "Speak 'quit' to quit." << endl;
-
 	bool quit = false;
 	while (!quit)
-	{
-		// Normally, applications would do application-specific things 
-		// here.  For this sample, we'll just sleep for a little bit.
-        #ifdef WIN32
-        	sleep(200);
-        #else
-    		usleep(200);
-        #endif
-
-		while (getRecognizerQueueSize() > 0)
-		{
-			string s = popRecognizedString();
-
-			// Check if the string contains 'quit'.
-			if (string::npos != s.rfind("quit"))
-			{
-				quit = true;
-			}
-
-			cout << "You said: " << s << endl;
-			//voce::synthesize(s);
-		}
-	}
-
+    	{
+    		// Normally, applications would do application-specific things 
+    		// here.  For this sample, we'll just sleep for a little bit.
+            #ifdef WIN32
+            	sleep(200);
+            #else
+        		usleep(200);
+            #endif
+    		while (getRecognizerQueueSize() > 0)
+        		{
+        			string s = popRecognizedString();
+        
+        			// Check if the string contains 'quit'.
+        			if (string::npos != s.rfind("quit"))
+                        {
+                        	quit = true;
+                        }
+            /*      if(string::npos == s.rfind("play"))
+                        {
+                            lara("play");
+                        }*/
+        			cout << "You said: " << s << endl;
+        			//voce::synthesize(s);
+        		}
+    	}
 	destroy();
+}
+
+void websocket_server()
+{
+    auto host_name = boost::asio::ip::host_name();
+    cout << host_name << endl;
 }
