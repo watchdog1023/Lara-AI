@@ -1,0 +1,3 @@
+#JSGF V1.0;
+grammar commands;
+public <commands> = (oh | zero | one | two | three | four | five | six | seven | eight | nine) * ;
