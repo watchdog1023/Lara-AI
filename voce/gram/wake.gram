@@ -1,0 +1,3 @@
+#JSGF V1.0;
+grammar wake;
+public <wake> = (lara | LARA | Lara) * ;
