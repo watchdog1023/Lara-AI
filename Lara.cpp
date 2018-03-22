@@ -75,7 +75,7 @@
 #include<boost/chrono.hpp>
 #include<boost/atomic.hpp>
 #include<boost/bind.hpp>
-#ifdef UNIX
+#ifdef __linux__
    #include<pthread.h>
 #endif
 //MPI
@@ -126,9 +126,7 @@
 #include<cstdint>
 #include "include/qr_code/QrCode.hpp"
 //QR code Scanner
-//#ifdef WIN32
-    #include<zbar.h>
-//#endif
+#include<zbar.h>
 #include<opencv2/imgproc/imgproc.hpp>
 //SDL Creation
 //#include<SDL/SDL.h>
@@ -303,7 +301,6 @@ bool trackingEnabled;//toggled pressing 't'
 //Timer
 bool flag = true;
 
-
 //mp3 Playback Variables
 char Key;
 
@@ -360,6 +357,7 @@ void timer(string quit);
 void generate_random_number(int lowest,int highest);
 void voice_rec();
 void websocket_server();
+void vinput();
 //Python3
 void py_spider();
 
@@ -687,7 +685,7 @@ ThreadReturn inputThread(void* client)
 }
 
 //Version Variable
-string version = "5.0.0";
+string version = "1.0.0";
 
 //Greeting Variable
 string greet;
@@ -3081,9 +3079,38 @@ void generate_random_number(int lowest,int highest)
         }
 }
 
+void vinput()
+{
+	init("./voice/voce", false, true, "./voice/voce/grammar", "commands");
+	bool quit = false;
+	while (!quit)
+	{
+		// Normally, applications would do application-specific things 
+		// here.  For this sample, we'll just sleep for a little bit.
+	#ifdef WIN32
+			Sleep(200);
+	#else
+			usleep(200);
+	#endif
+		while (getRecognizerQueueSize() > 0)
+		{
+			std::string s = voce::popRecognizedString();
+
+			// Check if the string contains 'quit'.
+			if (std::string::npos != s.rfind("quit"))
+			{
+				quit = true;
+			}
+
+			std::cout << "You said: " << s << std::endl;
+		}
+	}
+	destroy();
+}
+
 void voice_rec()
 {
-	init("./voice/voce", false, true, "./voice/voce/grammar", "digits");
+	init("./voice/voce", false, true, "./voice/voce/grammar", "wake");
 	cout << "This is a speech recognition test. " << "Speak digits from 0-9 into the microphone. " << "Speak 'quit' to quit." << endl;
 	bool quit = false;
 	while (!quit)
@@ -3100,18 +3127,30 @@ void voice_rec()
         			string s = popRecognizedString();
         
         			// Check if the string contains 'quit'.
-        			if (string::npos != s.rfind("quit"))
+                    if(string::npos == s.rfind("lara"))
                         {
-                        	quit = true;
+                            boost::thread input{&vinput};
+                            tgroup.join_all();
+                            //Start timer
+                            clock_t startTime = clock();
+                            int secondsPassed;
+                            int secondsToDelay = 60;
+                            while(flag)
+                                {
+                                    secondsPassed = (clock() - startTime) / CLOCKS_PER_SEC;
+                                    if(secondsPassed >= secondsToDelay)
+                                        {
+                                            #ifdef WIN32
+                                                TerminateThread(input.native_handle(), 0);
+                                            #else
+                                                pthread_cancel(input.native_handle());
+                                            #endif
+                                            flag = false;
+                                        }
+                                }
                         }
-            /*      if(string::npos == s.rfind("play"))
-                        {
-                            lara("play");
-                        }*/
-        			cout << "You said: " << s << endl;
-        			//voce::synthesize(s);
-        		}
-    	}
+                }
+        }
 	destroy();
 }
 
