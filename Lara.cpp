@@ -192,7 +192,7 @@
 #include<websocketpp/config/asio_no_tls_client.hpp>
 #include<websocketpp/client.hpp>
 //Hostname Getting
-#include <boost/asio/ip/host_name.hpp>
+#include<boost/asio/ip/host_name.hpp>
 //Serial Port Handling
 #ifdef WIN32
     #include "include/SerialPort.h"
@@ -314,8 +314,12 @@ bool flag = true;
 //mp3 Playback Variables
 char Key;
 
-//Portname must contain these backslashes, and remember to replace the following com port
-char *port_name = "\\\\.\\COM2";
+#ifdef WIN32
+    //Portname must contain these backslashes, and remember to replace the following com port
+    char *port_name = "\\\\.\\COM2";
+#else
+    const string port_name = "/dev/ttyACM0";
+#endif
 
 //String for incoming data
 char incomingData[MAX_DATA_LENGTH];
@@ -375,7 +379,11 @@ void voice_rec();
 void websocket_server();
 void vinput();
 #ifdef WIN32
-    void serial_server();
+    void win_serial_server_in();
+    void win_serial_server_out();
+#else
+    void unix_serial_server_in();
+    void unix_serial_server_out();
 #endif
 void serial_process(string data);
 //Python3
@@ -3190,23 +3198,24 @@ void websocket_server()
     cout << host_name << endl;
 }
 
-void serial_server()
+#ifdef WIN32
+void win_serial_server_out()
 {
   SerialPort arduino(port_name);
-  if(arduino.isConnected()){
-    cout << "Connection Established" << endl;
-  }
-  else{
-    cout << "ERROR, check port name" << endl;
-    system("exit");
-  }
+  if(arduino.isConnected())
+    {
+      cout << "Connection Established" << endl;
+    }
+  else
+    {
+      cout << "ERROR, check port name" << endl;
+      system("exit");
+    }
   
   while(arduino.isConnected())
     {
       //Check if data has been read or not
       int read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
-      //prints out data
-      //cout << incomingData << endl;
       //wait a bit
       Sleep(10000);
       if (incomingData[0] != '\0')
@@ -3216,6 +3225,73 @@ void serial_server()
     }
   serial_process(string(incomingData));
 }
+#else
+void unix_serial_server_out()
+{
+      // Open the serial port.
+      SerialStream serial_port;
+      char c;
+      serial_port.Open(port_name);
+      if(!serial_port.good())
+         {
+            cerr << "[" << __FILE__ << ":" << __LINE__ << "] " << "Error: Could not open serial port." << endl;
+            exit(1);
+         }
+      // Set the baud rate of the serial port.
+      serial_port.SetBaudRate(SerialStreamBuf::BAUD_9600);
+      if(!serial_port.good())
+         {
+            cerr << "Error: Could not set the baud rate." << endl;
+            exit(1);
+         }
+      // Set the number of data bits.
+      serial_port.SetCharSize(SerialStreamBuf::CHAR_SIZE_8);
+      if(!serial_port.good())
+         {
+            cerr << "Error: Could not set the character size." << endl;
+            exit(1);
+         }
+      // Disable parity.
+      serial_port.SetParity(SerialStreamBuf::PARITY_NONE);
+      if(!serial_port.good())
+         {
+            cerr << "Error: Could not disable the parity." << endl;
+            exit(1);
+         }
+      // Set the number of stop bits.
+      serial_port.SetNumOfStopBits(1);
+      if(!serial_port.good())
+         {
+            cerr << "Error: Could not set the number of stop bits." << endl ;
+            exit(1) ;
+         }
+      // Turn off hardware flow control.
+      serial_port.SetFlowControl(SerialStreamBuf::FLOW_CONTROL_NONE);
+      if (!serial_port.good())
+         {
+            cerr << "Error: Could not use hardware flow control." << endl;
+            exit(1);
+         }
+      //Wait for some data to be available at the serial port.
+      //Keep reading data from serial port and print it to the screen.
+      //Wait for some data to be available at the serial port.
+      while(serial_port.rdbuf()->in_avail() == 0)
+         {
+            usleep(100);
+         }
+      usleep(10000);
+      char out_buf[] = "check";
+      serial_port.write(out_buf, 1);
+      while(1)
+         {
+            char next_byte;
+            serial_port.get(next_byte);
+            //cout << next_byte;
+            serial_process(string(next_byte));
+         }
+     cerr << endl;
+}
+#endif
 
 void serial_process(string data)
 {
