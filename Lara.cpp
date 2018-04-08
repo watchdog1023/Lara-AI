@@ -193,6 +193,12 @@
 #include<websocketpp/client.hpp>
 //Hostname Getting
 #include <boost/asio/ip/host_name.hpp>
+//Serial Port Handling
+#ifdef WIN32
+    #include "include/SerialPort.h"
+#else
+    #include<SerialStream.h>
+#endif
 
 //Parameters
 #pragma comment(lib, "wsock32.lib")
@@ -220,12 +226,16 @@ using namespace voce;
 using namespace sql;
 //Websocket
 using namespace websocketpp;
+//NN
 #ifdef WIN32    
     using namespace OpenNN;
 #else
     using namespace tensorflow;
 #endif
 using namespace zbar;
+#ifdef __linux__ 
+    using namespace LibSerial;
+#endif
 
 //Volatile Bool
 volatile bool running;
@@ -304,6 +314,12 @@ bool flag = true;
 //mp3 Playback Variables
 char Key;
 
+//Portname must contain these backslashes, and remember to replace the following com port
+char *port_name = "\\\\.\\COM2";
+
+//String for incoming data
+char incomingData[MAX_DATA_LENGTH];
+
 //Neural Net Variables
 //Global Net Variables
 DataSet data_set;
@@ -358,6 +374,10 @@ void generate_random_number(int lowest,int highest);
 void voice_rec();
 void websocket_server();
 void vinput();
+#ifdef WIN32
+    void serial_server();
+#endif
+void serial_process(string data);
 //Python3
 void py_spider();
 
@@ -802,6 +822,7 @@ int main(int argc, char* argv[])
 
 void start()
 {
+    tgroup.create_thread(boost::bind(&serial_server));
     if(greet == "1")
         {
             sleep(1);
@@ -3094,15 +3115,14 @@ void vinput()
 	#endif
 		while (getRecognizerQueueSize() > 0)
 		{
-			std::string s = voce::popRecognizedString();
-
+			string s = popRecognizedString();
 			// Check if the string contains 'quit'.
 			if (std::string::npos != s.rfind("quit"))
 			{
 				quit = true;
 			}
 
-			std::cout << "You said: " << s << std::endl;
+			cout << "You said: " << s << endl;
 		}
 	}
 	destroy();
@@ -3110,52 +3130,99 @@ void vinput()
 
 void voice_rec()
 {
-	init("./voice/voce", false, true, "./voice/voce/grammar", "wake");
-	cout << "This is a speech recognition test. " << "Speak digits from 0-9 into the microphone. " << "Speak 'quit' to quit." << endl;
-	bool quit = false;
-	while (!quit)
-    	{
-    		// Normally, applications would do application-specific things 
-    		// here.  For this sample, we'll just sleep for a little bit.
-            #ifdef WIN32
-            	sleep(200);
-            #else
-        		usleep(200);
-            #endif
-    		while (getRecognizerQueueSize() > 0)
-        		{
-        			string s = popRecognizedString();
-        
-        			// Check if the string contains 'quit'.
-                    if(string::npos == s.rfind("lara"))
-                        {
-                            boost::thread input{&vinput};
-                            tgroup.join_all();
-                            //Start timer
-                            clock_t startTime = clock();
-                            int secondsPassed;
-                            int secondsToDelay = 60;
-                            while(flag)
-                                {
-                                    secondsPassed = (clock() - startTime) / CLOCKS_PER_SEC;
-                                    if(secondsPassed >= secondsToDelay)
-                                        {
-                                            #ifdef WIN32
-                                                TerminateThread(input.native_handle(), 0);
-                                            #else
-                                                pthread_cancel(input.native_handle());
-                                            #endif
-                                            flag = false;
-                                        }
-                                }
-                        }
-                }
-        }
-	destroy();
+    start:
+    	init("voice/voce", false, true, "voice/voce/grammar", "wake");
+    	cout << "This is a speech recognition test. " << "Speak digits from 0-9 into the microphone. " << "Speak 'quit' to quit." << endl;
+    	bool quit = false;
+    	while (!quit)
+        	{
+        		// Normally, applications would do application-specific things 
+        		// here.  For this sample, we'll just sleep for a little bit.
+                #ifdef WIN32
+                	sleep(200);
+                #else
+            		usleep(200);
+                #endif
+        		while (getRecognizerQueueSize() > 0)
+            		{
+            			string s = popRecognizedString();
+            
+            			// Check if the string contains 'quit'.
+                        if(string::npos == s.rfind("lara"))
+                            {
+                                #ifdef WIN32
+                                    PlayMP3("voice/yes.mp3");
+                                #else
+                                    voice("yes.ogg")
+                                #endif
+                                #ifdef WIN32
+                                    sleep(1);
+                                StopMP3("voice/yes.mp3");
+                                #endif
+                                boost::thread input{&vinput};
+                                tgroup.join_all();
+                                //Start timer
+                                clock_t startTime = clock();
+                                int secondsPassed;
+                                int secondsToDelay = 60;
+                                while(flag)
+                                    {
+                                        secondsPassed = (clock() - startTime) / CLOCKS_PER_SEC;
+                                        if(secondsPassed >= secondsToDelay)
+                                            {
+                                                #ifdef WIN32
+                                                    TerminateThread(input.native_handle(), 0);
+                                                #else
+                                                    pthread_cancel(input.native_handle());
+                                                #endif
+                                                flag = false;
+                                            }
+                                    }
+                            }
+                    }
+            }
+    goto start;
 }
 
 void websocket_server()
 {
     auto host_name = boost::asio::ip::host_name();
     cout << host_name << endl;
+}
+
+void serial_server()
+{
+  SerialPort arduino(port_name);
+  if(arduino.isConnected()){
+    cout << "Connection Established" << endl;
+  }
+  else{
+    cout << "ERROR, check port name" << endl;
+    system("exit");
+  }
+  
+  while(arduino.isConnected())
+    {
+      //Check if data has been read or not
+      int read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
+      //prints out data
+      //cout << incomingData << endl;
+      //wait a bit
+      Sleep(10000);
+      if (incomingData[0] != '\0')
+        {
+          break;
+        }
+    }
+  serial_process(string(incomingData));
+}
+
+void serial_process(string data)
+{
+  if(data == "2496848485551705465575149324968484855517054655751493" || data == "24968484855517054655751493" || data == "249684848555170546557514932496848485551705465575149324968484855517054655751493")
+    {
+        tgroup.create_thread(boost::bind(&vid_diplay_holo, "greeting"));
+        tgroup.create_thread(bind(&lara));
+      tgroup.join_all();
+    }
 }
