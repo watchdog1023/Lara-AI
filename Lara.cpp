@@ -385,6 +385,8 @@ void vinput();
     void unix_serial_server_in();
     void unix_serial_server_out();
 #endif
+void rfid_greet();
+void rfid_greet_talk();
 void serial_process(string data);
 //Python3
 void py_spider();
@@ -830,7 +832,11 @@ int main(int argc, char* argv[])
 
 void start()
 {
-    tgroup.create_thread(boost::bind(&serial_server));
+    #ifdef WIN32
+        tgroup.create_thread(boost::bind(&win_serial_server_out));
+    #else
+        tgroup.create_thread(boost::bind(&unix_serial_server_out));
+    #endif
     if(greet == "1")
         {
             sleep(1);
@@ -922,9 +928,9 @@ void lara()
         {
             #ifdef WIN32
                 PlayMP3( "voice/greedings2.mp3" );
-                sleep(2);
+                sleep(4);
             #else
-                voice("greedings2.ogg");  
+                voice("greedings2.ogg");
             #endif
         }
     //output current date
@@ -3208,7 +3214,7 @@ void win_serial_server_out()
     }
   else
     {
-      cout << "ERROR, check port name" << endl;
+      //cout << "ERROR, check port name" << endl;
       system("exit");
     }
   
@@ -3293,12 +3299,35 @@ void unix_serial_server_out()
 }
 #endif
 
+void rfid_greet_talk()
+{
+    #ifdef WIN32
+        PlayMP3("voice/see_you_again.mp3");
+    #else
+        voice("see_you_again.ogg")
+    #endif
+    #ifdef WIN32
+        sleep(2);
+        StopMP3("voice/see_you_again.mp3");
+    #endif
+}
+
+void rfid_greet()
+{
+    tgroup.create_thread(boost::bind(&vid_diplay_holo, "greeting"));
+    tgroup.create_thread(bind(&rfid_greet_talk));
+    tgroup.join_all();
+    #ifdef WIN32
+        win_serial_server_out();
+    #else
+        unix_serial_server_out();
+    #endif
+}
+
 void serial_process(string data)
 {
-  if(data == "2496848485551705465575149324968484855517054655751493" || data == "24968484855517054655751493" || data == "249684848555170546557514932496848485551705465575149324968484855517054655751493")
+  if(data == "-1-1-1-1-1-1-1-1-1-1-124968484855517054655751493-1-1-1-1-1-1-1-1-1-1-1" || data == "24968484855517054655751493-1-1-1-1-1-1-1-1-1-1-1" || data == "24968484855517054655751493-1-1-1-1-1-1-1-1-1-1-124968484855517054655751493-1-1-1-1-1-1-1-1-1-1-124968484855517054655751493-1-1-1-1-1-1-1-1-1-1-1" || data == "24968484855517054655751493-1-1-1-1-1-1-1-1-1-1-124968484855517054655751493-1-1-1-1-1-1-1-1-1-1-124968484855517054655751493-1-1-1-1-1-1-1-1-1-1-124968484855517054655751493-1-1-1-1-1-1-1-1-1-1-1")
     {
-        tgroup.create_thread(boost::bind(&vid_diplay_holo, "greeting"));
-        tgroup.create_thread(bind(&lara));
-      tgroup.join_all();
+        rfid_greet();
     }
 }
