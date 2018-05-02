@@ -300,7 +300,7 @@ void voice(const string& filename)
 const char* MONTHS[] ={"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};  
 const static int SENSITIVITY_VALUE = 40;//for higher sensitivity, use a lower value
 const static int BLUR_SIZE = 10;//size of blur used to smooth the intensity image output from absdiff() function
-const sf::Uint8 audioData   = 1;
+const sf::Uint8 audioData = 1;
 const sf::Uint8 endOfStream = 2;
 const unsigned short port = 2435;
 
@@ -378,16 +378,13 @@ void generate_random_number(int lowest,int highest);
 void voice_rec();
 void websocket_server();
 void vinput();
-#ifdef WIN32
-    void win_serial_server_in();
-    void win_serial_server_out();
-#else
-    void unix_serial_server_in();
-    void unix_serial_server_out();
+void holo_looper();
+#ifdef RFID || #ifdef DEBUG || #ifdef ALL
+void start_rfid_daemon();
 #endif
-void rfid_greet();
-void rfid_greet_talk();
-void serial_process(string data);
+#ifdef MOTOR || #ifdef DEBUG || #ifdef ALL
+void start_motor_daemon();
+#endif
 //Python3
 void py_spider();
 
@@ -832,14 +829,9 @@ int main(int argc, char* argv[])
 
 void start()
 {
-    #ifdef WIN32
-        tgroup.create_thread(boost::bind(&win_serial_server_out));
-    #else
-        tgroup.create_thread(boost::bind(&unix_serial_server_out));
-    #endif
     if(greet == "1")
         {
-            sleep(1);
+            sleep(2);
             tgroup.create_thread(boost::bind(&vid_diplay_holo, "greeting"));
         }
     if(greet == "2")
@@ -848,7 +840,6 @@ void start()
         }
     timer("NO");
     tgroup.join_all();
-//    std::system("exit");  
 }
 
 void timer(string quit)
@@ -898,14 +889,14 @@ void timer(string quit)
 void lara()
 {
     //Get Time Variables
-    char current_time [10];
+    char current_time[10];
     _strtime(current_time);
     
     //get date variables
-    time_t     rawtime;
+    time_t rawtime;
     struct tm* timeinfo;
-    time( &rawtime );
-    timeinfo = localtime( &rawtime );
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
     if(timeinfo->tm_mday == "25")
         {
             update();
@@ -933,6 +924,7 @@ void lara()
                 voice("greedings2.ogg");
             #endif
         }
+    boost::thread t2{&holo_looper};
     //output current date
     cout << "Today's date is: " << timeinfo->tm_mday << " " << MONTHS[ timeinfo->tm_mon ] << " " << (timeinfo->tm_year + 1900) << endl;
 	//output current time
@@ -952,11 +944,19 @@ void lara()
     cout << "Generate a [random] number" << endl;
     cout << "[quit]" << endl;
     #ifdef WIN32
-        StopMP3( "voice/greedings1.mp3" );
+    if(greet == "1"){
+        StopMP3( "voice/greedings1.mp3" );}
+    else{
         StopMP3( "voice/greedings2.mp3" );
+    }
     #endif
     greet = "2";
     cin >> task;
+    #ifdef WIN32
+        TerminateThread(t2.native_handle(), 0);
+    #else
+        pthread_cancel(t2.native_handle());
+    #endif
     if(task.length() == 0)
         {
             start();
@@ -1863,7 +1863,7 @@ void spider()
         {
             const char *url = seedUrls.pop();
             spider.Initialize(url);
-            //  Spider 5 URLs of this domain.
+     -       //  Spider 5 URLs of this domain.
             //  but first, save the base domain in seenDomains
             const char *domain = spider.getUrlDomain(url);
             seenDomains.Append(spider.getBaseDomain(domain));
@@ -2028,13 +2028,33 @@ void holo_logo()
    }
 }
 
+void holo_looper()
+{
+   while(1)
+   {
+      int c = 0;
+      cvNamedWindow("Holo Display", CV_WINDOW_AUTOSIZE);
+      CvCapture* capture = cvCreateFileCapture("videos/holo/wait.mp4");
+      IplImage* frame;
+      while(c != 1)
+         {
+            frame = cvQueryFrame(capture);
+            if(!frame)
+                break;
+            cvShowImage("Holo Display", frame);
+            cvWaitKey(25);
+         }
+        cvReleaseImage(&frame);
+        cvReleaseCapture(&capture);
+   }
+}
+
 void vid_diplay_holo(string holovid)
 {
     VideoCapture cap(("videos/holo/" + holovid + ".mp4").c_str());
     if(!cap.isOpened())
     {
       cout << "Error opening video stream or file" << endl;
-      lara();
     }
     while(1)
         {
@@ -2807,8 +2827,6 @@ void qr_scanner()
             lara();
         }
     ImageScanner scanner;  
-/*      scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 1);  
-*/
     //get the width of frames of the video
     double dWidth = cap.get(CV_CAP_PROP_FRAME_WIDTH); 
     //get the height of frames of the video
@@ -2924,7 +2942,6 @@ void tar_craete()
             cout << tar.lastErrorText() << "\r\n";
             return;
         }
-
     //  Create the compressed TAR archive.
     success = tar.WriteTarGz("/Users/chilkat/testData/tar/abc123.tgz");
     if (success != true)
@@ -3145,7 +3162,7 @@ void vinput()
 void voice_rec()
 {
     start:
-    	init("voice/voce", false, true, "voice/voce/grammar", "wake");
+    	init("./voice/voce", false, true, "./voice/voce/grammar", "wake");
     	cout << "This is a speech recognition test. " << "Speak digits from 0-9 into the microphone. " << "Speak 'quit' to quit." << endl;
     	bool quit = false;
     	while (!quit)
@@ -3198,136 +3215,30 @@ void voice_rec()
     goto start;
 }
 
+#ifdef RFID || #ifdef DEBUG || #ifdef ALL
+void start_rfid_daemon()
+{
+    #ifdef WIN32
+        system("start RFIDd.exe");
+    #else
+        system("./add-ons/RFIDd");
+    #endif
+}
+#endif
+
+#ifdef MOTOR || #ifdef DEBUG || #ifdef ALL
+void start_motor_daemon()
+{
+    #ifdef WIN32
+        system("start MOTORd.exe");
+    #else
+        system("./add-ons/MOTORd");
+    #endif
+}
+#endif
+
 void websocket_server()
 {
     auto host_name = boost::asio::ip::host_name();
     cout << host_name << endl;
-}
-
-#ifdef WIN32
-void win_serial_server_out()
-{
-  SerialPort arduino(port_name);
-  if(arduino.isConnected())
-    {
-      cout << "Connection Established" << endl;
-    }
-  else
-    {
-      //cout << "ERROR, check port name" << endl;
-      system("exit");
-    }
-  
-  while(arduino.isConnected())
-    {
-      //Check if data has been read or not
-      int read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
-      //wait a bit
-      Sleep(10000);
-      if (incomingData[0] != '\0')
-        {
-          break;
-        }
-    }
-  serial_process(string(incomingData));
-}
-#else
-void unix_serial_server_out()
-{
-      // Open the serial port.
-      SerialStream serial_port;
-      char c;
-      serial_port.Open(port_name);
-      if(!serial_port.good())
-         {
-            cerr << "[" << __FILE__ << ":" << __LINE__ << "] " << "Error: Could not open serial port." << endl;
-            exit(1);
-         }
-      // Set the baud rate of the serial port.
-      serial_port.SetBaudRate(SerialStreamBuf::BAUD_9600);
-      if(!serial_port.good())
-         {
-            cerr << "Error: Could not set the baud rate." << endl;
-            exit(1);
-         }
-      // Set the number of data bits.
-      serial_port.SetCharSize(SerialStreamBuf::CHAR_SIZE_8);
-      if(!serial_port.good())
-         {
-            cerr << "Error: Could not set the character size." << endl;
-            exit(1);
-         }
-      // Disable parity.
-      serial_port.SetParity(SerialStreamBuf::PARITY_NONE);
-      if(!serial_port.good())
-         {
-            cerr << "Error: Could not disable the parity." << endl;
-            exit(1);
-         }
-      // Set the number of stop bits.
-      serial_port.SetNumOfStopBits(1);
-      if(!serial_port.good())
-         {
-            cerr << "Error: Could not set the number of stop bits." << endl ;
-            exit(1) ;
-         }
-      // Turn off hardware flow control.
-      serial_port.SetFlowControl(SerialStreamBuf::FLOW_CONTROL_NONE);
-      if (!serial_port.good())
-         {
-            cerr << "Error: Could not use hardware flow control." << endl;
-            exit(1);
-         }
-      //Wait for some data to be available at the serial port.
-      //Keep reading data from serial port and print it to the screen.
-      //Wait for some data to be available at the serial port.
-      while(serial_port.rdbuf()->in_avail() == 0)
-         {
-            usleep(100);
-         }
-      usleep(10000);
-      char out_buf[] = "check";
-      serial_port.write(out_buf, 1);
-      while(1)
-         {
-            char next_byte;
-            serial_port.get(next_byte);
-            //cout << next_byte;
-            serial_process(string(next_byte));
-         }
-     cerr << endl;
-}
-#endif
-
-void rfid_greet_talk()
-{
-    #ifdef WIN32
-        PlayMP3("voice/see_you_again.mp3");
-    #else
-        voice("see_you_again.ogg")
-    #endif
-    #ifdef WIN32
-        sleep(2);
-        StopMP3("voice/see_you_again.mp3");
-    #endif
-}
-
-void rfid_greet()
-{
-    tgroup.create_thread(boost::bind(&vid_diplay_holo, "greeting"));
-    tgroup.create_thread(bind(&rfid_greet_talk));
-    tgroup.join_all();
-    #ifdef WIN32
-        win_serial_server_out();
-    #else
-        unix_serial_server_out();
-    #endif
-}
-
-void serial_process(string data)
-{
-  if(data == "-1-1-1-1-1-1-1-1-1-1-124968484855517054655751493-1-1-1-1-1-1-1-1-1-1-1" || data == "24968484855517054655751493-1-1-1-1-1-1-1-1-1-1-1" || data == "24968484855517054655751493-1-1-1-1-1-1-1-1-1-1-124968484855517054655751493-1-1-1-1-1-1-1-1-1-1-124968484855517054655751493-1-1-1-1-1-1-1-1-1-1-1" || data == "24968484855517054655751493-1-1-1-1-1-1-1-1-1-1-124968484855517054655751493-1-1-1-1-1-1-1-1-1-1-124968484855517054655751493-1-1-1-1-1-1-1-1-1-1-124968484855517054655751493-1-1-1-1-1-1-1-1-1-1-1")
-    {
-        rfid_greet();
-    }
 }
