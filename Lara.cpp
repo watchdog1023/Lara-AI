@@ -166,10 +166,10 @@
 //Java Environment
 #include<jni.h>
 //Encryption Headers
-#include<cryptopp/osrng.h>
+/*#include<cryptopp/osrng.h>
 #include<cryptopp/modes.h>
 #include<cryptopp/aes.h>
-#include<cryptopp/filters.h>
+#include<cryptopp/filters.h>*/
 //Bitcoin Balance
 //#include<bitcoinapi/bitcoinapi.h>
 //Neural Net
@@ -210,7 +210,7 @@ using namespace termcolor;
 #ifdef WIN32
     using namespace mp3;
 #endif
-using namespace CryptoPP;
+//using namespace CryptoPP;
 //using namespace sf;
 //Boost Namespaces
 //using namespace boost;
@@ -378,7 +378,9 @@ void generate_random_number(int lowest,int highest);
 void voice_rec();
 void websocket_server();
 void vinput();
+//Looper
 void holo_looper();
+void holo_looper_working();
 #ifdef RFID || #ifdef DEBUG || #ifdef ALL
 void start_rfid_daemon();
 #endif
@@ -387,6 +389,8 @@ void start_motor_daemon();
 #endif
 //Python3
 void py_spider();
+void py_NN(string state);
+void py_functions(string function);
 
 //global variables
 string task;
@@ -711,14 +715,27 @@ ThreadReturn inputThread(void* client)
     #endif
 }
 
+//Temp
+IplImage* fps;
+
 //Version Variable
 string version = "1.0.0";
 
 //Greeting Variable
 string greet;
 
+//MP3 Player
+string mp3player;
+
 //UUID Variable
 string uuid = uuid_text;
+
+//Idle Bool
+bool idle = true;
+int kill = 0;
+boost::thread ty;
+boost::thread tfs;
+boost::thread tw;
 
 int main(int argc, char* argv[])
 {
@@ -867,16 +884,21 @@ void timer(string quit)
     while(flag)
         {
             secondsPassed = (clock() - startTime) / CLOCKS_PER_SEC;
-            if(secondsPassed >= secondsToDelay)
+            if((secondsPassed >= secondsToDelay) && (idle == true))
                 {
-                    #ifdef WIN32
+					
+					#ifdef WIN32
                         std::system("cls");
                     #else
                         std::system("clear");
                     #endif
                     #ifdef WIN32
+						TerminateThread(tfs.native_handle(), 0);
+						sleep(1);
                         TerminateThread(t.native_handle(), 0);
                     #else
+						pthread_cancel(tfs.native_handle());
+						sleep(1);
                         pthread_cancel(t.native_handle());
                     #endif
                     wait();
@@ -906,6 +928,14 @@ void lara()
     #else
         cout << termcolor::green;
     #endif
+	if(mp3player == "yes")
+		{
+			goto player;
+		}
+	if(idle == false)
+		{
+			idle = true;
+		}
     if(greet == "1")
         {
             #ifdef WIN32
@@ -919,14 +949,16 @@ void lara()
         {
             #ifdef WIN32
                 PlayMP3( "voice/greedings2.mp3" );
-                sleep(4);
+                sleep(2);
             #else
                 voice("greedings2.ogg");
             #endif
-        }
-    boost::thread t2{&holo_looper};
-    //output current date
-    cout << "Today's date is: " << timeinfo->tm_mday << " " << MONTHS[ timeinfo->tm_mon ] << " " << (timeinfo->tm_year + 1900) << endl;
+			task.clear();
+		}
+	tfs = boost::thread(boost::bind(&holo_looper));
+	//output current date
+    player:
+	cout << "Today's date is: " << timeinfo->tm_mday << " " << MONTHS[ timeinfo->tm_mon ] << " " << (timeinfo->tm_year + 1900) << endl;
 	//output current time
     cout << "Current Time is: "<< current_time << endl;
 	cout << "What task must I perform?" << endl;
@@ -941,27 +973,34 @@ void lara()
     cout << "Turn On [webcam]" << endl; 
     cout << "Activate [qr scanner]" << endl;
     cout << "Roll a [dice]" << endl;
+    cout << "Take [screenshot]" << endl;
     cout << "Generate a [random] number" << endl;
     cout << "[quit]" << endl;
     #ifdef WIN32
-    if(greet == "1"){
-        StopMP3( "voice/greedings1.mp3" );}
-    else{
-        StopMP3( "voice/greedings2.mp3" );
-    }
+    if(greet == "1")
+		{
+		    StopMP3( "voice/greedings1.mp3" );
+		}
+    else
+		{
+		    StopMP3( "voice/greedings2.mp3" );
+		}
     #endif
     greet = "2";
-    cin >> task;
-    #ifdef WIN32
-        TerminateThread(t2.native_handle(), 0);
+    getline(cin,task);
+    idle = false;
+	destroyAllWindows();
+	#ifdef WIN32
+        TerminateThread(tfs.native_handle(), 0);
+		cvReleaseImage(&fps);
     #else
-        pthread_cancel(t2.native_handle());
+        pthread_cancel(tfs.native_handle());
     #endif
     if(task.length() == 0)
         {
             start();
         }
-	if(task == "play")
+	if(task == "class_play")
 		{
 			#ifdef WIN32
 				PlayMP3("voice/what_song.mp3");
@@ -973,6 +1012,23 @@ void lara()
 				sleep(2);
 				StopMP3("voice/what_song.mp3");
 			#endif
+		}
+	if(task == "play")
+		{
+			mp3player = "yes";
+			#ifdef WIN32
+				PlayMP3("voice/mp3_playback.mp3");
+				sleep(2);
+				StopMP3("voice/mp3_playback.mp3");
+			#else
+				voice("mp3_playback.ogg");
+			#endif
+			#ifdef WIN32
+				system("start player/lara_mp3_player.exe");
+			#else
+				system("./player/lara_mp3_player");
+			#endif
+			lara();
 		}
     if(task == "dice")
         {
@@ -1013,7 +1069,13 @@ void lara()
         }
     if(task == "random")
         {
-            
+			ty = boost::thread(&holo_looper_working);
+			sleep(10);
+			#ifdef WIN32
+				TerminateThread(ty.native_handle(), 0);
+			#else	
+			    pthread_cancel(ty.native_handle());
+			#endif
         }
     if(task == "purge")
         {
@@ -1157,7 +1219,7 @@ void lara()
                                         usleep(20);
                                         std::system("clear");
                                     #endif
-                                    start();
+                                    lara();
                                 }
                         }
                 }
@@ -1997,12 +2059,12 @@ void vid_diplay()
 
 void wait()
 {
-    boost::thread t{&holo_logo};
+    tw = boost::thread(boost::bind(&holo_logo));
     getch();
     #ifdef WIN32
-       TerminateThread(t.native_handle(),0);
+       TerminateThread(tw.native_handle(),0);
     #else
-       pthread_cancel(t.native_handle());
+       pthread_cancel(tw.native_handle());
     #endif
     start();
 }
@@ -2012,19 +2074,40 @@ void holo_logo()
    while(1)
    {
       int c = 0;
-      cvNamedWindow("Holo Display", CV_WINDOW_AUTOSIZE);
-      CvCapture* capture = cvCreateFileCapture("videos/holo/logo.mp4");
-      IplImage* frame;
+      cvNamedWindow("Holo Display Logo", CV_WINDOW_AUTOSIZE);
+      CvCapture* capture2 = cvCreateFileCapture("videos/holo/logo.mp4");
+      IplImage* frame2;
       while(c != 1)
          {
-            frame = cvQueryFrame(capture);
-            if(!frame)
+            frame2 = cvQueryFrame(capture2);
+            if(!frame2)
                 break;
-            cvShowImage("Holo Display", frame);
+            cvShowImage("Holo Display Logo", frame2);
             cvWaitKey(25);
          }
-        cvReleaseImage(&frame);
-        cvReleaseCapture(&capture);
+        cvReleaseImage(&frame2);
+        cvReleaseCapture(&capture2);
+   }
+}
+
+void holo_looper_working()
+{
+	while(1)
+   {
+      int c = 0;
+      cvNamedWindow("Holo Display", CV_WINDOW_AUTOSIZE);
+      CvCapture* capture3 = cvCreateFileCapture("videos/holo/work.mp4");
+      IplImage* frame3;
+      while(c != 1)
+         {
+            frame3 = cvQueryFrame(capture3);
+            if(!frame3)
+                break;
+            cvShowImage("Holo Display", frame3);
+            cvWaitKey(25);
+         }
+        cvReleaseImage(&frame3);
+        cvReleaseCapture(&capture3);
    }
 }
 
@@ -2035,16 +2118,16 @@ void holo_looper()
       int c = 0;
       cvNamedWindow("Holo Display", CV_WINDOW_AUTOSIZE);
       CvCapture* capture = cvCreateFileCapture("videos/holo/wait.mp4");
-      IplImage* frame;
+      //IplImage* fps;
       while(c != 1)
          {
-            frame = cvQueryFrame(capture);
-            if(!frame)
+            fps = cvQueryFrame(capture);
+            if(!fps)
                 break;
-            cvShowImage("Holo Display", frame);
+            cvShowImage("Holo Display", fps);
             cvWaitKey(25);
          }
-        cvReleaseImage(&frame);
+        //cvReleaseImage(&fps);
         cvReleaseCapture(&capture);
    }
 }
@@ -3241,4 +3324,67 @@ void websocket_server()
 {
     auto host_name = boost::asio::ip::host_name();
     cout << host_name << endl;
+}
+
+void py_NN(string state)
+{
+	PyObject *pName, *pModule, *pFunc;
+    PyObject *pArgs;
+
+	Py_Initialize();
+		pName = PyUnicode_DecodeFSDefault("brain");
+		pModule = PyImport_Import(pName);
+		Py_DECREF(pName);
+	    if (pModule != NULL)
+			{
+				if(state == "train")
+				{
+					pFunc = PyObject_GetAttrString(pModule, "train");
+					pArgs = NULL;
+					PyObject_CallObject(pFunc, pArgs);
+				}
+				if(state == "restore")
+					{
+						pFunc = PyObject_GetAttrString(pModule, "restore");
+						pArgs = NULL;
+						PyObject_CallObject(pFunc, pArgs);
+					}
+			}	
+    Py_Finalize();
+}
+
+void py_functions(string function)
+{
+	PyObject *pName, *pModule, *pFunc;
+    PyObject *pArgs;
+
+	Py_Initialize();
+		pName = PyUnicode_DecodeFSDefault("functions");
+		pModule = PyImport_Import(pName);
+		Py_DECREF(pName);
+	    if (pModule != NULL)
+			{
+				if(function == "screenshot")
+				{
+					pFunc = PyObject_GetAttrString(pModule, "getscreenshot");
+					pArgs = NULL;
+					PyObject_CallObject(pFunc, pArgs);
+                    #ifdef WIN32
+                        PlayMP3("voice/screenshot.mp3");
+                        sleep(1);
+                        StopMP3("voice/screenshot.mp3");
+                    #else
+                        voice("screenshot.ogg")
+                    #endif
+                    cout << "Screenshot saved in screenshot folder" << endl;
+                    #ifdef WIN32
+                        PlayMP3("voice/screenshotdone.mp3");
+                        sleep(1);
+                        StopMP3("voice/screenshotdone.mp3");
+                    #else
+                        voice("screenshotdone.ogg")
+                    #endif
+				}
+			}	
+    Py_Finalize();
 }
