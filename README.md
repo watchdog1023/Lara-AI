@@ -1,5 +1,6 @@
 # Lara-AI
 compile with -fpermissive -Wwrite-strings -Wdeprecated-declarations -Wfatal-errors flags 
+
 NB:Linux users should use mpc++ to compile 
 
 # Windows Specify 
