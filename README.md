@@ -26,7 +26,7 @@ Linux:PASS
 # Run Status
 Windows:PASS
 
-LINUX:FAILED
+LINUX:PASS
 
 # NOTE
 JRE 32-bit is needed to run Lara-AI
