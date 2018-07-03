@@ -6,6 +6,7 @@
 #include<fstream>
 #include<istream>
 #include<string>
+#undef max
 #include<vector>
 #include<cmath>
 #include<math.h>
@@ -16,7 +17,10 @@
 #include<ctime>
 #ifdef WIN32
     #include<direct.h>
+#else
+	#include<sys/time.h>
 #endif
+#include<time.h>
 //for sleep fuction
 #ifdef WIN32
     #include<conio.h>
@@ -81,8 +85,6 @@
 //MPI
 #ifdef WIN32
     #include<mpi.h>
-#elif __APPLE__
-    #include<mpi.h>
 #else
     #include<mpi/mpi.h>
 #endif
@@ -101,22 +103,10 @@
     #include<unistd.h>
 #endif
 //MYSQL database
-#ifdef WIN32
-	#include<cppconn/driver.h>
-	#include<cppconn/exception.h>
-	#include<cppconn/resultset.h>
-	#include<cppconn/statement.h>
-#elif __APPLE__
-	#include<jdbc/cppconn/driver.h>
-	#include<jdbc/cppconn/exception.h>
-	#include<jdbc/cppconn/resultset.h>
-	#include<jdbc/cppconn/statement.h>
-#else
-	#include<cppconn/driver.h>
-	#include<cppconn/exception.h>
-	#include<cppconn/resultset.h>
-	#include<cppconn/statement.h>
-#endif
+#include<cppconn/driver.h>
+#include<cppconn/exception.h>
+#include<cppconn/resultset.h>
+#include<cppconn/statement.h>
 #ifdef WIN32
     #include<mysql.h>
 #else
@@ -138,9 +128,13 @@
 #include "include/IRC/Thread.h"
 //QR Code Generation
 #include<cstdint>
-#include "include/qr_code/QrCode.hpp"
+#ifdef WIN32
+	#include "include/qr_code/QrCode.hpp"
+#endif
 //QR code Scanner
-#include<zbar.h>
+#ifdef WIN32
+	#include<zbar.h>
+#endif
 #include<opencv2/imgproc/imgproc.hpp>
 //SDL Creation
 //#include<SDL/SDL.h>
@@ -169,7 +163,7 @@
 #endif
 //Python Environment
 #ifdef WIN32
-    #include<python3/Python.h>
+    #include<Python.h>
     #include<python2/Python.h>
 #else
     #include<python3.5m/Python.h>
@@ -201,25 +195,29 @@
 //For Voice Recognition and Voice Synthesis
 #include<voce.h>
 //Websocket
-#include<websocketpp/config/asio_no_tls.hpp>
-#include<websocketpp/server.hpp>
-#include<websocketpp/config/asio_no_tls_client.hpp>
-#include<websocketpp/client.hpp>
-//Hostname Getting
-#include<boost/asio/ip/host_name.hpp>
-//Serial Port Handling
 #ifdef WIN32
+	#include<websocketpp/config/asio_no_tls.hpp>
+	#include<websocketpp/server.hpp>
+	#include<websocketpp/config/asio_no_tls_client.hpp>
+	#include<websocketpp/client.hpp>
+#endif
+//Hostname Getting
+//#include<boost/asio/ip/host_name.hpp>
+//Serial Port Handling
+/*#ifdef WIN32
     #include "include/SerialPort.h"
 #else
     #include<SerialStream.h>
-#endif
+#endif*/
 
 //Parameters
 #pragma comment(lib, "wsock32.lib")
 
 using namespace std;
 using namespace cv;
-using namespace qrcodegen;
+#ifdef WIN32
+	using namespace qrcodegen;
+#endif
 using namespace termcolor;
 #ifdef WIN32
     using namespace mp3;
@@ -238,17 +236,21 @@ using namespace termcolor;
 using namespace voce;
 //MYSQL Connection
 using namespace sql;
-//Websocket
-using namespace websocketpp;
+#ifdef WIN32
+	//Websocket
+	using namespace websocketpp;
+#endif
 //NN
 #ifdef WIN32    
     using namespace OpenNN;
 #else
-    using namespace tensorflow;
+    //using namespace tensorflow;
 #endif
-using namespace zbar;
+#ifdef WIN32
+	using namespace zbar;
+#endif
 #ifdef __linux__ 
-    using namespace LibSerial;
+    //using namespace LibSerial;
 #endif
 
 //Volatile Bool
@@ -336,11 +338,11 @@ char Key;
 #endif
 
 //String for incoming data
-char incomingData[MAX_DATA_LENGTH];
+char incomingData[/*MAX_DATA_LENGTH*/1000000];
 
 //Neural Net Variables
 //Global Net Variables
-DataSet data_set;
+/*DataSet data_set;
 NeuralNetwork neural_network;
 LossIndex loss_index;
 TrainingStrategy training_strategy;
@@ -350,7 +352,7 @@ DataSet local_data_set;
 NeuralNetwork local_neural_network;
 LossIndex local_loss_index;
 TrainingStrategy local_training_strategy;
-ModelSelection local_model_selection;
+ModelSelection local_model_selection;*/
 
 //Prototypes
 //C/C+
@@ -380,7 +382,9 @@ void validate_paypal_token();
 void tweet();
 void tweet_with_image();
 void tweet_with_image_multi();
-void qr_scanner();
+#ifdef WIN32
+	void qr_scanner();
+#endif
 void NN();
 void tar_craete();
 void open_img();
@@ -746,7 +750,7 @@ string uuid = uuid_text;
 
 //Idle Bool
 bool idle = true;
-int kill = 0;
+//int kill = 0;
 boost::thread ty;
 boost::thread tfs;
 boost::thread tw;
@@ -766,11 +770,13 @@ int main(int argc, char* argv[])
             if(myfile3.is_open())
                 {
                     while(getline(myfile3,uuid_text))
-                        {
+						{
                             uuid = uuid_text;
-                            memo_check();
-                        }
-                    myfile3.close();
+							memo_check();
+						}
+					#ifdef WIN32
+						myfile3.close();
+					#endif
                 }
             else
                 {
@@ -808,6 +814,7 @@ int main(int argc, char* argv[])
             string name = path + argv[2];
             string output = name + ".mp3";
             string song = argv[2];
+			#ifdef WIN32
             PlayMP3(output.c_str());
             cout << "Now Playing " << song << endl;
             cout << "1 - Resume Song" << endl;
@@ -855,6 +862,21 @@ int main(int argc, char* argv[])
                                 }         
                         }
                 }
+			#else
+				voice(output.c_str());
+				ifstream myfile3 ("uuid.txt");
+                if(myfile3.is_open())
+                    {
+                        while(getline(myfile3,uuid_text))
+                            {
+                                uuid = uuid_text;
+                                memo_check();
+                            }
+                        #ifdef WIN32
+							myfile3.close();
+						#endif
+                    }
+			#endif
         }
 }
 
@@ -926,7 +948,9 @@ void lara()
 {
     //Get Time Variables
     char current_time[10];
-    _strtime(current_time);
+    #ifdef WIN32
+		_strtime(current_time);
+	#endif
     
     //get date variables
     time_t rawtime;
@@ -970,6 +994,9 @@ void lara()
 			task.clear();
 		}
 	tfs = boost::thread(boost::bind(&holo_looper));
+	#ifdef __linux__
+		strftime(current_time,10,"Current Time is:%I:%M%p",timeinfo);
+	#endif
 	//output current date
     player:
 	cout << "Today's date is: " << timeinfo->tm_mday << " " << MONTHS[ timeinfo->tm_mon ] << " " << (timeinfo->tm_year + 1900) << endl;
@@ -985,8 +1012,10 @@ void lara()
     cout << "Display a [video]" << endl;
 	cout << "[play] a song" << endl;
     cout << "Turn On [webcam]" << endl; 
-    cout << "Activate [qr scanner]" << endl;
-    cout << "Roll a [dice]" << endl;
+    #ifdef WIN32
+		cout << "Activate [qr scanner]" << endl;
+    #endif
+	cout << "Roll a [dice]" << endl;
     cout << "Take [screenshot]" << endl;
     cout << "Generate a [random] number" << endl;
     cout << "[quit]" << endl;
@@ -1349,8 +1378,10 @@ void lara()
             #else
                 usleep(5);
             #endif
-            myfile.close();
-            remove(filename_date.c_str());
+            #ifdef WIN32
+				myfile.close();
+            #endif
+			remove(filename_date.c_str());
             lara();
         }    
              
@@ -1382,6 +1413,10 @@ void lara()
             #endif
             webcam_streaming();
         }
+	if(task == "screenshot")
+		{
+			py_functions("screenshot");
+		}
     if(task == "debug")
         {
             debug();
@@ -1430,7 +1465,7 @@ void debug()
             sleep(2);
             StopMP3( "voice/start_diagnostic.mp3" );
         #else
-            voice("start_diagnostic.ogg")
+            voice("start_diagnostic.ogg");
         #endif
         cin >> dia;
         if(dia == "yes")
@@ -1745,8 +1780,10 @@ void memo_check()
                     #endif
                     cout << line << '\n';
                 }
-            myfile.close();
             #ifdef WIN32
+				myfile.close();
+            #endif
+			#ifdef WIN32
                 sleep(15);
                 std::system("cls");
             #else
@@ -1759,6 +1796,7 @@ void memo_check()
 
 void update()
 {
+	#ifdef WIN32
     char url[] = "ftp://tomb.ddns.net:8080/lara-v/lara-v.zip";
     char url2[] = "ftp://tomb.ddns.net:8080/lara-v/version.txt";
     char url3[] = "ftp://127.0.0.1:8080/lara-v/lara-v.zip";
@@ -1867,7 +1905,8 @@ void update()
                 StopMP3( "voice/update_interrupted.mp3" );
             #endif
             start();
-        }    
+        }
+	#endif
     start();
 }
 
@@ -1891,10 +1930,14 @@ void init_start()
         system(setpath.c_str());
     #else
         //Bash Set PATH
+		stringstream cc;
+		string d;
         char cwd[1024];
         getcwd(cwd, sizeof(cwd));
-        string setpath = "export PATH=$PATH:" + cwd;
-        string setpathper = "echo '" + setpath + "'  >> /etc/profile"
+		cc << cwd;
+		cc >> d;
+        string setpath = "export PATH=$PATH:" + d;
+        string setpathper = "echo '" + setpath + "'  >> /etc/profile";
         system(setpath.c_str());
         system(setpathper.c_str());
     #endif
@@ -2897,7 +2940,7 @@ void tweet_with_image_multi()
     cout << jsonResponse.emit() << "\r\n";
     cout << "Success." << "\r\n";
 }
-
+#ifdef WIN32
 void qr_scanner()
 {
     string camera;
@@ -2979,7 +3022,7 @@ void qr_scanner()
                 }
         }
 }
-
+#endif
 void NN()
 {/*
     int training_strategy = 1.0e-6;
@@ -3063,7 +3106,7 @@ void generate_random_number(int lowest,int highest)
             #ifdef WIN32
                 PlayMP3("voice/1.mp3");
             #else
-                voice("1.ogg")
+                voice("1.ogg");
             #endif
             cout << random_integer << endl;
             #ifdef WIN32
@@ -3077,7 +3120,7 @@ void generate_random_number(int lowest,int highest)
             #ifdef WIN32
                 PlayMP3("voice/2.mp3");
             #else
-                voice("2.ogg")
+                voice("2.ogg");
             #endif
             cout << random_integer << endl;
             #ifdef WIN32
@@ -3091,7 +3134,7 @@ void generate_random_number(int lowest,int highest)
             #ifdef WIN32
                 PlayMP3("voice/3.mp3");
             #else
-                voice("3.ogg")
+                voice("3.ogg");
             #endif
             cout << random_integer << endl;
             #ifdef WIN32
@@ -3105,7 +3148,7 @@ void generate_random_number(int lowest,int highest)
             #ifdef WIN32
                 PlayMP3("voice/4.mp3");
             #else
-                voice("4.ogg")
+                voice("4.ogg");
             #endif
             cout << random_integer << endl;
             #ifdef WIN32
@@ -3119,7 +3162,7 @@ void generate_random_number(int lowest,int highest)
             #ifdef WIN32
                 PlayMP3("voice/5.mp3");
             #else
-                voice("5.ogg")
+                voice("5.ogg");
             #endif
             cout << random_integer << endl;
             #ifdef WIN32
@@ -3133,7 +3176,7 @@ void generate_random_number(int lowest,int highest)
             #ifdef WIN32
                 PlayMP3("voice/6.mp3");
             #else
-                voice("6.ogg")
+                voice("6.ogg");
             #endif
             cout << random_integer << endl;
             #ifdef WIN32
@@ -3147,7 +3190,7 @@ void generate_random_number(int lowest,int highest)
             #ifdef WIN32
                 PlayMP3("voice/7.mp3");
             #else
-                voice("7.ogg")
+                voice("7.ogg");
             #endif
             cout << random_integer << endl;
             #ifdef WIN32
@@ -3161,7 +3204,7 @@ void generate_random_number(int lowest,int highest)
             #ifdef WIN32
                 PlayMP3("voice/8.mp3");
             #else
-                voice("8.ogg")
+                voice("8.ogg");
             #endif
             cout << random_integer << endl;
             #ifdef WIN32
@@ -3175,7 +3218,7 @@ void generate_random_number(int lowest,int highest)
             #ifdef WIN32
                 PlayMP3("voice/9.mp3");
             #else
-                voice("9.ogg")
+                voice("9.ogg");
             #endif
             cout << random_integer << endl;
             #ifdef WIN32
@@ -3189,7 +3232,7 @@ void generate_random_number(int lowest,int highest)
             #ifdef WIN32
                 PlayMP3("voice/10.mp3");
             #else
-                voice("10.ogg")
+                voice("10.ogg");
             #endif
             cout << random_integer << endl;
             #ifdef WIN32
@@ -3203,7 +3246,7 @@ void generate_random_number(int lowest,int highest)
             #ifdef WIN32
                 PlayMP3("voice/11.mp3");
             #else
-                voice("11.ogg")
+                voice("11.ogg");
             #endif
             cout << random_integer << endl;
             #ifdef WIN32
@@ -3217,7 +3260,7 @@ void generate_random_number(int lowest,int highest)
             #ifdef WIN32
                 PlayMP3("voice/12.mp3");
             #else
-                voice("12.ogg")
+                voice("12.ogg");
             #endif
             cout << random_integer << endl;
             #ifdef WIN32
@@ -3281,7 +3324,7 @@ void voice_rec()
                                 #ifdef WIN32
                                     PlayMP3("voice/yes.mp3");
                                 #else
-                                    voice("yes.ogg")
+                                    voice("yes.ogg");
                                 #endif
                                 #ifdef WIN32
                                     sleep(1);
@@ -3336,8 +3379,8 @@ void start_motor_daemon()
 
 void websocket_server()
 {
-    auto host_name = boost::asio::ip::host_name();
-    cout << host_name << endl;
+//    auto host_name = boost::asio::ip::host_name();
+ //   cout << host_name << endl;
 }
 
 void py_NN(string state)
@@ -3388,7 +3431,7 @@ void py_functions(string function)
                         sleep(1);
                         StopMP3("voice/screenshot.mp3");
                     #else
-                        voice("screenshot.ogg")
+                        voice("screenshot.ogg");
                     #endif
                     cout << "Screenshot saved in screenshot folder" << endl;
                     #ifdef WIN32
@@ -3396,7 +3439,7 @@ void py_functions(string function)
                         sleep(1);
                         StopMP3("voice/screenshotdone.mp3");
                     #else
-                        voice("screenshotdone.ogg")
+                        voice("screenshotdone.ogg");
                     #endif
 				}
 			}	
