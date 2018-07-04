@@ -85,6 +85,8 @@
 //MPI
 #ifdef WIN32
     #include<mpi.h>
+#elif __OSX__
+    #include<mpi.h>
 #else
     #include<mpi/mpi.h>
 #endif
@@ -188,7 +190,10 @@
 #ifdef WIN32
     //OpenNN
     #include<opennn/opennn.h>
-#else
+#elif __linux__
+    //Tensorflow
+    #include<tensorflow/c/c_api.h>
+#elif _WIN64
     //Tensorflow
     #include<tensorflow/c/c_api.h>
 #endif
