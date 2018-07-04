@@ -85,7 +85,7 @@
 //MPI
 #ifdef WIN32
     #include<mpi.h>
-#elif __OSX__
+#elif __APPLE__
     #include<mpi.h>
 #else
     #include<mpi/mpi.h>
