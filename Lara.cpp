@@ -1,6 +1,12 @@
 //AI Designed for home use
 //Built using Mingw32 Build Mr Robot
 //Modded Lexa code
+
+//Check for C++ Compiler{
+#ifndef __cplusplus
+	#error A C++ compiler is required!
+#endif 
+//}
 #include<iostream>
 #include<sstream>
 #include<fstream>
