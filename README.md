@@ -23,10 +23,18 @@ Windows:PASS
 
 Linux:PASS
 
+MacOSX:Pending
+
+Pi:Pending
+
 # Run Status
 Windows:PASS
 
 LINUX:FAILED
+
+MacOSX:Pending
+
+Pi:Pending
 
 # NOTE
 JRE 32-bit is needed to run Lara-AI
