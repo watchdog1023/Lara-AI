@@ -210,7 +210,7 @@
     #include<opennn/opennn.h>
 #elif __linux__
     //Tensorflow
-    #include<tensorflow/c/c_api.h>
+//    #include<tensorflow/c/c_api.h>
 #elif _WIN64
     //Tensorflow
     #include<tensorflow/c/c_api.h>
