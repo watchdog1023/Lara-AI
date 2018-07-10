@@ -1,5 +1,4 @@
 mpic++ -v -fpermissive -std=c++14 -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux/ -I/usr/lib/jvm/java-8-openjdk-amd64/include/ -c Lara.cpp -o Lara.o -Wfatal-errors
-g++ -v -time -c include/download.cpp -o download.o -Wwrite-strings -Wfatal-errors
 g++ -v -time -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
 g++ -v -time -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
 g++ -v -time -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
