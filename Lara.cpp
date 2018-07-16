@@ -3529,8 +3529,10 @@ void alarm_timer()
 					cout << "There goes the alarm!" << endl;
 					#ifdef WIN32
 						PlayMP3("voice/alarm.mp3");
+						PlayMP3("voice/alarm_sound.mp3");
 						system("PAUSE");
 						StopMP3("voice/alarm.mp3");
+						StopMP3("voice/alarm_sound.mp3");
 					#else
 						voice("alarm.ogg")
 					#endif
