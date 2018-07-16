@@ -427,7 +427,7 @@ void holo_looper_working();
 void start_rfid_daemon();
 #endif
 #ifdef MOTOR || #ifdef DEBUG || #ifdef ALL
-void start_motor_daemon();
+void start_motor_daemon(string state);
 #endif
 //Python3
 void py_spider();
@@ -3392,13 +3392,24 @@ void start_rfid_daemon()
 #endif
 
 #ifdef MOTOR || #ifdef DEBUG || #ifdef ALL
-void start_motor_daemon()
+void start_motor_daemon(string state)
 {
-    #ifdef WIN32
-        system("start MOTORd.exe");
-    #else
-        system("./add-ons/MOTORd");
-    #endif
+	if(state == "ON")
+		{	
+			#ifdef WIN32
+			    system("start MOTORd.exe ON");
+			#else
+			    system("./add-ons/MOTORd ON");
+			#endif
+		}
+	if(state ==  "OFF")
+		{
+			#ifdef WIN32
+			    system("start MOTORd.exe OFF");
+			#else
+			    system("./add-ons/MOTORd OFF");
+			#endif
+		}
 }
 #endif
 
