@@ -122,10 +122,10 @@
 	#include<jdbc/cppconn/resultset.h>
 	#include<jdbc/cppconn/statement.h>
 #else
-	#include<jdbc/cppconn/driver.h>
-	#include<jdbc/cppconn/exception.h>
-	#include<jdbc/cppconn/resultset.h>
-	#include<jdbc/cppconn/statement.h>
+	#include<cppconn/driver.h>
+	#include<cppconn/exception.h>
+	#include<cppconn/resultset.h>
+	#include<cppconn/statement.h>
 #endif
 #ifdef WIN32
     #include<mysql.h>
@@ -210,7 +210,7 @@
     #include<opennn/opennn.h>
 #elif __linux__
     //Tensorflow
-//    #include<tensorflow/c/c_api.h>
+    #include<tensorflow/c/c_api.h>
 #elif _WIN64
     //Tensorflow
     #include<tensorflow/c/c_api.h>
@@ -419,6 +419,7 @@ void generate_random_number(int lowest,int highest);
 void voice_rec();
 void websocket_server();
 void vinput();
+void alarm_timer();
 //Looper
 void holo_looper();
 void holo_looper_working();
@@ -924,6 +925,7 @@ void timer(string quit)
         {
             goto end;
         }
+	boost::thread tu{alarm_timer};
     boost::thread t{&lara};
     tgroup.join_all();
     end:
@@ -3467,4 +3469,61 @@ void py_functions(string function)
 				}
 			}	
     Py_Finalize();
+}
+
+void alarm_timer()
+{
+	string times[200];
+	loop:
+		int pos = 0;
+		string temp;
+		fstream al("alarms.txt");
+		getline(al ,temp);
+		string fil;
+		string infile = temp;
+		int TempNumOne = infile.size();
+		char Filename[1000];
+		for (int a = 0;a<=TempNumOne;a++)
+			{
+				Filename[a] = infile[a];
+				fil += Filename[a];
+				if(Filename[a] == ';')
+                    {
+						reverse(fil.begin(),fil.end());
+						fil.erase (0,1);
+						reverse(fil.begin(),fil.end());
+						times[pos] = fil;
+						pos++;
+                        fil = "";
+					}
+			}
+		al.close();
+	
+		//Get Time Variables
+	    char current_time[10];
+	    #ifdef WIN32
+			_strtime(current_time);
+		#endif
+    
+	    //get date variables
+	    time_t rawtime;
+	    struct tm* timeinfo;
+	    time(&rawtime);
+	    timeinfo = localtime(&rawtime);
+		
+		for(int h = 0;h<200;h++)
+		{
+			if(string(current_time) == times[h])
+				{
+					cout << "There goes the alarm!" << endl;
+					#ifdef WIN32
+						PlayMP3("voice/alarm.mp3");
+						system("PAUSE");
+						StopMP3("voice/alarm.mp3");
+					#else
+						voice("alarm.ogg")
+					#endif
+				}
+		}
+		goto loop;
 }
