@@ -3477,6 +3477,12 @@ void py_functions(string function)
                     #else
                         voice("screenshotdone.ogg");
                     #endif
+					#ifdef WIN32
+						system("cls");
+					#else
+						system("clear");
+					#endif
+					lara();
 				}
 			}	
     Py_Finalize();
