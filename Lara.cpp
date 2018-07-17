@@ -925,7 +925,7 @@ void timer(string quit)
         {
             goto end;
         }
-	boost::thread tu{alarm_timer};
+	boost::thread tu{&alarm_timer};
     boost::thread t{&lara};
     tgroup.join_all();
     end:
@@ -933,10 +933,12 @@ void timer(string quit)
                 {
                     #ifdef WIN32
                         TerminateThread(t.native_handle(), 0);
+						TerminateThread(tw.native_handle(), 0);
                     #else
                         pthread_cancel(t.native_handle());
+						pthread_cancel(tw.native_handle());
                     #endif
-                    std::system("exit");
+                    return 0;
                 }
     //Start timer
     clock_t startTime = clock();
@@ -956,11 +958,11 @@ void timer(string quit)
                     #ifdef WIN32
 						TerminateThread(tfs.native_handle(), 0);
 						sleep(1);
-                        TerminateThread(t.native_handle(), 0);
+                        TerminateThread(ty.native_handle(), 0);
                     #else
 						pthread_cancel(tfs.native_handle());
 						sleep(1);
-                        pthread_cancel(t.native_handle());
+                        pthread_cancel(ty.native_handle());
                     #endif
                     wait();
                     flag = false;
@@ -971,6 +973,11 @@ void timer(string quit)
 
 void lara()
 {
+	loop2:
+	#ifdef WIN32
+		StopMP3("voice/alarm.mp3");
+		StopMP3("voice/alarm_sound.mp3");
+	#endif
     //Get Time Variables
     char current_time[10];
     #ifdef WIN32
@@ -1066,7 +1073,7 @@ void lara()
     #endif
     if(task.length() == 0)
         {
-            start();
+            goto loop2;
         }
 	if(task == "class_play")
 		{
@@ -1425,7 +1432,7 @@ void lara()
                 voice("goodbye.ogg");
             #endif
             timer("YES");
-            std::system("exit");
+            return 0;
         }
      if(task == "webcam")
         {
@@ -3536,7 +3543,7 @@ void alarm_timer()
 					#ifdef WIN32
 						PlayMP3("voice/alarm.mp3");
 						PlayMP3("voice/alarm_sound.mp3");
-						system("PAUSE");
+						getch();
 						StopMP3("voice/alarm.mp3");
 						StopMP3("voice/alarm_sound.mp3");
 					#else
