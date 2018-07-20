@@ -1043,7 +1043,11 @@ void lara()
     player:
 	cout << "Today's date is: " << timeinfo->tm_mday << " " << MONTHS[ timeinfo->tm_mon ] << " " << (timeinfo->tm_year + 1900) << endl;
 	//output current time
+	#ifdef WIN32
     cout << "Current Time is: "<< current_time << endl;
+	#else
+	cout << "Current Time is: " << currentDateTime() << endl;
+	#endif
 	cout << "What task must I perform?" << endl;
     cout << "[update]" << endl;
     cout << "Add [memo]'s" << endl;  
