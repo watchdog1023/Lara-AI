@@ -3548,7 +3548,7 @@ void alarm_timer()
 						StopMP3("voice/alarm.mp3");
 						StopMP3("voice/alarm_sound.mp3");
 					#else
-						voice("alarm.ogg")
+						voice("alarm.ogg");
 					#endif
 				}
 		}
