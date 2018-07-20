@@ -450,8 +450,18 @@ boost::mutex mutex;
 //Thread Group
 boost::thread_group tgroup;
 
-//Bool fuctions
+//Const fuctions
+const string currentDateTime() {
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
+    // for more information about date/time format
+    strftime(buf, sizeof(buf), "%X", &tstruct);
 
+    return buf;
+}
 //Classes
 class ConsoleCommandHandler
 {
@@ -3496,7 +3506,7 @@ void py_functions(string function)
 			}	
     Py_Finalize();
 }
-#ifdef WIN32
+
 void alarm_timer()
 {
 	string times[200];
@@ -3540,8 +3550,12 @@ void alarm_timer()
 		
 		for(int h = 0;h<200;h++)
 		{
-			if(string(current_time) == times[h])
-				{
+			#ifdef WIN32
+				if(string(current_time) == times[h])
+			#else 
+				if(currentDateTime() == time[h])
+			#endif	
+			{
 					cout << "There goes the alarm!" << endl;
 					#ifdef WIN32
 						PlayMP3("voice/alarm.mp3");
@@ -3556,4 +3570,3 @@ void alarm_timer()
 		}
 		goto loop;
 }
-#endif
