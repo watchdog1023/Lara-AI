@@ -419,7 +419,9 @@ void generate_random_number(int lowest,int highest);
 void voice_rec();
 void websocket_server();
 void vinput();
+#ifdef WIN32
 void alarm_timer();
+#endif
 //Looper
 void holo_looper();
 void holo_looper_working();
@@ -3494,7 +3496,7 @@ void py_functions(string function)
 			}	
     Py_Finalize();
 }
-
+#ifdef WIN32
 void alarm_timer()
 {
 	string times[200];
@@ -3554,3 +3556,4 @@ void alarm_timer()
 		}
 		goto loop;
 }
+#endif
