@@ -3552,10 +3552,11 @@ void alarm_timer()
 		
 		for(int h = 0;h<200;h++)
 		{
+			string check = currentDateTime();
 			#ifdef WIN32
 				if(string(current_time) == times[h])
 			#else 
-				if(currentDateTime() == time[h])
+				if(check == time[h])
 			#endif	
 			{
 					cout << "There goes the alarm!" << endl;
