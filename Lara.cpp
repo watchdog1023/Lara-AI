@@ -3520,9 +3520,10 @@ void alarm_timer()
 						pos++;
                         fil = "";
 					}
-			}
+		}
+	#ifdef WIN32
 		al.close();
-	
+	#endif
 		//Get Time Variables
 	    char current_time[10];
 	    #ifdef WIN32
