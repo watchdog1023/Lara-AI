@@ -121,6 +121,11 @@
 	#include<jdbc/cppconn/exception.h>
 	#include<jdbc/cppconn/resultset.h>
 	#include<jdbc/cppconn/statement.h>
+#elif __linux__
+	#include<cppconn/driver.h>
+	#include<cppconn/exception.h>
+	#include<cppconn/resultset.h>
+	#include<cppconn/statement.h>
 #else
 	#include<jdbc/cppconn/driver.h>
 	#include<jdbc/cppconn/exception.h>
