@@ -34,7 +34,7 @@ LINUX:FAILED
 
 MacOSX:Pending
 
-Raspbian :PASS
+Raspbian :Failed
 
 # NOTE
 JRE 32-bit is needed to run Lara-AI
