@@ -14,6 +14,7 @@ def getscreenshot():
     im = PIL.ImageGrab.grab()
     stamp = now.strftime("%Y-%m-%d %H:%M")
     im.save("screenshot//screenshot-" + stamp + ".png")
+    return
     
 def send_whatsapp():
     if os.name == "posix":
