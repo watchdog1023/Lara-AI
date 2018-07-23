@@ -3707,6 +3707,8 @@ void alarm_timer()
 						StopMP3("voice/alarm_sound.mp3");
 					#else
 						voice("alarm.ogg");
+						socket_connect();
+						getch();
 					#endif
 				}
 		}
