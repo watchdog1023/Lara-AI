@@ -11,6 +11,10 @@
 #include<sstream>
 #include<fstream>
 #include<istream>
+#ifdef __linux__
+	#include<string.h>
+#endif
+#include<stdio.h>
 #include<string>
 #undef max
 #include<vector>
@@ -401,10 +405,14 @@ void spider();
 #endif
 void lara();
 void webcam_streaming();
-void vid_diplay();
+#ifndef __arm__
+	void vid_diplay();
+#endif
 void irc();
 void hand_rec();
-void vid_diplay_holo(string holovid);
+#ifndef __arm__
+	void vid_diplay_holo(string holovid);
+#endif
 void init_start();
 void get_twitter_token();
 void get_paypal_token();
@@ -419,7 +427,9 @@ void NN();
 void tar_craete();
 void open_img();
 void BTC();
-void holo_logo();
+#ifndef __arm__
+	void holo_logo();
+#endif
 void wait();
 void timer(string quit);
 void generate_random_number(int lowest,int highest);
@@ -427,15 +437,19 @@ void voice_rec();
 void websocket_server();
 void vinput();
 void alarm_timer();
-//Looper
-void holo_looper();
-void holo_looper_working();
+#ifndef __arm__
+	//Looper
+	void holo_looper();
+	void holo_looper_working();
+#endif
 #ifdef RFID || #ifdef DEBUG || #ifdef ALL
-void start_rfid_daemon();
+	void start_rfid_daemon();
 #endif
 #ifdef MOTOR || #ifdef DEBUG || #ifdef ALL
-void start_motor_daemon(string state);
+	void start_motor_daemon(string state);
 #endif
+void socket_connect();
+
 //Python3
 void py_spider();
 void py_NN(string state);
@@ -468,6 +482,112 @@ const string currentDateTime() {
     return buf;
 }
 //Classes
+#ifdef __linux__
+	//TCP Client class
+	class tcp_client
+		{
+		    private:
+		        int sock;
+		        std::string address;
+		        int port;
+		        struct sockaddr_in server;
+	     
+		    public:
+		        tcp_client();
+		        bool conn(string, int);
+		        bool send_data(string data);
+		        string receive(int);
+		};
+ 
+	tcp_client::tcp_client()
+		{
+		    sock = -1;
+		    port = 0;
+		    address = "";
+		}
+ 
+	//Connect to a host on a certain port number
+	bool tcp_client::conn(string address , int port)
+		{
+		    //create socket if it is not already created
+		    if(sock == -1)
+		        {
+		            //Create socket
+		            sock = socket(AF_INET , SOCK_STREAM , 0);
+		            if (sock == -1)
+		                {
+		                    perror("Could not create socket");
+		                }
+		            cout<<"Socket created\n";
+		        }
+		    else
+		        {
+		            //Nothing
+		        }
+     
+		    //setup address structure
+			if(inet_addr(address.c_str()) == -1)
+			    {
+			        struct hostent *he;
+			        struct in_addr **addr_list;
+			        if((he = gethostbyname(address.c_str())) == NULL)
+			            {
+			                herror("gethostbyname");
+			                cout<<"Failed to resolve hostname\n";
+			                return false;
+			            }
+			        addr_list = (struct in_addr **) he->h_addr_list;
+			        for(int i = 0; addr_list[i] != NULL; i++)
+			            {
+			            server.sin_addr = *addr_list[i]; 
+		                //cout<<address<<" resolved to "<<inet_ntoa(*addr_list[i])<<endl;
+		                break;
+			            }
+				}   
+			//plain ip address
+			else
+				{
+					server.sin_addr.s_addr = inet_addr( address.c_str() );
+				}
+			server.sin_family = AF_INET;
+			server.sin_port = htons(port);
+			//Connect to remote server
+			if(connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0)
+				{
+				    perror("connect failed. Error");
+				    return 1;
+				}
+			cout<<"Connected\n";
+			return true;
+		}
+ 
+	//Send data to the connected host
+	bool tcp_client::send_data(string data)
+		{
+		    //Send some data
+		    if(send(sock,data.c_str(),strlen(data.c_str()),0) < 0)
+				{
+				    perror("Send failed: ");
+				    return false;
+				}
+			return true;
+		}
+ 
+	//Receive data from the connected host
+	string tcp_client::receive(int size=512)
+		{
+		    char buffer[size];
+			string reply;
+			//Receive a reply from the server
+			if(recv(sock,buffer,sizeof(buffer),0) < 0)
+				{
+				    puts("recv failed");
+				}
+			reply = buffer;
+			return reply;
+		}
+#endif
+ //IRC Class
 class ConsoleCommandHandler
 {
     public:
@@ -839,11 +959,13 @@ int main(int argc, char* argv[])
         {
             voice_rec();
         }
-    if(string(argv[1]) == "holo")
-        {
-            holovideo = "1";
-            vid_diplay_holo("greeting");
-        }
+	#ifndef __arm__
+		if(string(argv[1]) == "holo")
+		    {
+		        holovideo = "1";
+		        vid_diplay_holo("greeting");
+		    }
+	#endif
     if(string(argv[1]) == "debug")
         {
             debugmode = "Yes";
@@ -856,53 +978,53 @@ int main(int argc, char* argv[])
             string output = name + ".mp3";
             string song = argv[2];
 			#ifdef WIN32
-            PlayMP3(output.c_str());
-            cout << "Now Playing " << song << endl;
-            cout << "1 - Resume Song" << endl;
-            cout << "2 - Pause Song" << endl;
-            cout << "3 - Stop Song" << endl;
-            cout << "4 - Play Song again" << endl;
-            cout << "5 - Close Song" << endl;
-            cout << "ESC - Exit MP3 Player" << endl;
-            while(2013)
-                {
-                    for(Key = 0;Key < 256;Key++)
-                        {
-                            if(GetAsyncKeyState(Key) == -32767)
-                                {    
-                                    switch(Key)
-                                        {
-                                            case VK_NUMPAD1:
-                                                PauseMP3(output.c_str());
-                                                break;
-                                            case VK_NUMPAD2:
-                                                ResumeMP3(output.c_str());
-                                                break;
-                                            case VK_NUMPAD3:
-                                                StopMP3(output.c_str());
-                                                break;
-                                            case VK_NUMPAD4:
-                                                PlayMP3(output.c_str());
-                                                break;
-                                            case VK_NUMPAD5:
-                                                CloseMP3(output.c_str());
-                                                break;
-                                            case VK_ESCAPE:
-                                                CloseMP3(output.c_str());
-                                                ifstream myfile3 ("uuid.txt");
-                                                if(myfile3.is_open())
-                                                    {
-                                                        while(getline(myfile3,uuid_text))
-                                                            {
-                                                                uuid = uuid_text;
-                                                                memo_check();
-                                                            }
-                                                        myfile3.close();
-                                                    }
-                                        }
-                                }         
-                        }
-                }
+	            PlayMP3(output.c_str());
+	            cout << "Now Playing " << song << endl;
+	            cout << "1 - Resume Song" << endl;
+	            cout << "2 - Pause Song" << endl;
+	            cout << "3 - Stop Song" << endl;
+	            cout << "4 - Play Song again" << endl;
+	            cout << "5 - Close Song" << endl;
+	            cout << "ESC - Exit MP3 Player" << endl;
+	            while(2013)
+	                {
+	                    for(Key = 0;Key < 256;Key++)
+	                        {
+	                            if(GetAsyncKeyState(Key) == -32767)
+	                                {    
+	                                    switch(Key)
+	                                        {
+	                                            case VK_NUMPAD1:
+	                                                PauseMP3(output.c_str());
+	                                                break;
+	                                            case VK_NUMPAD2:
+	                                                ResumeMP3(output.c_str());
+	                                                break;
+	                                            case VK_NUMPAD3:
+	                                                StopMP3(output.c_str());
+	                                                break;
+	                                            case VK_NUMPAD4:
+	                                                PlayMP3(output.c_str());
+	                                                break;
+	                                            case VK_NUMPAD5:
+	                                                CloseMP3(output.c_str());
+	                                                break;
+	                                            case VK_ESCAPE:
+	                                                CloseMP3(output.c_str());
+	                                                ifstream myfile3 ("uuid.txt");
+	                                                if(myfile3.is_open())
+	                                                    {
+	                                                        while(getline(myfile3,uuid_text))
+	                                                            {
+	                                                                uuid = uuid_text;
+	                                                                memo_check();
+	                                                            }
+	                                                        myfile3.close();
+	                                                    }
+	                                        }
+	                                }         
+	                        }
+	                }
 			#else
 				voice(output.c_str());
 				ifstream myfile3 ("uuid.txt");
@@ -923,15 +1045,17 @@ int main(int argc, char* argv[])
 
 void start()
 {
-    if(greet == "1")
-        {
-            sleep(2);
-            tgroup.create_thread(boost::bind(&vid_diplay_holo, "greeting"));
-        }
-    if(greet == "2")
-        {
-            tgroup.create_thread(boost::bind(&vid_diplay_holo, "greeting2"));
-        }
+	#ifndef __arm__
+		if(greet == "1")
+		    {
+		        sleep(2);
+		        tgroup.create_thread(boost::bind(&vid_diplay_holo, "greeting"));
+	        }
+	    if(greet == "2")
+	        {
+	            tgroup.create_thread(boost::bind(&vid_diplay_holo, "greeting2"));
+	        }
+	#endif
     timer("NO");
     tgroup.join_all();
 }
@@ -1042,18 +1166,17 @@ void lara()
             #endif
 			task.clear();
 		}
-	tfs = boost::thread(boost::bind(&holo_looper));
-	#ifdef __linux__
-		strftime(current_time,10,"Current Time is:%I:%M%p",timeinfo);
+	#ifndef __arm__
+		tfs = boost::thread(boost::bind(&holo_looper));
 	#endif
 	//output current date
     player:
 	cout << "Today's date is: " << timeinfo->tm_mday << " " << MONTHS[ timeinfo->tm_mon ] << " " << (timeinfo->tm_year + 1900) << endl;
 	//output current time
 	#ifdef WIN32
-    cout << "Current Time is: "<< current_time << endl;
+	    cout << "Current Time is: "<< current_time << endl;
 	#else
-	cout << "Current Time is: " << currentDateTime() << endl;
+		cout << "Current Time is: " << currentDateTime() << endl;
 	#endif
 	cout << "What task must I perform?" << endl;
     cout << "[update]" << endl;
@@ -1062,7 +1185,9 @@ void lara()
     cout << "[comms] Mode" << endl;
     cout << "Activate [hand] Recognition" << endl;
     cout << "[spider] a website" << endl;
-    cout << "Display a [video]" << endl;
+    #ifndef __arm__
+		cout << "Display a [video]" << endl;
+	#endif
 	cout << "[play] a song" << endl;
     cout << "Turn On [webcam]" << endl; 
     #ifdef WIN32
@@ -1073,23 +1198,21 @@ void lara()
     cout << "Generate a [random] number" << endl;
     cout << "[quit]" << endl;
     #ifdef WIN32
-    if(greet == "1")
-		{
-		    StopMP3( "voice/greedings1.mp3" );
-		}
-    else
-		{
-		    StopMP3( "voice/greedings2.mp3" );
-		}
-    #endif
+	   if(greet == "1")
+			{
+			    StopMP3( "voice/greedings1.mp3" );
+			}
+	   else
+			{
+			    StopMP3( "voice/greedings2.mp3" );
+			}
+	   #endif
     greet = "2";
     getline(cin,task);
     idle = false;
-	destroyAllWindows();
 	#ifdef WIN32
         TerminateThread(tfs.native_handle(), 0);
-		cvReleaseImage(&fps);
-    #else
+	#else
         pthread_cancel(tfs.native_handle());
     #endif
     if(task.length() == 0)
@@ -1165,7 +1288,9 @@ void lara()
         }
     if(task == "random")
         {
-			ty = boost::thread(&holo_looper_working);
+			#ifndef __arm__
+				ty = boost::thread(&holo_looper_working);
+			#endif
 			sleep(10);
 			#ifdef WIN32
 				TerminateThread(ty.native_handle(), 0);
@@ -1328,12 +1453,12 @@ void lara()
         {
             update();
         }
-        
-    if(task == "video")
-        {
-            vid_diplay();
-        }
-    
+    #ifndef __arm__
+		if(task == "video")
+		    {
+		        vid_diplay();
+		    }
+    #endif
     if(task == "spider")
         {
             spider();
@@ -1614,8 +1739,10 @@ void debug()
                             NN();
                         }   
                     if(what == "holo")
-                        {   
-                            vid_diplay_holo("greetings");
+                        {
+							#ifndef __arm__
+								vid_diplay_holo("greetings");
+							#endif
                         }
                     if(what == "image")
                         {
@@ -1850,115 +1977,115 @@ void memo_check()
 void update()
 {
 	#ifdef WIN32
-    char url[] = "ftp://tomb.ddns.net:8080/lara-v/lara-v.zip";
-    char url2[] = "ftp://tomb.ddns.net:8080/lara-v/version.txt";
-    char url3[] = "ftp://127.0.0.1:8080/lara-v/lara-v.zip";
-    char url4[] = "ftp://127.0.0.1:8080/lara-v/version.txt";
-    bool reload = false;
-    string line;
-    #ifdef WIN32
-        PlayMP3( "voice/update.mp3" );
-        sleep(5);
-        StopMP3( "voice/update.mp3" );
-    #else
-        voice("update.ogg");
-    #endif
-    try
-        {
-            if(Download::download(url2, reload))
-            if (myfile2.is_open())
-                {
-                    while ( getline (myfile2,line) )
-                        {
-                            version_check = line;
-                            if(version_check > version)
-                                {
-                                    #ifdef WIN32
-                                        PlayMP3( "voice/update_found.mp3" );
-                                    #else
-                                        voice("update_found.ogg");
-                                    #endif
-                                    printf("Beginning download\n");
-                                    #ifdef WIN32
-                                        sleep(1);
-                                        StopMP3( "voice/update_found.mp3" );  
-                                    #endif
-                                    try
-                                        {   
-                                            if(Download::download(url, reload, showprogress))
-                                                #ifdef WIN32
-                                                    PlayMP3( "voice/update_complete.mp3" );
-                                                #else
+		char url[] = "ftp://tomb.ddns.net:8080/lara-v/lara-v.zip";
+		char url2[] = "ftp://tomb.ddns.net:8080/lara-v/version.txt";
+		char url3[] = "ftp://127.0.0.1:8080/lara-v/lara-v.zip";
+		char url4[] = "ftp://127.0.0.1:8080/lara-v/version.txt";
+		bool reload = false;
+		string line;
+		#ifdef WIN32
+		    PlayMP3( "voice/update.mp3" );
+		    sleep(5);
+		    StopMP3( "voice/update.mp3" );
+		#else
+		    voice("update.ogg");
+		#endif
+		try
+		    {
+		        if(Download::download(url2, reload))
+		        if (myfile2.is_open())
+		            {
+		                while ( getline (myfile2,line) )
+		                    {
+		                        version_check = line;
+		                        if(version_check > version)
+		                            {
+		                                #ifdef WIN32
+		                                    PlayMP3( "voice/update_found.mp3" );
+		                                #else
+		                                    voice("update_found.ogg");
+		                                #endif
+		                                printf("Beginning download\n");
+		                                #ifdef WIN32
+		                                    sleep(1);
+		                                    StopMP3( "voice/update_found.mp3" );  
+		                                #endif
+		                                try
+		                                    {   
+		                                        if(Download::download(url, reload, showprogress))
+		                                            #ifdef WIN32
+		                                                PlayMP3( "voice/update_complete.mp3" );
+		                                            #else
                                                     voice("update_complete.ogg");
-                                                #endif
-                                                printf("Update Complete\n");
-                                                #ifdef WIN32
-                                                    sleep(1);
-                                                    StopMP3( "voice/update_complete.mp3" );
-                                                #endif
-                                        }      
-                                    catch(DLExc exc)
-                                        {
-                                            #ifdef WIN32
-                                                PlayMP3( "voice/update_interrupted.mp3" );
-                                            #else
-                                                voice("update_interrupted.ogg");
-                                            #endif
-                                            printf("%s\n", exc.geterr());
-                                            printf("Download interrupted\n");
-                                            #ifdef WIN32
-                                                sleep(1);
-                                                StopMP3( "voice/update_interrupted.mp3" );
-                                            #endif
-                                        }    
-                                }
-                            if(version_check == version)
-                                {
-                                    #ifdef WIN32
-                                        PlayMP3( "voice/update_no.mp3" );
-                                    #else
-                                        voice("update_no.ogg");
+		                                            #endif
+		                                            printf("Update Complete\n");
+		                                            #ifdef WIN32
+		                                                sleep(1);
+		                                                StopMP3( "voice/update_complete.mp3" );
+		                                            #endif
+		                                    }      
+		                                catch(DLExc exc)
+		                                    {
+		                                        #ifdef WIN32
+		                                            PlayMP3( "voice/update_interrupted.mp3" );
+		                                        #else
+		                                            voice("update_interrupted.ogg");
+		                                        #endif
+		                                        printf("%s\n", exc.geterr());
+		                                        printf("Download interrupted\n");
+		                                        #ifdef WIN32
+		                                            sleep(1);
+		                                            StopMP3( "voice/update_interrupted.mp3" );
+		                                        #endif
+		                                    }    
+		                            }
+		                        if(version_check == version)
+		                            {
+		                                #ifdef WIN32
+		                                    PlayMP3( "voice/update_no.mp3" );
+		                                #else
+		                                    voice("update_no.ogg");
+		                                #endif
+		                                cout << "There is no update available" << endl;
+		                                #ifdef WIN32
+		                                    sleep(1);
+		                                    StopMP3( "voice/update_no.mp3" );
+		                                #endif
+		                                lara();
+		                            }
+		                        if(version_check < version)
+		                            {
+		                                #ifdef WIN32
+		                                    PlayMP3( "voice/update_no.mp3" );
+		                                #else
+		                                    voice("update_no.ogg");
+		                                #endif
+		                                cout << "There is no update available" << endl;
+		                                #ifdef WIN32
+		                                    sleep(1);
+		                                    StopMP3( "voice/update_no.mp3" );
                                     #endif
-                                    cout << "There is no update available" << endl;
-                                    #ifdef WIN32
-                                        sleep(1);
-                                        StopMP3( "voice/update_no.mp3" );
-                                    #endif
-                                    lara();
-                                }
-                            if(version_check < version)
-                                {
-                                    #ifdef WIN32
-                                        PlayMP3( "voice/update_no.mp3" );
-                                    #else
-                                        voice("update_no.ogg");
-                                    #endif
-                                    cout << "There is no update available" << endl;
-                                    #ifdef WIN32
-                                        sleep(1);
-                                        StopMP3( "voice/update_no.mp3" );
-                                    #endif
-                                    lara();
-                                }
-                        }
-                    myfile2.close();
-                }
-        }
-    catch(DLExc exc)
-        {
-            #ifdef WIN32
-                PlayMP3( "voice/update_interrupted.mp3" );
-            #else
-                voice("update_interrupted.ogg");
+		                                lara();
+		                            }
+		                    }
+		                myfile2.close();
+		            }
+			}
+		catch(DLExc exc)
+		    {
+		        #ifdef WIN32
+		            PlayMP3( "voice/update_interrupted.mp3" );
+		        #else
+		            voice("update_interrupted.ogg");
             #endif
-            printf("%s\n", exc.geterr());
-            printf("Download interrupted\n");
-            #ifdef WIN32
-                sleep(1);
+		        printf("%s\n", exc.geterr());
+		        printf("Download interrupted\n");
+		        #ifdef WIN32
+		            sleep(1);
                 StopMP3( "voice/update_interrupted.mp3" );
-            #endif
-            start();
-        }
+		        #endif
+		        start();
+		    }
 	#endif
     start();
 }
@@ -2146,31 +2273,33 @@ void open_img()
     waitKey(0);
     start();
 }
-
-void vid_diplay()
-{
-    cvNamedWindow("Holo Video Display", CV_WINDOW_AUTOSIZE);
-    CvCapture* capture = cvCreateFileCapture("video.mp4");
-    IplImage* frame;
-    while(1)
-    {
-        frame = cvQueryFrame(capture);
-        if(!frame)
-            break;
-        cvShowImage("Video Display", frame);
-        char c = cvWaitKey(20);
-        if(c == 27)
-            break;    
-    }
-    cvReleaseCapture(&capture);
-    cvDestroyWindow("Holo Video Display");
-    start();
-}
-
+#ifndef __arm__
+	void vid_diplay()
+		{
+		    cvNamedWindow("Holo Video Display", CV_WINDOW_AUTOSIZE);
+			CvCapture* capture = cvCreateFileCapture("video.mp4");
+			IplImage* frame;
+			while(1)
+				{
+				    frame = cvQueryFrame(capture);
+				    if(!frame)
+				        break;
+				    cvShowImage("Video Display", frame);
+				    char c = cvWaitKey(20);
+				    if(c == 27)
+				        break;    
+				}
+			cvReleaseCapture(&capture);
+			cvDestroyWindow("Holo Video Display");
+			start();
+		}		
+#endif
 void wait()
 {
-    tw = boost::thread(boost::bind(&holo_logo));
-    getch();
+	#ifndef __arm__
+	    tw = boost::thread(boost::bind(&holo_logo));
+    #endif
+	getch();
     #ifdef WIN32
        TerminateThread(tw.native_handle(),0);
     #else
@@ -2178,100 +2307,101 @@ void wait()
     #endif
     start();
 }
+#ifndef __arm__
+	void holo_logo()
+		{
+		   while(1)
+				{
+					int c = 0;
+					cvNamedWindow("Holo Display Logo", CV_WINDOW_AUTOSIZE);
+					CvCapture* capture2 = cvCreateFileCapture("videos/holo/logo.mp4");
+					IplImage* frame2;
+					while(c != 1)
+						{
+							frame2 = cvQueryFrame(capture2);
+							if(!frame2)
+								break;
+							cvShowImage("Holo Display Logo", frame2);
+							cvWaitKey(25);
+						}
+					cvReleaseImage(&frame2);
+					cvReleaseCapture(&capture2);
+				}
+		}	
 
-void holo_logo()
-{
-   while(1)
-   {
-      int c = 0;
-      cvNamedWindow("Holo Display Logo", CV_WINDOW_AUTOSIZE);
-      CvCapture* capture2 = cvCreateFileCapture("videos/holo/logo.mp4");
-      IplImage* frame2;
-      while(c != 1)
-         {
-            frame2 = cvQueryFrame(capture2);
-            if(!frame2)
-                break;
-            cvShowImage("Holo Display Logo", frame2);
-            cvWaitKey(25);
-         }
-        cvReleaseImage(&frame2);
-        cvReleaseCapture(&capture2);
-   }
-}
+	void holo_looper_working()
+		{
+			while(1)
+				{
+					int c = 0;
+					cvNamedWindow("Holo Display", CV_WINDOW_AUTOSIZE);
+					CvCapture* capture3 = cvCreateFileCapture("videos/holo/work.mp4");
+					IplImage* frame3;
+					while(c != 1)
+						{
+							frame3 = cvQueryFrame(capture3);
+							if(!frame3)
+								break;
+							cvShowImage("Holo Display", frame3);
+							cvWaitKey(25);
+						}		
+					cvReleaseImage(&frame3);
+					cvReleaseCapture(&capture3);
+				}	
+		}
 
-void holo_looper_working()
-{
-	while(1)
-   {
-      int c = 0;
-      cvNamedWindow("Holo Display", CV_WINDOW_AUTOSIZE);
-      CvCapture* capture3 = cvCreateFileCapture("videos/holo/work.mp4");
-      IplImage* frame3;
-      while(c != 1)
-         {
-            frame3 = cvQueryFrame(capture3);
-            if(!frame3)
-                break;
-            cvShowImage("Holo Display", frame3);
-            cvWaitKey(25);
-         }
-        cvReleaseImage(&frame3);
-        cvReleaseCapture(&capture3);
-   }
-}
+	void holo_looper()
+		{
+			while(1)
+				{	
+					int c = 0;
+					cvNamedWindow("Holo Display", CV_WINDOW_AUTOSIZE);
+					CvCapture* capture = cvCreateFileCapture("videos/holo/wait.mp4");
+					//IplImage* fps;
+					while(c != 1)
+						{	
+							fps = cvQueryFrame(capture);
+							if(!fps)
+								break;
+							cvShowImage("Holo Display", fps);
+							cvWaitKey(25);
+						}
+					//cvReleaseImage(&fps);
+					cvReleaseCapture(&capture);
+				}
+		}
 
-void holo_looper()
-{
-   while(1)
-   {
-      int c = 0;
-      cvNamedWindow("Holo Display", CV_WINDOW_AUTOSIZE);
-      CvCapture* capture = cvCreateFileCapture("videos/holo/wait.mp4");
-      //IplImage* fps;
-      while(c != 1)
-         {
-            fps = cvQueryFrame(capture);
-            if(!fps)
-                break;
-            cvShowImage("Holo Display", fps);
-            cvWaitKey(25);
-         }
-        //cvReleaseImage(&fps);
-        cvReleaseCapture(&capture);
-   }
-}
+	void vid_diplay_holo(string holovid)
+		{
+			VideoCapture cap(("videos/holo/" + holovid + ".mp4").c_str());
+			if(!cap.isOpened())
+				{
+					cout << "Error opening video stream or file" << endl;
+				}
+			while(1)
+				{
+					Mat frame;
+					// Capture frame-by-frame
+					cap >> frame;
+	 
+					// If the frame is empty, break immediately
+					if (frame.empty())
+						break;
 
-void vid_diplay_holo(string holovid)
-{
-    VideoCapture cap(("videos/holo/" + holovid + ".mp4").c_str());
-    if(!cap.isOpened())
-    {
-      cout << "Error opening video stream or file" << endl;
-    }
-    while(1)
-        {
-            Mat frame;
-            // Capture frame-by-frame
-            cap >> frame;
- 
-            // If the frame is empty, break immediately
-            if (frame.empty())
-                break;
+					// Display the resulting frame
+					imshow("Holo Video", frame);
 
-            // Display the resulting frame
-            imshow("Holo Video", frame);
-
-            // Press  ESC on keyboard to exit
-            char c=(char)waitKey(25);
-            if(c == 27)
-                break;
-        }
-    // When everything done, release the video capture object
-    cap.release();
-    // Closes all the frames
-    destroyAllWindows();
-}
+					// Press  ESC on keyboard to exit
+					char c=(char)waitKey(25);
+					if(c == 27)
+						break;
+				}
+			// When everything done, release the video capture object
+			cap.release();
+			// Closes all the frames
+			destroyAllWindows();
+	}
+#endif
 
 void irc()
 {
@@ -2994,88 +3124,89 @@ void tweet_with_image_multi()
     cout << "Success." << "\r\n";
 }
 #ifdef WIN32
-void qr_scanner()
-{
-    string camera;
-    int type_camera;
-    cout << "Which Camera do you want to activate?" << endl;
-    cout << "[external]" << endl;
-    cout << "[internal]" << endl;
-    getline(cin, camera);
-    if(camera == "external")
-        {
-            type_camera = "1";    
-        }
-    if(camera == "internal")
-        {
-            type_camera = "0";    
-        }
-    VideoCapture cap(type_camera);
-   // cap.set(CV_CAP_PROP_FRAME_WIDTH,800);
-   // cap.set(CV_CAP_PROP_FRAME_HEIGHT,640);
-   //if not success, return to lara
-    if (!cap.isOpened())
-        {
-            cout << "Cannot open the video cam" << endl;
-            lara();
-        }
-    ImageScanner scanner;  
-    //get the width of frames of the video
-    double dWidth = cap.get(CV_CAP_PROP_FRAME_WIDTH); 
-    //get the height of frames of the video
-    double dHeight = cap.get(CV_CAP_PROP_FRAME_HEIGHT); 
-    cout << "Frame size : " << dWidth << " x " << dHeight << endl;
-    //create a window called "QR Scanner"
-    namedWindow("QR Scanner",CV_WINDOW_AUTOSIZE); 
-    while (1)
-        {
-            Mat frame;
-            bool bSuccess = cap.read(frame); // read a new frame from video
-            if (!bSuccess) //if not success, break loop
-                {
-                    cout << "Cannot read a frame from video stream" << endl;
-                    lara();
-                }
-            Mat grey;
-            cvtColor(frame,grey,CV_BGR2GRAY);
-            int width = frame.cols;  
-            int height = frame.rows;  
-            uchar *raw = (uchar *)grey.data;  
-            // wrap image data  
-            Image image(width, height, "Y800", raw, width * height);  
-            // scan the image for barcodes  
-            int n = scanner.scan(image);  
-            // extract results  
-            for(Image::SymbolIterator symbol = image.symbol_begin();symbol != image.symbol_end();++symbol)
-                {  
-                    vector<Point> vp;  
-                    //do something useful with results  
-                    cout << "decoded " << symbol->get_type_name()  << " symbol \"" << symbol->get_data() << '"' <<" "<< endl;  
-                    int n = symbol->get_location_size();  
-                    for(int i=0;i<n;i++)
-                        {  
-                            vp.push_back(Point(symbol->get_location_x(i),symbol->get_location_y(i))); 
-                        }  
-                    RotatedRect r = minAreaRect(vp);  
-                    Point2f pts[4];  
-                    r.points(pts);  
-                    for(int i=0;i<4;i++)
-                        {  
-                            line(frame,pts[i],pts[(i+1)%4],Scalar(255,0,0),3);  
-                        }  
-                    //cout<<"Angle: "<<r.angle<<endl;  
-                }
-            //show the frame in "QR Scanner" window
-            imshow("QR Scanner", frame);
-            //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
-            if (waitKey(30) == 27) 
-                {
-                    cout << "esc key is pressed by user" << endl;
-                    lara(); 
-                }
-        }
-}
+	void qr_scanner()
+		{
+		    string camera;
+		    int type_camera;
+		    cout << "Which Camera do you want to activate?" << endl;
+		    cout << "[external]" << endl;
+		    cout << "[internal]" << endl;
+		    getline(cin, camera);
+		    if(camera == "external")
+		        {
+		            type_camera = "1";    
+		        }
+		    if(camera == "internal")
+		        {
+		            type_camera = "0";    
+		        }
+		    VideoCapture cap(type_camera);
+		   // cap.set(CV_CAP_PROP_FRAME_WIDTH,800);
+		   // cap.set(CV_CAP_PROP_FRAME_HEIGHT,640);
+		   //if not success, return to lara
+		    if (!cap.isOpened())
+		        {
+		            cout << "Cannot open the video cam" << endl;
+		            lara();
+		        }
+		    ImageScanner scanner;  
+		    //get the width of frames of the video
+		    double dWidth = cap.get(CV_CAP_PROP_FRAME_WIDTH); 
+		    //get the height of frames of the video
+		    double dHeight = cap.get(CV_CAP_PROP_FRAME_HEIGHT); 
+		    cout << "Frame size : " << dWidth << " x " << dHeight << endl;
+		    //create a window called "QR Scanner"
+		    namedWindow("QR Scanner",CV_WINDOW_AUTOSIZE); 
+		    while (1)
+		        {
+		            Mat frame;
+		            bool bSuccess = cap.read(frame); // read a new frame from video
+		            if (!bSuccess) //if not success, break loop
+		                {
+		                    cout << "Cannot read a frame from video stream" << endl;
+		                    lara();
+		                }
+		            Mat grey;
+		            cvtColor(frame,grey,CV_BGR2GRAY);
+		            int width = frame.cols;  
+		            int height = frame.rows;  
+		            uchar *raw = (uchar *)grey.data;  
+			        // wrap image data  
+					Image image(width, height, "Y800", raw, width * height);  
+					// scan the image for barcodes  
+					int n = scanner.scan(image);  
+					// extract results  
+					for(Image::SymbolIterator symbol = image.symbol_begin();symbol != image.symbol_end();++symbol)
+					    {  
+					        vector<Point> vp;  
+					        //do something useful with results  
+					        cout << "decoded " << symbol->get_type_name()  << " symbol \"" << symbol->get_data() << '"' <<" "<< endl;  
+					        int n = symbol->get_location_size();  
+					        for(int i=0;i<n;i++)
+					            {  
+					                vp.push_back(Point(symbol->get_location_x(i),symbol->get_location_y(i))); 
+					            }  
+					        RotatedRect r = minAreaRect(vp);  
+					        Point2f pts[4];  
+					        r.points(pts);  
+					        for(int i=0;i<4;i++)
+					            {  
+					                line(frame,pts[i],pts[(i+1)%4],Scalar(255,0,0),3);  
+					            }  
+					        //cout<<"Angle: "<<r.angle<<endl;  
+					    }
+					//show the frame in "QR Scanner" window
+					imshow("QR Scanner", frame);
+					//wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
+					if (waitKey(30) == 27) 
+					    {
+					        cout << "esc key is pressed by user" << endl;
+					        lara(); 
+					    }
+				}	
+	}
 #endif
+
 void NN()
 {/*
     int training_strategy = 1.0e-6;
@@ -3409,36 +3540,36 @@ void voice_rec()
 }
 
 #ifdef RFID || #ifdef DEBUG || #ifdef ALL
-void start_rfid_daemon()
-{
-    #ifdef WIN32
-        system("start RFIDd.exe");
-    #else
-        system("./add-ons/RFIDd");
-    #endif
-}
+	void start_rfid_daemon()
+		{
+			#ifdef WIN32
+			    system("start RFIDd.exe");
+			#else
+			    system("./add-ons/RFIDd");
+			#endif
+		}		
 #endif
 
 #ifdef MOTOR || #ifdef DEBUG || #ifdef ALL
-void start_motor_daemon(string state)
-{
-	if(state == "ON")
-		{	
-			#ifdef WIN32
-			    system("start MOTORd.exe ON");
-			#else
-			    system("./add-ons/MOTORd ON");
-			#endif
-		}
-	if(state ==  "OFF")
+	void start_motor_daemon(string state)
 		{
-			#ifdef WIN32
-			    system("start MOTORd.exe OFF");
-			#else
-			    system("./add-ons/MOTORd OFF");
-			#endif
+			if(state == "ON")
+				{	
+					#ifdef WIN32
+					    system("start MOTORd.exe ON");
+					#else
+					    system("./add-ons/MOTORd ON");
+					#endif
+				}
+			if(state ==  "OFF")
+				{
+					#ifdef WIN32
+						system("start MOTORd.exe OFF");
+					#else
+						system("./add-ons/MOTORd OFF");
+					#endif
+				}
 		}
-}
 #endif
 
 void websocket_server()
@@ -3570,6 +3701,7 @@ void alarm_timer()
 					#ifdef WIN32
 						PlayMP3("voice/alarm.mp3");
 						PlayMP3("voice/alarm_sound.mp3");
+						socket_connect();
 						getch();
 						StopMP3("voice/alarm.mp3");
 						StopMP3("voice/alarm_sound.mp3");
@@ -3580,3 +3712,44 @@ void alarm_timer()
 		}
 		goto loop;
 }
+
+#ifdef WIN32
+	void socket_connect()
+		{
+		    WSADATA wsa;
+		    SOCKET s;
+		    struct sockaddr_in server;
+		    char *message , server_reply[2000];
+		    int recv_size;
+		    if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
+			    {
+			        return;
+			    }
+			if((s = socket(AF_INET , SOCK_STREAM , 0 )) == INVALID_SOCKET)
+				{
+					//Nothing
+				}
+			server.sin_addr.s_addr = inet_addr("192.168.1.107"/*"216.58.223.14"*/);
+			server.sin_family = AF_INET;
+			server.sin_port = htons(8080);
+			
+			//Connect to remote server
+			if (connect(s,(struct sockaddr*)&server,sizeof(server)) < 0)
+				{
+					return;
+				}
+		}
+#else
+	void socket_connect()
+		{
+			tcp_client c;
+			string host;
+			host = "192.168.1.107";
+			//connect to host
+			c.conn(host , 8080);
+			//send some data
+			c.send_data("Hi");
+			//done
+			return;
+		}
+#endif
