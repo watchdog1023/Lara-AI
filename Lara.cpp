@@ -3728,7 +3728,6 @@ void alarm_timer()
 						socket_connect();
 						getch();
 						music2.stop();
-						music2.clear();
 					#endif
 				}
 		}
