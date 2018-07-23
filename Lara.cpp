@@ -334,7 +334,7 @@ void signalHandler(int signal)
 void unix_alarm(const string& filename)
 {
     // Load an ogg music file
-    if (!music.openFromFile("voice/ogg/" + filename))
+    if (!music2.openFromFile("voice/ogg/" + filename))
         return;
 
     // Play it
@@ -3730,7 +3730,7 @@ void alarm_timer()
 					#else
 						unix_alarm("alarm.ogg");
 						socket_connect();
-						getchar();
+						getch();
 						music2.stop();
 					#endif
 				}
