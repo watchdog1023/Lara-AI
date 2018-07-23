@@ -290,6 +290,9 @@ using namespace sql;
 //Volatile Bool
 volatile bool running;
 
+//SMFL Vars
+sf::Music music2;
+
 //String Functions
 string encrypt(string msg, string const& key)
     {
@@ -326,6 +329,23 @@ void showprogress(unsigned long total, unsigned long part)//Displays the downloa
 void signalHandler(int signal)
 {
     running = false;
+}
+
+void unix_alarm(const string& filename)
+{
+    // Load an ogg music file
+    if (!music.openFromFile("voice/ogg/" + filename))
+        return;
+
+    // Play it
+    music2.play();
+	music2.setLoop(true);
+    /*// Loop while the music is playing
+    while (music.getStatus() == sf::Music::Playing)
+        {
+            // Leave some CPU time for other processes
+            sf::sleep(sf::milliseconds(100));
+        }*/
 }
 
 void voice(const string& filename)
@@ -518,7 +538,6 @@ const string currentDateTime() {
 		                {
 		                    perror("Could not create socket");
 		                }
-		            cout<<"Socket created\n";
 		        }
 		    else
 		        {
@@ -557,7 +576,6 @@ const string currentDateTime() {
 				    perror("connect failed. Error");
 				    return 1;
 				}
-			cout<<"Connected\n";
 			return true;
 		}
  
@@ -638,7 +656,7 @@ class ConsoleCommandHandler
         struct CommandEntry
             {
                 int argCount;
-                void (*handler)(string /*arguments*/, IRCClient* /*client*/);
+                void (*handler)(string , IRCClient* );
             };
     
         map<string, CommandEntry> _commands;
@@ -3706,9 +3724,11 @@ void alarm_timer()
 						StopMP3("voice/alarm.mp3");
 						StopMP3("voice/alarm_sound.mp3");
 					#else
-						voice("alarm.ogg");
+						unix_alarm("alarm.ogg");
 						socket_connect();
 						getch();
+						music2.stop();
+						music2.clear();
 					#endif
 				}
 		}
@@ -3731,7 +3751,7 @@ void alarm_timer()
 				{
 					//Nothing
 				}
-			server.sin_addr.s_addr = inet_addr("192.168.1.107"/*"216.58.223.14"*/);
+			server.sin_addr.s_addr = inet_addr("192.168.1.107");
 			server.sin_family = AF_INET;
 			server.sin_port = htons(8080);
 			
