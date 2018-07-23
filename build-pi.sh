@@ -1,4 +1,9 @@
+#!/bin/bash
+function pause(){
+   read -p "$*"
+}
 mpic++ -fpermissive -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include/linux" -v -c Lara.cpp -o Lara.o -Wfatal-errors
+pause 'Press [Enter] key to continue...'
 g++ -v -time -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
 g++ -v -time -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
 g++ -v -time -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
