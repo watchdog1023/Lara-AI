@@ -334,7 +334,7 @@ void signalHandler(int signal)
 void unix_alarm(const string& filename)
 {
     // Load an ogg music file
-    if (!music2.openFromFile("voice/ogg/" + filename))
+    if (!music.openFromFile("voice/ogg/" + filename))
         return;
 
     // Play it
@@ -450,7 +450,9 @@ void BTC();
 #ifndef __arm__
 	void holo_logo();
 #endif
-void wait();
+#ifndef __arm__
+	void wait();
+#endif
 void timer(string quit);
 void generate_random_number(int lowest,int highest);
 void voice_rec();
@@ -1100,34 +1102,34 @@ void timer(string quit)
                     return 0;
                 }
     //Start timer
-    clock_t startTime = clock();
-    int secondsPassed;
-    int secondsToDelay = 120;
-    while(flag)
-        {
-            secondsPassed = (clock() - startTime) / CLOCKS_PER_SEC;
-            if((secondsPassed >= secondsToDelay) && (idle == true))
-                {
-					
-					#ifdef WIN32
-                        std::system("cls");
-                    #else
-                        std::system("clear");
-                    #endif
-                    #ifdef WIN32
-						TerminateThread(tfs.native_handle(), 0);
-						sleep(1);
-                        TerminateThread(ty.native_handle(), 0);
-                    #else
-						pthread_cancel(tfs.native_handle());
-						sleep(1);
-                        pthread_cancel(ty.native_handle());
-                    #endif
-                    wait();
-                    flag = false;
-                }
-        }
-        
+    #ifndef __arm__
+		clock_t startTime = clock();
+		int secondsPassed;
+		int secondsToDelay = 120;
+		while(flag)
+		    {
+		        secondsPassed = (clock() - startTime) / CLOCKS_PER_SEC;
+		        if((secondsPassed >= secondsToDelay) && (idle == true))
+		            {					
+						#ifdef WIN32
+						   std::system("cls");
+						#else
+						    std::system("clear");
+						#endif
+						#ifdef WIN32
+							TerminateThread(tfs.native_handle(), 0);
+							sleep(1);
+						    TerminateThread(ty.native_handle(), 0);
+						#else
+							pthread_cancel(tfs.native_handle());
+							sleep(1);
+					        pthread_cancel(ty.native_handle());
+					    #endif
+					    wait();
+					    flag = false;
+					}
+			}	
+    #endif 
 }
 
 void lara()
@@ -2312,19 +2314,21 @@ void open_img()
 			start();
 		}		
 #endif
-void wait()
-{
-	#ifndef __arm__
-	    tw = boost::thread(boost::bind(&holo_logo));
-    #endif
-	getch();
-    #ifdef WIN32
-       TerminateThread(tw.native_handle(),0);
-    #else
-       pthread_cancel(tw.native_handle());
-    #endif
-    start();
-}
+
+#ifndef __arm__
+	void wait()
+		{
+			tw = boost::thread(boost::bind(&holo_logo));
+		    getch();
+		    #ifdef WIN32
+		       TerminateThread(tw.native_handle(),0);
+		    #else
+		       pthread_cancel(tw.native_handle());
+		    #endif
+		    start();
+		}
+#endif
+
 #ifndef __arm__
 	void holo_logo()
 		{
@@ -3726,7 +3730,7 @@ void alarm_timer()
 					#else
 						unix_alarm("alarm.ogg");
 						socket_connect();
-						getch();
+						getchar();
 						music2.stop();
 					#endif
 				}
