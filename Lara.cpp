@@ -536,7 +536,6 @@ const string currentDateTime() {
 		            sock = socket(AF_INET , SOCK_STREAM , 0);
 		            if (sock == -1)
 		                {
-		                    perror("Could not create socket");
 		                }
 		        }
 		    else
@@ -551,9 +550,7 @@ const string currentDateTime() {
 			        struct in_addr **addr_list;
 			        if((he = gethostbyname(address.c_str())) == NULL)
 			            {
-			                herror("gethostbyname");
-			                cout<<"Failed to resolve hostname\n";
-			                return false;
+							return false;
 			            }
 			        addr_list = (struct in_addr **) he->h_addr_list;
 			        for(int i = 0; addr_list[i] != NULL; i++)
@@ -573,8 +570,7 @@ const string currentDateTime() {
 			//Connect to remote server
 			if(connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0)
 				{
-				    perror("connect failed. Error");
-				    return 1;
+					return;
 				}
 			return true;
 		}
@@ -585,7 +581,6 @@ const string currentDateTime() {
 		    //Send some data
 		    if(send(sock,data.c_str(),strlen(data.c_str()),0) < 0)
 				{
-				    perror("Send failed: ");
 				    return false;
 				}
 			return true;
@@ -599,7 +594,6 @@ const string currentDateTime() {
 			//Receive a reply from the server
 			if(recv(sock,buffer,sizeof(buffer),0) < 0)
 				{
-				    puts("recv failed");
 				}
 			reply = buffer;
 			return reply;
@@ -920,6 +914,9 @@ string version = "1.0.0";
 
 //Greeting Variable
 string greet;
+
+//IP Array
+string ips[] = {"192.168.1.100","192.168.1.101","192.168.1.102","192.168.1.103","192.168.1.104","192.168.1.105","192.168.1.106","192.168.1.107","192.168.1.108","192.168.1.109","192.168.1.110","192.168.1.111","192.168.1.112","192.168.1.113","192.168.1.114","192.168.1.115","192.168.1.116","192.168.1.117","192.168.1.118","192.168.1.119","192.168.1.120","192.168.1.121","192.168.1.122","192.168.1.123","192.168.1.124","192.168.1.125","192.168.1.126","192.168.1.127","192.168.1.128","192.168.1.129","192.168.1.130"};
 
 //MP3 Player
 string mp3player;
@@ -3756,24 +3753,33 @@ void alarm_timer()
 				{
 					//Nothing
 				}
-			server.sin_addr.s_addr = inet_addr("192.168.1.107");
+				for(int start = 0;start < 30;start++){
+    
+			server.sin_addr.s_addr = inet_addr(ips[start].c_str());
 			server.sin_family = AF_INET;
 			server.sin_port = htons(8080);
 			
 			//Connect to remote server
 			if (connect(s,(struct sockaddr*)&server,sizeof(server)) < 0)
 				{
-					return;
+					//Nothing
 				}
+			else{
+     break;
+    }
+	}
 		}
 #else
 	void socket_connect()
 		{
 			tcp_client c;
 			string host;
-			host = "192.168.1.107";
-			//connect to host
-			c.conn(host , 8080);
+			for(int start = 0;start < 30;start++)
+				{
+					host = ips[start].c_str();
+					//connect to host
+					c.conn(host , 8080);
+				}
 			//send some data
 			c.send_data("Hi");
 			//done
