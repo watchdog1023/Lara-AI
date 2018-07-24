@@ -36,6 +36,10 @@ MacOSX:Pending
 
 Raspbian :PASS
 
+# Lara Android Companion App @:
+
+https://github.com/watchdog1023/Lara-AI-Android-App
+
 # NOTE
 JRE 32-bit is needed to run Lara-AI
 (JREx.x.x/bin/client/ should be in your path)
