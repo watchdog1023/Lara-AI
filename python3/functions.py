@@ -1,5 +1,8 @@
 #This is normal functions
-import PIL.ImageGrab
+if os.name == "posix":
+    import pyscreenshot as ImageGrab
+else:
+    import PIL.ImageGrab
 import datetime
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -11,10 +14,12 @@ import os
 
 def getscreenshot():
     now = datetime.datetime.now()
-    im = PIL.ImageGrab.grab()
+    if os.name == "posix":
+        im = ImageGrab.grab()
+    else:
+        im = PIL.ImageGrab.grab()
     stamp = now.strftime("%Y-%m-%d %H:%M")
     im.save("screenshot//screenshot-" + stamp + ".png")
-    return
     
 def send_whatsapp():
     if os.name == "posix":
