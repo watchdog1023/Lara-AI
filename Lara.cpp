@@ -21,6 +21,7 @@
 #include<cmath>
 #include<math.h>
 #include<cassert>
+#include<assert.h>
 //Neural Network Pattern Recognition
 #include<stdexcept>
 //for date & time
@@ -40,6 +41,10 @@
     #include<curses.h>
 #endif
 #include<unistd.h>
+//For getch(),linux
+#ifdef __linux__
+    #include<termios.h>
+#endif
 //C libs to use system function
 #include<cstdio>
 #include<cstdlib>
@@ -195,10 +200,8 @@
 //Python Environment
 #ifdef WIN32
     #include<Python.h>
-    #include<python2/Python.h>
 #else
     #include<python3.5m/Python.h>
-    #include<python2.7/Python.h>
 #endif
 //Ruby Environment
 //#include<ruby/ruby.h>
@@ -227,7 +230,12 @@
     #include<tensorflow/c/c_api.h>
 #endif
 //For Voice Recognition and Voice Synthesis
-#include<voce.h>
+#include<sphinxbase/err.h>
+#include<sphinxbase/ad.h>
+#include<pocketsphinx/pocketsphinx.h>
+#if __linux__
+    #include<sys/select.h>
+#endif
 //Websocket
 #ifdef WIN32
 	#include<websocketpp/config/asio_no_tls.hpp>
@@ -243,9 +251,15 @@
 #else
     #include<SerialStream.h>
 #endif*/
+//Boost Version
+#include<boost/version.hpp>
 
 //Parameters
 #pragma comment(lib, "wsock32.lib")
+
+//Definations
+#define Pocketsphinx "5prealpha"
+#define sphinx "5prealpha"
 
 using namespace std;
 using namespace cv;
@@ -266,8 +280,6 @@ using namespace termcolor;
 //using namespace MPI;
 //Tesseract-OCR Namespcaes
 //using namespace tesseract;
-//For Voice Recognition and Voice Synthesis
-using namespace voce;
 //MYSQL Connection
 using namespace sql;
 #ifdef WIN32
@@ -283,9 +295,6 @@ using namespace sql;
 #ifdef WIN32
 	using namespace zbar;
 #endif
-#ifdef __linux__ 
-    //using namespace LibSerial;
-#endif
 
 //Volatile Bool
 volatile bool running;
@@ -300,7 +309,7 @@ string encrypt(string msg, string const& key)
             return msg;
         
         for (string::size_type i = 0; i < msg.size(); ++i)
-            msg[i] ^= key[i%key.size()];
+            msg[i] ^= key[i % key.size()];
         return msg;
     }
     
@@ -336,16 +345,9 @@ void unix_alarm(const string& filename)
     // Load an ogg music file
     if (!music2.openFromFile("voice/ogg/" + filename))
         return;
-
     // Play it
     music2.play();
 	music2.setLoop(true);
-    /*// Loop while the music is playing
-    while (music.getStatus() == sf::Music::Playing)
-        {
-            // Leave some CPU time for other processes
-            sf::sleep(sf::milliseconds(100));
-        }*/
 }
 
 void voice(const string& filename)
@@ -374,6 +376,51 @@ const sf::Uint8 audioData = 1;
 const sf::Uint8 endOfStream = 2;
 const unsigned short port = 2435;
 
+//Static Constants
+static const arg_t cont_args_def[] = {
+    POCKETSPHINX_OPTIONS,
+    /* Argument file. */
+    {"-argfile",ARG_STRING,NULL,"Argument file giving extra arguments."},
+    {"-adcdev",ARG_STRING,NULL,"Name of audio device to use for input."},
+    {"-inmic",ARG_BOOLEAN,"yes","Transcribe audio from microphone."},
+    {"-time",ARG_BOOLEAN,"no","Print word times in file transcription."},
+    CMDLN_EMPTY_OPTION
+};
+
+//Int Functions
+#ifdef __linux__
+    int getch(void)
+        {
+            struct termios oldattr, newattr;
+            int ch;
+            tcgetattr( STDIN_FILENO, &oldattr );
+            newattr = oldattr;
+            newattr.c_lflag &= ~( ICANON | ECHO );
+            tcsetattr( STDIN_FILENO, TCSANOW, &newattr );
+            ch = getchar();
+            tcsetattr( STDIN_FILENO, TCSANOW, &oldattr );
+            return ch;
+        }   
+
+    int getche(void)
+        {
+            struct termios oldattr, newattr;
+            int ch;
+            tcgetattr( STDIN_FILENO, &oldattr );
+            newattr = oldattr;
+            newattr.c_lflag &= ~( ICANON );
+            tcsetattr( STDIN_FILENO, TCSANOW, &newattr );
+            ch = getchar();
+            tcsetattr( STDIN_FILENO, TCSANOW, &oldattr );
+            return ch;
+        }
+#endif
+
+//Voice Rec Variables
+static ps_decoder_t *ps;
+static cmd_ln_t *vconfig;
+string voutput;
+
 //Bool Vaules
 bool debugMode;//toggled pressing 'd'
 bool trackingEnabled;//toggled pressing 't'
@@ -392,7 +439,7 @@ char Key;
 #endif
 
 //String for incoming data
-char incomingData[/*MAX_DATA_LENGTH*/1000000];
+char incomingData[1000000];
 
 //Neural Net Variables
 //Global Net Variables
@@ -453,9 +500,10 @@ void BTC();
 void wait();
 void timer(string quit);
 void generate_random_number(int lowest,int highest);
+void recognize_from_microphone();
+void sleep_msec(int32 ms);
 void voice_rec();
 void websocket_server();
-void vinput();
 void alarm_timer();
 #ifndef __arm__
 	//Looper
@@ -467,6 +515,9 @@ void alarm_timer();
 #endif
 #ifdef MOTOR || #ifdef DEBUG || #ifdef ALL
 	void start_motor_daemon(string state);
+#endif
+#ifdef CUDA
+    void run();
 #endif
 void socket_connect();
 
@@ -490,13 +541,12 @@ boost::mutex mutex;
 boost::thread_group tgroup;
 
 //Const fuctions
-const string currentDateTime() {
+const string currentDateTime()
+{
     time_t     now = time(0);
     struct tm  tstruct;
     char       buf[80];
     tstruct = *localtime(&now);
-    // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
-    // for more information about date/time format
     strftime(buf, sizeof(buf), "%X", &tstruct);
 
     return buf;
@@ -599,7 +649,7 @@ const string currentDateTime() {
 			return reply;
 		}
 #endif
- //IRC Class
+//IRC Class
 class ConsoleCommandHandler
 {
     public:
@@ -959,6 +1009,7 @@ int main(int argc, char* argv[])
                     init_start();
                 }
         }
+
     if (string(argv[1]) == "hand")
         {
             #ifdef WIN32
@@ -970,10 +1021,59 @@ int main(int argc, char* argv[])
             #endif
             hand_rec();
         }
-    if(string(argv[1]) == "voice")
+
+    if(string(argv[1]) == "-hmm")
         {
-            voice_rec();
+            int s = 0;
+            vloop:
+                cout << "Ready to listen,Please press the talk key[~] if you want me to do something" << endl;
+                while(1)
+                    {
+                        if ('`' == getch())
+                            {
+                                char const *cfg;
+                                err_set_logfp(NULL);
+                                err_set_debug_level(0);
+                                //-hmm model/en-us/en-us -lm model/en-us/en-us.lm.bin -dict model/en-us/cmudict-en-us.dict
+                                vconfig = cmd_ln_parse_r(NULL, cont_args_def, argc, argv, TRUE);
+                                ps_default_search_args(vconfig);
+                                ps = ps_init(vconfig);
+                                if (ps == NULL)
+                                    {
+                                        cmd_ln_free_r(vconfig);
+                                        return 1;
+                                    }
+                                recognize_from_microphone();
+                                ps_free(ps);
+                                cmd_ln_free_r(vconfig);
+                                cout << voutput << endl;
+                                break;
+                            }
+                    }
+                    if(voutput == "hello")
+                        {
+                            #ifdef WIN32
+                                PlayMP3("voice/hello_test.mp3");
+                                sleep(2);
+                                StopMP3("voice/hello_test.mp3");
+                            #else
+                                voice("hello_test.ogg");
+                            #endif
+                            goto vloop;
+                        }
+                    else
+                        {
+                            #ifdef WIN32
+                                PlayMP3("voice/cant_rec.mp3");
+                                sleep(2);
+                                StopMP3("voice/cant_rec.mp3");
+                            #else
+                                voice("cant_rec.ogg");
+                            #endif
+                            goto vloop;
+                        }
         }
+
 	#ifndef __arm__
 		if(string(argv[1]) == "holo")
 		    {
@@ -981,11 +1081,13 @@ int main(int argc, char* argv[])
 		        vid_diplay_holo("greeting");
 		    }
 	#endif
+
     if(string(argv[1]) == "debug")
         {
             debugmode = "Yes";
             start();
         }
+
     if(string(argv[1]) == "-mp3")
         {
             string path = "music\\";
@@ -1618,7 +1720,12 @@ void debug()
 {
     cout << "I am Lara" << endl;
     cout << uuid << endl;
-	//printf("Tesseract-ocr version: %s\n",tesseract::TessBaseAPI::Version());
+    printf("COMPILED ON:%s,AT:%s\n", __DATE__, __TIME__);
+    cout << "OpenCV version:" << CV_VERSION << endl;
+    cout << "Boost version:" << BOOST_LIB_VERSION << endl;
+	cout << "Pocketsphinx Version:" << Pocketsphinx << endl;
+    cout << "Sphinx Version:" << sphinx << endl;
+    //printf("Tesseract-ocr version: %s\n",tesseract::TessBaseAPI::Version());
     //printf("Leptonica version: %s\n",getLeptonicaVersion());
     #ifdef WIN32
         sleep(2);
@@ -3476,88 +3583,86 @@ void generate_random_number(int lowest,int highest)
         }
 }
 
-void vinput()
+void sleep_msec(int32 ms)
 {
-	init("./voice/voce", false, true, "./voice/voce/grammar", "commands");
-	bool quit = false;
-	while (!quit)
-	{
-		// Normally, applications would do application-specific things 
-		// here.  For this sample, we'll just sleep for a little bit.
-	#ifdef WIN32
-			Sleep(200);
-	#else
-			usleep(200);
-	#endif
-		while (getRecognizerQueueSize() > 0)
-		{
-			string s = popRecognizedString();
-			// Check if the string contains 'quit'.
-			if (std::string::npos != s.rfind("quit"))
-			{
-				quit = true;
-			}
+    #if (defined(_WIN32) && !defined(GNUWINCE)) || defined(_WIN32_WCE)
+        Sleep(ms);
+    #else
+        struct timeval tmo;
+        tmo.tv_sec = 0;
+        tmo.tv_usec = ms * 1000;
+        select(0, NULL, NULL, NULL, &tmo);
+    #endif
+}
 
-			cout << "You said: " << s << endl;
-		}
-	}
-	destroy();
+void recognize_from_microphone()
+{
+    ad_rec_t *ad;
+    int16 adbuf[2048];
+    uint8 utt_started, in_speech;
+    int32 k;
+    char const *hyp;
+    if ((ad = ad_open_dev(cmd_ln_str_r(vconfig, "-adcdev"),(int) cmd_ln_float32_r(vconfig,"-samprate"))) == NULL)
+        E_FATAL("Failed to open audio device\n");
+    if (ad_start_rec(ad) < 0)
+        E_FATAL("Failed to start recording\n");
+    if (ps_start_utt(ps) < 0)
+        E_FATAL("Failed to start utterance\n");
+    utt_started = FALSE;
+
+    for (int i =0;i<50;i++)
+        {
+            if ((k = ad_read(ad, adbuf, 2048)) < 0)
+                E_FATAL("Failed to read audio\n");
+            ps_process_raw(ps, adbuf, k, FALSE, FALSE);
+            in_speech = ps_get_in_speech(ps);
+            if (in_speech && !utt_started)
+                {
+                    utt_started = TRUE;
+                }
+            if (!in_speech && utt_started)
+                {
+                    /* speech -> silence transition, time to start new utterance  */
+                    ps_end_utt(ps);
+                    hyp = ps_get_hyp(ps, NULL );
+                    if (hyp != NULL)
+                        {
+                            printf("%s\n", hyp);
+                            fflush(stdout);
+                        }
+                    if (ps_start_utt(ps) < 0)
+                        E_FATAL("Failed to start utterance\n");
+                    utt_started = FALSE;
+                }
+            sleep_msec(100);
+        }
+    ad_close(ad);
+    voutput = hyp;
 }
 
 void voice_rec()
 {
-    start:
-    	init("./voice/voce", false, true, "./voice/voce/grammar", "wake");
-    	cout << "This is a speech recognition test. " << "Speak digits from 0-9 into the microphone. " << "Speak 'quit' to quit." << endl;
-    	bool quit = false;
-    	while (!quit)
-        	{
-        		// Normally, applications would do application-specific things 
-        		// here.  For this sample, we'll just sleep for a little bit.
-                #ifdef WIN32
-                	sleep(200);
-                #else
-            		usleep(200);
-                #endif
-        		while (getRecognizerQueueSize() > 0)
-            		{
-            			string s = popRecognizedString();
-            
-            			// Check if the string contains 'quit'.
-                        if(string::npos == s.rfind("lara"))
-                            {
-                                #ifdef WIN32
-                                    PlayMP3("voice/yes.mp3");
-                                #else
-                                    voice("yes.ogg");
-                                #endif
-                                #ifdef WIN32
-                                    sleep(1);
-                                StopMP3("voice/yes.mp3");
-                                #endif
-                                boost::thread input{&vinput};
-                                tgroup.join_all();
-                                //Start timer
-                                clock_t startTime = clock();
-                                int secondsPassed;
-                                int secondsToDelay = 60;
-                                while(flag)
-                                    {
-                                        secondsPassed = (clock() - startTime) / CLOCKS_PER_SEC;
-                                        if(secondsPassed >= secondsToDelay)
-                                            {
-                                                #ifdef WIN32
-                                                    TerminateThread(input.native_handle(), 0);
-                                                #else
-                                                    pthread_cancel(input.native_handle());
-                                                #endif
-                                                flag = false;
-                                            }
-                                    }
-                            }
-                    }
-            }
-    goto start;
+    char const *cfg;
+    err_set_logfp(NULL);
+    err_set_debug_level(0);
+    char* argv2[] = {"-hmm"," model/en-us/en-us","-lm"," model/en-us/en-us.lm.bin","-dict"," model/en-us/cmudict-en-us.dict"};
+    int argc2 = 6;
+    vconfig = cmd_ln_parse_r(NULL, cont_args_def, argc2, argv2, TRUE);        
+    ps_default_search_args(vconfig);
+    ps = ps_init(vconfig);
+    if (ps == NULL)
+        {
+            cmd_ln_free_r(vconfig);
+            return 1;
+        }
+    recognize_from_microphone();
+    ps_free(ps);
+    cmd_ln_free_r(vconfig);
+    cout << voutput << endl;
+    if(voutput == "hello")
+        {
+            cout << "it works" << endl;
+        }
 }
 
 #ifdef RFID || #ifdef DEBUG || #ifdef ALL
@@ -3630,6 +3735,7 @@ void py_functions(string function)
 {
 	PyObject *pName, *pModule, *pFunc;
     PyObject *pArgs;
+    PyObject* pResult;
 
 	Py_Initialize();
 		pName = PyUnicode_DecodeFSDefault("functions");
@@ -3662,6 +3768,33 @@ void py_functions(string function)
 					#else
 						system("clear");
 					#endif
+					lara();
+				}
+                if(function == "stt")
+				{
+					pFunc = PyObject_GetAttrString(pModule, "STT");
+					pArgs = NULL;
+					pResult = PyObject_CallObject(pFunc, pArgs);
+/*                    #ifdef WIN32
+                        PlayMP3("voice/screenshot.mp3");
+                        sleep(1);
+                        StopMP3("voice/screenshot.mp3");
+                    #else
+                        voice("screenshot.ogg");
+                    #endif*/
+                    cout << pResult  << endl;
+                    /*#ifdef WIN32
+                        PlayMP3("voice/screenshotdone.mp3");
+                        sleep(1);
+                        StopMP3("voice/screenshotdone.mp3");
+                    #else
+                        voice("screenshotdone.ogg");
+                    #endif
+					#ifdef WIN32
+						system("cls");
+					#else
+						system("clear");
+					#endif*/
 					lara();
 				}
 			}	
