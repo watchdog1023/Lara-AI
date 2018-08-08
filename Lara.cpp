@@ -502,7 +502,6 @@ void timer(string quit);
 void generate_random_number(int lowest,int highest);
 void recognize_from_microphone();
 void sleep_msec(int32 ms);
-void voice_rec();
 void websocket_server();
 void alarm_timer();
 #ifndef __arm__
@@ -1024,7 +1023,6 @@ int main(int argc, char* argv[])
 
     if(string(argv[1]) == "-hmm")
         {
-            int s = 0;
             vloop:
                 cout << "Ready to listen,Please press the talk key[~] if you want me to do something" << endl;
                 while(1)
@@ -3638,31 +3636,6 @@ void recognize_from_microphone()
         }
     ad_close(ad);
     voutput = hyp;
-}
-
-void voice_rec()
-{
-    char const *cfg;
-    err_set_logfp(NULL);
-    err_set_debug_level(0);
-    char* argv2[] = {"-hmm"," model/en-us/en-us","-lm"," model/en-us/en-us.lm.bin","-dict"," model/en-us/cmudict-en-us.dict"};
-    int argc2 = 6;
-    vconfig = cmd_ln_parse_r(NULL, cont_args_def, argc2, argv2, TRUE);        
-    ps_default_search_args(vconfig);
-    ps = ps_init(vconfig);
-    if (ps == NULL)
-        {
-            cmd_ln_free_r(vconfig);
-            return 1;
-        }
-    recognize_from_microphone();
-    ps_free(ps);
-    cmd_ln_free_r(vconfig);
-    cout << voutput << endl;
-    if(voutput == "hello")
-        {
-            cout << "it works" << endl;
-        }
 }
 
 #ifdef RFID || #ifdef DEBUG || #ifdef ALL
