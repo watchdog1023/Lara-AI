@@ -36,9 +36,6 @@
 #ifdef WIN32
     #include<conio.h>
     #include<windows.h>
-#else
-    #include<ncurses.h>
-    #include<curses.h>
 #endif
 #include<unistd.h>
 //For getch(),linux
@@ -3608,7 +3605,7 @@ void recognize_from_microphone()
         E_FATAL("Failed to start utterance\n");
     utt_started = FALSE;
 
-    for (int i =0;i<50;i++)
+    for (int i = 0;i < 25;i++)
         {
             if ((k = ad_read(ad, adbuf, 2048)) < 0)
                 E_FATAL("Failed to read audio\n");
