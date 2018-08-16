@@ -21,7 +21,7 @@ https://drive.google.com/open?id=0ByLm512z8MOiZURjcEJxazc3YWM
 # Build Status
 Windows:PASS
 
-Linux:Pending
+Linux:PASS
 
 MacOSX:Pending
 
@@ -30,7 +30,7 @@ Raspbian:Pending
 # Run Status
 Windows:PASS
 
-LINUX:Pending
+LINUX:PASS
 
 MacOSX:Pending
 
