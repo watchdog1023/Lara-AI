@@ -1056,6 +1056,21 @@ int main(int argc, char* argv[])
                             #endif
                             goto vloop;
                         }
+                    else if(voutput == "quit")
+                        {
+                            string d;
+                            cout << "Are you Sure?" << endl;
+                            getline(cin,d);
+                            if(d == "y" or d =="yes" or d == "YES" or d == "Y")
+                                {
+                                    cout << "Goodbye" << endl;
+                                    system("exit");
+                                }
+                            else
+                                {
+                                    goto vloop;
+                                }
+                        }
                     else
                         {
                             #ifdef WIN32
