@@ -25,7 +25,7 @@ Linux:PASS
 
 MacOSX:Pending
 
-Raspbian:Pending
+Raspbian:PASS
 
 # Run Status
 Windows:PASS
@@ -34,7 +34,7 @@ LINUX:PASS
 
 MacOSX:Pending
 
-Raspbian :Pending
+Raspbian :PASS
 
 # Lara Android Companion App @:
 
