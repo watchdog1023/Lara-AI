@@ -10,7 +10,7 @@ Build with -static-libgcc -static-libstdc++ flags at start and -lchilkat-9.5.0 -
 Build with -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lchilkat-9.5.0 -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase flags at end(include all the .o files when building)
 
 # Libs
-The Libaries used are termcolor,qrcodegen,OpenNN,tinyxml2,chilkat,zbar,MYSQL connector++,tesseract-ocr,leptonica,curl,opennn,websocketpp,pocketsphinx,sphinxbase,mpi,SFML,CUDA(Seperate build file),boost and opencv3
+The Libaries used are termcolor,qrcodegen,chilkat,zbar,MYSQL connector++,tesseract-ocr,leptonica,curl,websocketpp,pocketsphinx,sphinxbase,mpi,SFML,CUDA(Seperate build file),boost and opencv3
 
 Custom Compiler Toolchain at:
 
