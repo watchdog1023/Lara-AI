@@ -24,16 +24,29 @@
 #include<assert.h>
 //Neural Network Pattern Recognition
 #include<stdexcept>
+//Internet Connectivity 
+#if defined(WIN32) || defined(__CYGWIN32__)
+    #include<winsock2.h>
+    #include<WinSock.h>
+    #include<ws2tcpip.h>
+#else
+    #include<sys/socket.h>
+    #include<sys/types.h>
+    #include<netinet/in.h>
+    #include<netdb.h>
+    #include<arpa/inet.h>
+    #include<unistd.h>
+#endif
 //for date & time
 #include<ctime>
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__) 
     #include<direct.h>
 #else
 	#include<sys/time.h>
 #endif
 #include<time.h>
 //for sleep fuction
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
     #include<conio.h>
     #include<windows.h>
 #endif
@@ -46,12 +59,12 @@
 #include<cstdio>
 #include<cstdlib>
 //mp3 Playback
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
     #include "include/MP3.h"
 #endif
 #include<SFML/Audio.hpp>
 //Downloading
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
     #include<wininet.h>
     #include "include/download.h"
 #else
@@ -95,7 +108,7 @@
    #include<pthread.h>
 #endif
 //MPI
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
     #include<mpi.h>
 #elif __APPLE__
     #include<mpi.h>
@@ -103,21 +116,8 @@
     #include<mpi/mpi.h>
 #endif
 #include<boost/mpi.hpp>
-//Internet Connectivity 
-#ifdef WIN32
-    #include<winsock2.h>
-    #include<WinSock.h>
-    #include<ws2tcpip.h>
-#else
-    #include<sys/socket.h>
-    #include<sys/types.h>
-    #include<netinet/in.h>
-    #include<netdb.h>
-    #include<arpa/inet.h>
-    #include<unistd.h>
-#endif
 //MYSQL database
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
 	#include<cppconn/driver.h>
 	#include<cppconn/exception.h>
 	#include<cppconn/resultset.h>
@@ -140,7 +140,7 @@
 		#include<cppconn/statement.h>
 	#endif
 #endif
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
     #include<mysql.h>
 #else
     #include<mysql/mysql.h>
@@ -161,11 +161,11 @@
 #include "include/IRC/Thread.h"
 //QR Code Generation
 #include<cstdint>
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
 	#include "include/qr_code/QrCode.hpp"
 #endif
 //QR code Scanner
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
 	#include<zbar.h>
 #endif
 #include<opencv2/imgproc/imgproc.hpp>
@@ -195,7 +195,7 @@
     #include<wiringPi.h>
 #endif
 //Python Environment
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
     #include<Python.h>
 #else
     #include<python3.5m/Python.h>
@@ -216,9 +216,9 @@
 //#include "include/Neuron.h"
 //#include "include/Network.h"
 //#include "include/trainingdata.h"
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
     //OpenNN
-    #include<opennn/opennn.h>
+//    #include<opennn/opennn.h>
 #elif __linux__
     //Tensorflow
     #include<tensorflow/c/c_api.h>
@@ -234,7 +234,7 @@
     #include<sys/select.h>
 #endif
 //Websocket
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
 	#include<websocketpp/config/asio_no_tls.hpp>
 	#include<websocketpp/server.hpp>
 	#include<websocketpp/config/asio_no_tls_client.hpp>
@@ -243,13 +243,15 @@
 //Hostname Getting
 //#include<boost/asio/ip/host_name.hpp>
 //Serial Port Handling
-/*#ifdef WIN32
+/*#if defined(WIN32) || defined(__CYGWIN32__)
     #include "include/SerialPort.h"
 #else
     #include<SerialStream.h>
 #endif*/
 //Boost Version
 #include<boost/version.hpp>
+//Emotions detection
+#include "include/Emotions.h"
 
 //Parameters
 #pragma comment(lib, "wsock32.lib")
@@ -260,11 +262,11 @@
 
 using namespace std;
 using namespace cv;
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
 	using namespace qrcodegen;
 #endif
 using namespace termcolor;
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
     using namespace mp3;
 #endif
 //using namespace CryptoPP;
@@ -279,17 +281,17 @@ using namespace termcolor;
 //using namespace tesseract;
 //MYSQL Connection
 using namespace sql;
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
 	//Websocket
 	using namespace websocketpp;
 #endif
 //NN
-#ifdef WIN32    
-    using namespace OpenNN;
+#if defined(WIN32) || defined(__CYGWIN32__)    
+//    using namespace OpenNN;
 #else
     //using namespace tensorflow;
 #endif
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
 	using namespace zbar;
 #endif
 
@@ -315,7 +317,7 @@ string decrypt(string const& msg, string const& key)
         return encrypt(msg, key); 
     }
 
-#ifdef WIN32  
+#if defined(WIN32) || defined(__CYGWIN32__)  
 	string ExePath()
 		{
     			char buffer[MAX_PATH];
@@ -428,7 +430,7 @@ bool flag = true;
 //mp3 Playback Variables
 char Key;
 
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
     //Portname must contain these backslashes, and remember to replace the following com port
     char *port_name = "\\\\.\\COM2";
 #else
@@ -460,7 +462,7 @@ void debug();
 void update();
 void uuid_gen_first();
 void spider();
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
     void win_server();
     void win_client();
 #else
@@ -484,7 +486,7 @@ void validate_paypal_token();
 void tweet();
 void tweet_with_image();
 void tweet_with_image_multi();
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
 	void qr_scanner();
 #endif
 void NN();
@@ -961,6 +963,8 @@ string version = "1.0.0";
 //Greeting Variable
 string greet;
 
+string nowtime;
+
 //IP Array
 string ips[] = {"192.168.1.100","192.168.1.101","192.168.1.102","192.168.1.103","192.168.1.104","192.168.1.105","192.168.1.106","192.168.1.107","192.168.1.108","192.168.1.109","192.168.1.110","192.168.1.111","192.168.1.112","192.168.1.113","192.168.1.114","192.168.1.115","192.168.1.116","192.168.1.117","192.168.1.118","192.168.1.119","192.168.1.120","192.168.1.121","192.168.1.122","192.168.1.123","192.168.1.124","192.168.1.125","192.168.1.126","192.168.1.127","192.168.1.128","192.168.1.129","192.168.1.130"};
 
@@ -979,7 +983,7 @@ boost::thread tw;
 
 int main(int argc, char* argv[])
 {
-    #ifdef WIN32
+    #if defined(WIN32) || defined(__CYGWIN32__)
         std::system ("title Lara");
         std::system("color 02");
     #else
@@ -996,7 +1000,7 @@ int main(int argc, char* argv[])
                             uuid = uuid_text;
 							memo_check();
 						}
-					#ifdef WIN32
+					#if defined(WIN32) || defined(__CYGWIN32__)
 						myfile3.close();
 					#endif
                 }
@@ -1005,26 +1009,16 @@ int main(int argc, char* argv[])
                     init_start();
                 }
         }
-
-    if (string(argv[1]) == "hand")
-        {
-            #ifdef WIN32
-                PlayMP3("voice/hand_rec.mp3");
-                sleep(2);
-                StopMP3("voice/hand_rec.mp3");
-            #else
-                voice("hand_rec.ogg");
-            #endif
-            hand_rec();
-        }
-
-    if(string(argv[1]) == "-hmm")
-        {
-            vloop:
+	if(string(argv[1]) == "body")
+		{
+			boost::thread emo{&emot_reg};
+			boost::thread tim{&alarm_timer};
+            tgroup.join_all();
+            bvloop:
                 cout << "Ready to listen,Please press the talk key[~] if you want me to do something" << endl;
                 while(1)
                     {
-                        if ('`' == getch())
+                        if('`' == getch())
                             {
                                 char const *cfg;
                                 err_set_logfp(NULL);
@@ -1041,18 +1035,163 @@ int main(int argc, char* argv[])
                                 recognize_from_microphone();
                                 ps_free(ps);
                                 cmd_ln_free_r(vconfig);
-                                cout << voutput << endl;
                                 break;
                             }
                     }
                     if(voutput == "hello")
                         {
-                            #ifdef WIN32
+                            #if defined(WIN32) || defined(__CYGWIN32__)
                                 PlayMP3("voice/hello_test.mp3");
-                                sleep(2);
+                                sleep(0.5);
                                 StopMP3("voice/hello_test.mp3");
                             #else
                                 voice("hello_test.ogg");
+                            #endif
+                            goto bvloop;
+                        }
+                    else if((voutput == "time")|| (voutput == "what time is it"))
+                        {
+                             #if defined(WIN32) || defined(__CYGWIN32__)
+                                PlayMP3("voice/time.mp3");
+                                sleep(1);
+                                StopMP3("voice/time.mp3");
+                            #else
+                                voice("time.ogg");
+                            #endif
+                            cout << "The Time is:" << nowtime << endl;
+                            #if defined(WIN32) || defined(__CYGWIN32__)
+                                system("cls");
+                            #else
+                                system("clear");
+                            #endif
+                            goto bvloop;
+                        }
+                    else if(voutput == "who are you")
+                        {
+                             #if defined(WIN32) || defined(__CYGWIN32__)
+                                PlayMP3("voice/who.mp3");
+                                sleep(4);
+                                StopMP3("voice/who.mp3");
+                            #else
+                                voice("who.ogg");
+                            #endif
+                            #if defined(WIN32) || defined(__CYGWIN32__)
+                                system("cls");
+                            #else
+                                system("clear");
+                            #endif
+                            goto bvloop;
+                        }
+                    else if(voutput == "quit")
+                        {
+                            string d;
+                            cout << "Are you Sure?" << endl;
+                            getline(cin,d);
+                            if(d == "y" or d =="yes" or d == "YES" or d == "Y")
+                                {
+                                    cout << "Goodbye" << endl;
+                                    system("exit");
+                                }
+                            else
+                                {
+                                    goto bvloop;
+                                }
+                        }
+                    else
+                        {
+                            #if defined(WIN32) || defined(__CYGWIN32__)
+                                PlayMP3("voice/cant_rec.mp3");
+                                sleep(4);
+                                StopMP3("voice/cant_rec.mp3");
+                                CloseMP3("voice/cant_rec.mp3");
+                            #else
+                                voice("cant_rec.ogg");
+                            #endif
+                            goto bvloop;
+                        }
+        
+		}
+    if (string(argv[1]) == "hand")
+        {
+            #if defined(WIN32) || defined(__CYGWIN32__)
+                PlayMP3("voice/hand_rec.mp3");
+                sleep(2);
+                StopMP3("voice/hand_rec.mp3");
+            #else
+                voice("hand_rec.ogg");
+            #endif
+            hand_rec();
+        }
+
+    if(string(argv[1]) == "-hmm")
+        {
+            boost::thread tim{&alarm_timer};
+            tgroup.join_all();
+            vloop:
+                cout << "Ready to listen,Please press the talk key[~] if you want me to do something" << endl;
+                while(1)
+                    {
+                        if('`' == getch())
+                            {
+                                char const *cfg;
+                                err_set_logfp(NULL);
+                                err_set_debug_level(0);
+                                //-hmm model/en-us/en-us -lm model/en-us/en-us.lm.bin -dict model/en-us/cmudict-en-us.dict
+                                vconfig = cmd_ln_parse_r(NULL, cont_args_def, argc, argv, TRUE);
+                                ps_default_search_args(vconfig);
+                                ps = ps_init(vconfig);
+                                if (ps == NULL)
+                                    {
+                                        cmd_ln_free_r(vconfig);
+                                        return 1;
+                                    }
+                                recognize_from_microphone();
+                                ps_free(ps);
+                                cmd_ln_free_r(vconfig);
+                                break;
+                            }
+                    }
+                    if(voutput == "hello")
+                        {
+                            #if defined(WIN32) || defined(__CYGWIN32__)
+                                PlayMP3("voice/hello_test.mp3");
+                                sleep(0.5);
+                                StopMP3("voice/hello_test.mp3");
+                            #else
+                                voice("hello_test.ogg");
+                            #endif
+                            goto vloop;
+                        }
+                    else if((voutput == "time")|| (voutput == "what time is it"))
+                        {
+                             #if defined(WIN32) || defined(__CYGWIN32__)
+                                PlayMP3("voice/time.mp3");
+                                sleep(1);
+                                StopMP3("voice/time.mp3");
+                            #else
+                                voice("time.ogg");
+                            #endif
+                            cout << "The Time is:" << nowtime << endl;
+                            #if defined(WIN32) || defined(__CYGWIN32__)
+                                system("cls");
+                            #else
+                                system("clear");
+                            #endif
+                            goto vloop;
+                        }
+                    else if(voutput == "who are you")
+                        {
+                             #if defined(WIN32) || defined(__CYGWIN32__)
+                                PlayMP3("voice/who.mp3");
+                                sleep(4);
+                                StopMP3("voice/who.mp3");
+                            #else
+                                voice("who.ogg");
+                            #endif
+                            #if defined(WIN32) || defined(__CYGWIN32__)
+                                system("cls");
+                            #else
+                                system("clear");
                             #endif
                             goto vloop;
                         }
@@ -1073,10 +1212,11 @@ int main(int argc, char* argv[])
                         }
                     else
                         {
-                            #ifdef WIN32
+                            #if defined(WIN32) || defined(__CYGWIN32__)
                                 PlayMP3("voice/cant_rec.mp3");
-                                sleep(2);
+                                sleep(4);
                                 StopMP3("voice/cant_rec.mp3");
+                                CloseMP3("voice/cant_rec.mp3");
                             #else
                                 voice("cant_rec.ogg");
                             #endif
@@ -1104,7 +1244,7 @@ int main(int argc, char* argv[])
             string name = path + argv[2];
             string output = name + ".mp3";
             string song = argv[2];
-			#ifdef WIN32
+			#if defined(WIN32) || defined(__CYGWIN32__)
 	            PlayMP3(output.c_str());
 	            cout << "Now Playing " << song << endl;
 	            cout << "1 - Resume Song" << endl;
@@ -1162,7 +1302,7 @@ int main(int argc, char* argv[])
                                 uuid = uuid_text;
                                 memo_check();
                             }
-                        #ifdef WIN32
+                        #if defined(WIN32) || defined(__CYGWIN32__)
 							myfile3.close();
 						#endif
                     }
@@ -1199,7 +1339,7 @@ void timer(string quit)
     end:
         if(quit == "YES")
                 {
-                    #ifdef WIN32
+                    #if defined(WIN32) || defined(__CYGWIN32__)
                         TerminateThread(t.native_handle(), 0);
 						TerminateThread(tw.native_handle(), 0);
                     #else
@@ -1217,12 +1357,12 @@ void timer(string quit)
 		    secondsPassed = (clock() - startTime) / CLOCKS_PER_SEC;
 		    if((secondsPassed >= secondsToDelay) && (idle == true))
 		        {					
-					#ifdef WIN32
+					#if defined(WIN32) || defined(__CYGWIN32__)
 						std::system("cls");
 					#else
 						std::system("clear");
 					#endif
-					#ifdef WIN32
+					#if defined(WIN32) || defined(__CYGWIN32__)
 						TerminateThread(tfs.native_handle(), 0);
 						sleep(1);
 						TerminateThread(ty.native_handle(), 0);
@@ -1240,13 +1380,13 @@ void timer(string quit)
 void lara()
 {
 	loop2:
-	#ifdef WIN32
+	#if defined(WIN32) || defined(__CYGWIN32__)
 		StopMP3("voice/alarm.mp3");
 		StopMP3("voice/alarm_sound.mp3");
 	#endif
     //Get Time Variables
     char current_time[10];
-    #ifdef WIN32
+    #if defined(WIN32) || defined(__CYGWIN32__)
 		_strtime(current_time);
 	#endif
     
@@ -1259,7 +1399,7 @@ void lara()
         {
             update();
         }
-    #ifdef WIN32
+    #if defined(WIN32) || defined(__CYGWIN32__)
         std::system("color 02");
     #else
         cout << termcolor::green;
@@ -1274,7 +1414,7 @@ void lara()
 		}
     if(greet == "1")
         {
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3( "voice/greedings1.mp3" );
                 sleep(4);
             #else
@@ -1283,7 +1423,7 @@ void lara()
         }
     if(greet == "2")
         {
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3( "voice/greedings2.mp3" );
                 sleep(2);
             #else
@@ -1298,7 +1438,7 @@ void lara()
     player:
 	cout << "Today's date is: " << timeinfo->tm_mday << " " << MONTHS[ timeinfo->tm_mon ] << " " << (timeinfo->tm_year + 1900) << endl;
 	//output current time
-	#ifdef WIN32
+	#if defined(WIN32) || defined(__CYGWIN32__)
 	    cout << "Current Time is: "<< current_time << endl;
 	#else
 		cout << "Current Time is: " << currentDateTime() << endl;
@@ -1315,14 +1455,14 @@ void lara()
 	#endif
 	cout << "[play] a song" << endl;
     cout << "Turn On [webcam]" << endl; 
-    #ifdef WIN32
+    #if defined(WIN32) || defined(__CYGWIN32__)
 		cout << "Activate [qr scanner]" << endl;
     #endif
 	cout << "Roll a [dice]" << endl;
     cout << "Take [screenshot]" << endl;
     cout << "Generate a [random] number" << endl;
     cout << "[quit]" << endl;
-    #ifdef WIN32
+    #if defined(WIN32) || defined(__CYGWIN32__)
 	   if(greet == "1")
 			{
 			    StopMP3( "voice/greedings1.mp3" );
@@ -1335,7 +1475,7 @@ void lara()
     greet = "2";
     getline(cin,task);
     idle = false;
-	#ifdef WIN32
+	#if defined(WIN32) || defined(__CYGWIN32__)
         TerminateThread(tfs.native_handle(), 0);
 	#else
         pthread_cancel(tfs.native_handle());
@@ -1346,13 +1486,13 @@ void lara()
         }
 	if(task == "class_play")
 		{
-			#ifdef WIN32
+			#if defined(WIN32) || defined(__CYGWIN32__)
 				PlayMP3("voice/what_song.mp3");
 			#else
 				voice("what_song.ogg");
 			#endif
 			cout << "What song do you want me to play" << endl;
-			#ifdef WIN32
+			#if defined(WIN32) || defined(__CYGWIN32__)
 				sleep(2);
 				StopMP3("voice/what_song.mp3");
 			#endif
@@ -1360,14 +1500,14 @@ void lara()
 	if(task == "play")
 		{
 			mp3player = "yes";
-			#ifdef WIN32
+			#if defined(WIN32) || defined(__CYGWIN32__)
 				PlayMP3("voice/mp3_playback.mp3");
 				sleep(2);
 				StopMP3("voice/mp3_playback.mp3");
 			#else
 				voice("mp3_playback.ogg");
 			#endif
-			#ifdef WIN32
+			#if defined(WIN32) || defined(__CYGWIN32__)
 				system("start player/lara_mp3_player.exe");
 			#else
 				system("./player/lara_mp3_player");
@@ -1381,26 +1521,26 @@ void lara()
 				stringstream ss_many_dice;
 				ss_many_dice >> int_many_dice;
 				string many_dice = ss_many_dice.str();
-                #ifdef WIN32
+                #if defined(WIN32) || defined(__CYGWIN32__)
                     PlayMP3("voice/how_many_dice.mp3");
                 #else
                     voice("how_many_dice.ogg");
                 #endif
                 cout << "How many dice must I roll?" << endl;
-                #ifdef WIN32
+                #if defined(WIN32) || defined(__CYGWIN32__)
                     sleep(2);
                     StopMP3("voice/how_many_dice.mp3");
                 #endif
                 getline(cin,many_dice);
                 if(many_dice > "2")
                     {
-                        #ifdef WIN32
+                        #if defined(WIN32) || defined(__CYGWIN32__)
                             PlayMP3("voice/roll_2_only.mp3");
                         #else
                             voice("roll_2_only.ogg");
                         #endif
                         cout << "I can Only roll two dice" << endl;
-                        #ifdef WIN32
+                        #if defined(WIN32) || defined(__CYGWIN32__)
                             sleep(2);
                             StopMP3("voice/roll_2_only.mp3");
                         #endif
@@ -1417,7 +1557,7 @@ void lara()
 				ty = boost::thread(&holo_looper_working);
 			#endif
 			sleep(10);
-			#ifdef WIN32
+			#if defined(WIN32) || defined(__CYGWIN32__)
 				TerminateThread(ty.native_handle(), 0);
 			#else	
 			    pthread_cancel(ty.native_handle());
@@ -1427,7 +1567,7 @@ void lara()
         {
             string sure;
             cout << "Are you sure?" << endl;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3( "voice/are_you_sure.mp3" );
                 sleep(1);
                 StopMP3( "voice/are_you_sure.mp3" );
@@ -1441,7 +1581,7 @@ void lara()
                     cout <<"This feature is no ready because this is a reusable build"<<endl;
 //this is a temp statement
                     cout << "GoodBye" << endl;
-                    #ifdef WIN32
+                    #if defined(WIN32) || defined(__CYGWIN32__)
                         PlayMP3( "voice/goodbye.mp3" );
                         sleep(4);
                         StopMP3( "voice/goodbye.mp3" );
@@ -1453,7 +1593,7 @@ void lara()
                 }
             if(sure != "Yes", "yes", "YES", "Y", "y")
                 {
-                    #ifdef WIN32
+                    #if defined(WIN32) || defined(__CYGWIN32__)
                         std::system("cls");
                     #else
                         std::system("clear");
@@ -1465,7 +1605,7 @@ void lara()
     if(task == "comms")
         {
             string mode;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3( "voice/mode_start.mp3" );
                 sleep(2);
             #else
@@ -1475,14 +1615,14 @@ void lara()
             cout << "[p2p]" << endl;
             cout << "[IRC]" << endl;
             cout << "[text]" << endl;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 StopMP3( "voice/mode_start.mp3" );                
             #endif
             cin >> mode;
             if(mode == "p2p")
                 {
                     string mode_p2p;
-                    #ifdef WIN32
+                    #if defined(WIN32) || defined(__CYGWIN32__)
                         PlayMP3( "voice/like_to_be.mp3" );
                     #else
                         voice("like_to_be.ogg");
@@ -1490,14 +1630,14 @@ void lara()
                     cout << "Which would you like to be?" << endl;
                     cout << "[client]" << endl;
                     cout << "[server]" << endl;
-                    #ifdef WIN32
+                    #if defined(WIN32) || defined(__CYGWIN32__)
                         sleep(2);
                         StopMP3( "voice/like_to_be.mp3" ); 
                     #endif
                     cin >> mode_p2p;
                     if(mode_p2p == "server")
                         {
-                            #ifdef WIN32    
+                            #if defined(WIN32) || defined(__CYGWIN32__)    
                                 win_server();
                             #else
                                 unix_server();
@@ -1505,7 +1645,7 @@ void lara()
                         }
                     if(mode_p2p == "client")
                         {
-                            #ifdef WIN32
+                            #if defined(WIN32) || defined(__CYGWIN32__)
                                 win_client();
                             #else
                                 unix_client();
@@ -1558,7 +1698,7 @@ void lara()
                                 }
                             if(textoutput != "yes")
                                 {
-                                    #ifdef WIN32
+                                    #if defined(WIN32) || defined(__CYGWIN32__)
                                         sleep(20);
                                         std::system("cls");
                                     #else
@@ -1588,7 +1728,7 @@ void lara()
         {
             spider();
         }
-    #ifdef WIN32
+    #if defined(WIN32) || defined(__CYGWIN32__)
         if(task == "qr scanner")
         	{
         	    qr_scanner();
@@ -1668,7 +1808,7 @@ void lara()
                 {
                     myfile << reminder << endl;
                 }
-            #ifdef WIN32   
+            #if defined(WIN32) || defined(__CYGWIN32__)   
                 sleep(2);
             #else
                 usleep(2);
@@ -1676,12 +1816,12 @@ void lara()
             string space = " ";
             string spacer = "'";
             std::system(("cp" + space + spacer + filename_date + spacer + space + " memo/").c_str());
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 sleep(5);
             #else
                 usleep(5);
             #endif
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
 				myfile.close();
             #endif
 			remove(filename_date.c_str());
@@ -1695,7 +1835,7 @@ void lara()
     if(task == "quit")
         {
             cout << "Goodbye" << endl;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3( "voice/goodbye.mp3" );
                 sleep(2);
                 StopMP3( "voice/goodbye.mp3" );
@@ -1709,7 +1849,7 @@ void lara()
         {
             cout << "The first time you open the webcam it will crash" << endl;
             cout << "Plaese try again" << endl;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 sleep(10);
             #else
                 usleep(10);
@@ -1737,12 +1877,12 @@ void debug()
     cout << "Sphinx Version:" << sphinx << endl;
     //printf("Tesseract-ocr version: %s\n",tesseract::TessBaseAPI::Version());
     //printf("Leptonica version: %s\n",getLeptonicaVersion());
-    #ifdef WIN32
+    #if defined(WIN32) || defined(__CYGWIN32__)
         sleep(2);
     #else
         usleep(2);
     #endif
-    #ifdef WIN32
+    #if defined(WIN32) || defined(__CYGWIN32__)
         PlayMP3( "voice/debug.mp3" );
         sleep(2);
     #else
@@ -1751,14 +1891,14 @@ void debug()
     cout << "You are a Titan Tech technician" << endl;
     string debug;
     cout << "Do you want me to start a Terminal" << endl;
-    #ifdef WIN32
+    #if defined(WIN32) || defined(__CYGWIN32__)
         sleep(2);
         StopMP3( "voice/debug.mp3" );
     #endif
     cin >> debug;
     if(debug == "yes")
       {
-        #ifdef WIN32
+        #if defined(WIN32) || defined(__CYGWIN32__)
             std::system("cmd");
         #else
             std::system("bash");
@@ -1768,7 +1908,7 @@ void debug()
       {
         string dia;
         cout << "Do you want me to run a diagnostic test?" << endl;
-        #ifdef WIN32
+        #if defined(WIN32) || defined(__CYGWIN32__)
             PlayMP3( "voice/start_diagnostic.mp3" );
             sleep(2);
             StopMP3( "voice/start_diagnostic.mp3" );
@@ -1784,21 +1924,21 @@ void debug()
             {
                 loop:
                     string what;
-                    #ifdef WIN32
+                    #if defined(WIN32) || defined(__CYGWIN32__)
                         PlayMP3( "voice/do_then.mp3" );
                         sleep(2);
                     #else
                         voice("do_then.ogg");
                     #endif
                     cout << "What do you want to do then?" << endl;
-                    #ifdef WIN32
+                    #if defined(WIN32) || defined(__CYGWIN32__)
                         StopMP3( "voice/do_then.mp3" );
                     #endif
                     cin >> what;
                     if(what == "voice")
                         {
                             cout << "Testing are_you_sure.mp3" << endl;
-                            #ifdef WIN32
+                            #if defined(WIN32) || defined(__CYGWIN32__)
                                 PlayMP3( "voice/are_you_sure.mp3" );
                                 sleep(4);
                                 StopMP3( "voice/are_you_sure.mp3" );
@@ -1806,7 +1946,7 @@ void debug()
                                 voice("are_you_sure.ogg");
                             #endif
                             cout << "Testing debug.mp3" << endl;
-                            #ifdef WIN32
+                            #if defined(WIN32) || defined(__CYGWIN32__)
                                 PlayMP3( "voice/debug.mp3" );
                                 sleep(4);
                                 StopMP3( "voice/debug.mp3" );
@@ -1814,7 +1954,7 @@ void debug()
                                 voice("debug.ogg");
                             #endif
                             cout << "Testing do_then.mp3" << endl;
-                            #ifdef WIN32
+                            #if defined(WIN32) || defined(__CYGWIN32__)
                                 PlayMP3( "voice/do_then.mp3" );
                                 sleep(4);
                                 StopMP3( "voice/do_then.mp3" );
@@ -1822,7 +1962,7 @@ void debug()
                                 voice("do_then.ogg");
                             #endif
                             cout << "Testing goodbye.mp3" << endl;
-                            #ifdef WIN32
+                            #if defined(WIN32) || defined(__CYGWIN32__)
                                 PlayMP3( "voice/goodbye.mp3" );
                                 sleep(4);
                                 StopMP3( "voice/goodbye.mp3" );
@@ -1830,7 +1970,7 @@ void debug()
                                 voice("goodbye.ogg");
                             #endif
                             cout << "Testing greedings.mp3" << endl;
-                            #ifdef WIN32
+                            #if defined(WIN32) || defined(__CYGWIN32__)
                                 PlayMP3( "voice/greedings.mp3" );
                                 sleep(4);
                                 StopMP3( "voice/greedings.mp3" );
@@ -1838,7 +1978,7 @@ void debug()
                                 voice("greedings.ogg");
                             #endif
                             cout << "Testing greedings2.mp3" << endl;
-                            #ifdef WIN32
+                            #if defined(WIN32) || defined(__CYGWIN32__)
                                 PlayMP3( "voice/greedings2.mp3" );
                                 sleep(4);
                                 StopMP3( "voice/greedings2.mp3" );
@@ -1846,7 +1986,7 @@ void debug()
                                 voice("greedings2.ogg");
                             #endif
                             cout << "Testing like_to_do.mp3" << endl;
-                            #ifdef WIN32
+                            #if defined(WIN32) || defined(__CYGWIN32__)
                                 PlayMP3( "voice/like_to_do.mp3" );
                                 sleep(4);
                                 StopMP3( "voice/like_to_do.mp3" );
@@ -1854,7 +1994,7 @@ void debug()
                                 voice("like_to_do.ogg");
                             #endif
                             cout << "Testing start_diagnostic.mp3" << endl;
-                            #ifdef WIN32
+                            #if defined(WIN32) || defined(__CYGWIN32__)
                                 PlayMP3( "voice/start_diagnostic.mp3" );
                                 sleep(4);
                                 StopMP3( "voice/start_diagnostic.mp3" );
@@ -1886,7 +2026,7 @@ void debug()
       }
 }
 
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
     void win_server()
         {
             //Creating the server vars
@@ -2081,7 +2221,7 @@ void memo_check()
         {
             while (getline(myfile,line))
                 {
-                    #ifdef WIN32
+                    #if defined(WIN32) || defined(__CYGWIN32__)
                         PlayMP3( "voice/remind.mp3" );
                         sleep(1);
                         StopMP3( "voice/remind.mp3" );
@@ -2090,10 +2230,10 @@ void memo_check()
                     #endif
                     cout << line << '\n';
                 }
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
 				myfile.close();
             #endif
-			#ifdef WIN32
+			#if defined(WIN32) || defined(__CYGWIN32__)
                 sleep(15);
                 std::system("cls");
             #else
@@ -2106,14 +2246,14 @@ void memo_check()
 
 void update()
 {
-	#ifdef WIN32
+	#if defined(WIN32) || defined(__CYGWIN32__)
 		char url[] = "ftp://tomb.ddns.net:8080/lara-v/lara-v.zip";
 		char url2[] = "ftp://tomb.ddns.net:8080/lara-v/version.txt";
 		char url3[] = "ftp://127.0.0.1:8080/lara-v/lara-v.zip";
 		char url4[] = "ftp://127.0.0.1:8080/lara-v/version.txt";
 		bool reload = false;
 		string line;
-		#ifdef WIN32
+		#if defined(WIN32) || defined(__CYGWIN32__)
 		    PlayMP3( "voice/update.mp3" );
 		    sleep(5);
 		    StopMP3( "voice/update.mp3" );
@@ -2130,40 +2270,40 @@ void update()
 		                        version_check = line;
 		                        if(version_check > version)
 		                            {
-		                                #ifdef WIN32
+		                                #if defined(WIN32) || defined(__CYGWIN32__)
 		                                    PlayMP3( "voice/update_found.mp3" );
 		                                #else
 		                                    voice("update_found.ogg");
 		                                #endif
 		                                printf("Beginning download\n");
-		                                #ifdef WIN32
+		                                #if defined(WIN32) || defined(__CYGWIN32__)
 		                                    sleep(1);
 		                                    StopMP3( "voice/update_found.mp3" );  
 		                                #endif
 		                                try
 		                                    {   
 		                                        if(Download::download(url, reload, showprogress))
-		                                            #ifdef WIN32
+		                                            #if defined(WIN32) || defined(__CYGWIN32__)
 		                                                PlayMP3( "voice/update_complete.mp3" );
 		                                            #else
                                                     voice("update_complete.ogg");
 		                                            #endif
 		                                            printf("Update Complete\n");
-		                                            #ifdef WIN32
+		                                            #if defined(WIN32) || defined(__CYGWIN32__)
 		                                                sleep(1);
 		                                                StopMP3( "voice/update_complete.mp3" );
 		                                            #endif
 		                                    }      
 		                                catch(DLExc exc)
 		                                    {
-		                                        #ifdef WIN32
+		                                        #if defined(WIN32) || defined(__CYGWIN32__)
 		                                            PlayMP3( "voice/update_interrupted.mp3" );
 		                                        #else
 		                                            voice("update_interrupted.ogg");
 		                                        #endif
 		                                        printf("%s\n", exc.geterr());
 		                                        printf("Download interrupted\n");
-		                                        #ifdef WIN32
+		                                        #if defined(WIN32) || defined(__CYGWIN32__)
 		                                            sleep(1);
 		                                            StopMP3( "voice/update_interrupted.mp3" );
 		                                        #endif
@@ -2171,13 +2311,13 @@ void update()
 		                            }
 		                        if(version_check == version)
 		                            {
-		                                #ifdef WIN32
+		                                #if defined(WIN32) || defined(__CYGWIN32__)
 		                                    PlayMP3( "voice/update_no.mp3" );
 		                                #else
 		                                    voice("update_no.ogg");
 		                                #endif
 		                                cout << "There is no update available" << endl;
-		                                #ifdef WIN32
+		                                #if defined(WIN32) || defined(__CYGWIN32__)
 		                                    sleep(1);
 		                                    StopMP3( "voice/update_no.mp3" );
 		                                #endif
@@ -2185,13 +2325,13 @@ void update()
 		                            }
 		                        if(version_check < version)
 		                            {
-		                                #ifdef WIN32
+		                                #if defined(WIN32) || defined(__CYGWIN32__)
 		                                    PlayMP3( "voice/update_no.mp3" );
 		                                #else
 		                                    voice("update_no.ogg");
 		                                #endif
 		                                cout << "There is no update available" << endl;
-		                                #ifdef WIN32
+		                                #if defined(WIN32) || defined(__CYGWIN32__)
 		                                    sleep(1);
 		                                    StopMP3( "voice/update_no.mp3" );
                                     #endif
@@ -2203,14 +2343,14 @@ void update()
 			}
 		catch(DLExc exc)
 		    {
-		        #ifdef WIN32
+		        #if defined(WIN32) || defined(__CYGWIN32__)
 		            PlayMP3( "voice/update_interrupted.mp3" );
 		        #else
 		            voice("update_interrupted.ogg");
             #endif
 		        printf("%s\n", exc.geterr());
 		        printf("Download interrupted\n");
-		        #ifdef WIN32
+		        #if defined(WIN32) || defined(__CYGWIN32__)
 		            sleep(1);
                 StopMP3( "voice/update_interrupted.mp3" );
 		        #endif
@@ -2234,7 +2374,7 @@ void uuid_gen_first()
 
 void init_start()
 {
-    #ifdef WIN32
+    #if defined(WIN32) || defined(__CYGWIN32__)
         //Windows Set PATH
         string setpath = "setx path '%path%;" + ExePath() + "'";
         system(setpath.c_str());
@@ -2436,7 +2576,7 @@ void wait()
 	#else
 		getchar();
 	#endif
-	#ifdef WIN32
+	#if defined(WIN32) || defined(__CYGWIN32__)
 		TerminateThread(tw.native_handle(),0);
 	#else
 		pthread_cancel(tw.native_handle());
@@ -3261,7 +3401,7 @@ void tweet_with_image_multi()
     cout << jsonResponse.emit() << "\r\n";
     cout << "Success." << "\r\n";
 }
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
 	void qr_scanner()
 		{
 		    string camera;
@@ -3425,13 +3565,13 @@ void generate_random_number(int lowest,int highest)
         }
     if(random_integer == 1)
         {
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3("voice/1.mp3");
             #else
                 voice("1.ogg");
             #endif
             cout << random_integer << endl;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 sleep(2);
                 StopMP3("voice/1.mp3");
             #endif
@@ -3439,13 +3579,13 @@ void generate_random_number(int lowest,int highest)
         }
     if(random_integer == 2)
         {
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3("voice/2.mp3");
             #else
                 voice("2.ogg");
             #endif
             cout << random_integer << endl;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 sleep(2);
                 StopMP3("voice/2.mp3");
             #endif
@@ -3453,13 +3593,13 @@ void generate_random_number(int lowest,int highest)
         }
     if(random_integer == 3)
         {
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3("voice/3.mp3");
             #else
                 voice("3.ogg");
             #endif
             cout << random_integer << endl;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 sleep(2);
                 StopMP3("voice/3.mp3");
             #endif
@@ -3467,13 +3607,13 @@ void generate_random_number(int lowest,int highest)
         }
     if(random_integer == 4)
         {
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3("voice/4.mp3");
             #else
                 voice("4.ogg");
             #endif
             cout << random_integer << endl;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 sleep(2);
                 StopMP3("voice/4.mp3");
             #endif
@@ -3481,13 +3621,13 @@ void generate_random_number(int lowest,int highest)
         }
     if(random_integer == 5)
         {
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3("voice/5.mp3");
             #else
                 voice("5.ogg");
             #endif
             cout << random_integer << endl;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 sleep(2);
                 StopMP3("voice/5.mp3");
             #endif
@@ -3495,13 +3635,13 @@ void generate_random_number(int lowest,int highest)
         }
     if(random_integer == 6)
         {
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3("voice/6.mp3");
             #else
                 voice("6.ogg");
             #endif
             cout << random_integer << endl;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 sleep(2);
                 StopMP3("voice/6.mp3");
             #endif
@@ -3509,13 +3649,13 @@ void generate_random_number(int lowest,int highest)
         }
     if(random_integer == 7)
         {
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3("voice/7.mp3");
             #else
                 voice("7.ogg");
             #endif
             cout << random_integer << endl;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 sleep(2);
                 StopMP3("voice/7.mp3");
             #endif
@@ -3523,13 +3663,13 @@ void generate_random_number(int lowest,int highest)
         }
     if(random_integer == 8)
         {
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3("voice/8.mp3");
             #else
                 voice("8.ogg");
             #endif
             cout << random_integer << endl;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 sleep(2);
                 StopMP3("voice/8.mp3");
             #endif
@@ -3537,13 +3677,13 @@ void generate_random_number(int lowest,int highest)
         }
     if(random_integer == 9)
         {
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3("voice/9.mp3");
             #else
                 voice("9.ogg");
             #endif
             cout << random_integer << endl;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 sleep(2);
                 StopMP3("voice/9.mp3");
             #endif
@@ -3551,13 +3691,13 @@ void generate_random_number(int lowest,int highest)
         }
     if(random_integer == 10)
         {
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3("voice/10.mp3");
             #else
                 voice("10.ogg");
             #endif
             cout << random_integer << endl;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 sleep(2);
                 StopMP3("voice/10.mp3");
             #endif
@@ -3565,13 +3705,13 @@ void generate_random_number(int lowest,int highest)
         }
     if(random_integer == 11)
         {
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3("voice/11.mp3");
             #else
                 voice("11.ogg");
             #endif
             cout << random_integer << endl;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 sleep(2);
                 StopMP3("voice/11.mp3");
             #endif
@@ -3579,13 +3719,13 @@ void generate_random_number(int lowest,int highest)
         }
     if(random_integer == 12)
         {
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 PlayMP3("voice/12.mp3");
             #else
                 voice("12.ogg");
             #endif
             cout << random_integer << endl;
-            #ifdef WIN32
+            #if defined(WIN32) || defined(__CYGWIN32__)
                 sleep(2);
                 StopMP3("voice/12.mp3");
             #endif
@@ -3653,7 +3793,7 @@ void recognize_from_microphone()
 #ifdef RFID || #ifdef DEBUG || #ifdef ALL
 	void start_rfid_daemon()
 		{
-			#ifdef WIN32
+			#if defined(WIN32) || defined(__CYGWIN32__)
 			    system("start RFIDd.exe");
 			#else
 			    system("./add-ons/RFIDd");
@@ -3666,7 +3806,7 @@ void recognize_from_microphone()
 		{
 			if(state == "ON")
 				{	
-					#ifdef WIN32
+					#if defined(WIN32) || defined(__CYGWIN32__)
 					    system("start MOTORd.exe ON");
 					#else
 					    system("./add-ons/MOTORd ON");
@@ -3674,7 +3814,7 @@ void recognize_from_microphone()
 				}
 			if(state ==  "OFF")
 				{
-					#ifdef WIN32
+					#if defined(WIN32) || defined(__CYGWIN32__)
 						system("start MOTORd.exe OFF");
 					#else
 						system("./add-ons/MOTORd OFF");
@@ -3733,7 +3873,7 @@ void py_functions(string function)
 					pFunc = PyObject_GetAttrString(pModule, "getscreenshot");
 					pArgs = NULL;
 					PyObject_CallObject(pFunc, pArgs);
-                    #ifdef WIN32
+                    #if defined(WIN32) || defined(__CYGWIN32__)
                         PlayMP3("voice/screenshot.mp3");
                         sleep(1);
                         StopMP3("voice/screenshot.mp3");
@@ -3741,14 +3881,14 @@ void py_functions(string function)
                         voice("screenshot.ogg");
                     #endif
                     cout << "Screenshot saved in screenshot folder" << endl;
-                    #ifdef WIN32
+                    #if defined(WIN32) || defined(__CYGWIN32__)
                         PlayMP3("voice/screenshotdone.mp3");
                         sleep(1);
                         StopMP3("voice/screenshotdone.mp3");
                     #else
                         voice("screenshotdone.ogg");
                     #endif
-					#ifdef WIN32
+					#if defined(WIN32) || defined(__CYGWIN32__)
 						system("cls");
 					#else
 						system("clear");
@@ -3760,7 +3900,7 @@ void py_functions(string function)
 					pFunc = PyObject_GetAttrString(pModule, "STT");
 					pArgs = NULL;
 					pResult = PyObject_CallObject(pFunc, pArgs);
-/*                    #ifdef WIN32
+/*                    #if defined(WIN32) || defined(__CYGWIN32__)
                         PlayMP3("voice/screenshot.mp3");
                         sleep(1);
                         StopMP3("voice/screenshot.mp3");
@@ -3768,14 +3908,14 @@ void py_functions(string function)
                         voice("screenshot.ogg");
                     #endif*/
                     cout << pResult  << endl;
-                    /*#ifdef WIN32
+                    /*#if defined(WIN32) || defined(__CYGWIN32__)
                         PlayMP3("voice/screenshotdone.mp3");
                         sleep(1);
                         StopMP3("voice/screenshotdone.mp3");
                     #else
                         voice("screenshotdone.ogg");
                     #endif
-					#ifdef WIN32
+					#if defined(WIN32) || defined(__CYGWIN32__)
 						system("cls");
 					#else
 						system("clear");
@@ -3812,12 +3952,12 @@ void alarm_timer()
                         fil = "";
 					}
 		}
-	#ifdef WIN32
+	#if defined(WIN32) || defined(__CYGWIN32__)
 		al.close();
 	#endif
 		//Get Time Variables
 	    char current_time[10];
-	    #ifdef WIN32
+	    #if defined(WIN32) || defined(__CYGWIN32__)
 			_strtime(current_time);
 		#endif
     
@@ -3830,14 +3970,15 @@ void alarm_timer()
 		for(int h = 0;h<200;h++)
 		{
 			string check = currentDateTime();
-			#ifdef WIN32
+            nowtime = check;
+			#if defined(WIN32) || defined(__CYGWIN32__)
 				if(string(current_time) == times[h])
 			#else 
 				if(check == times[h])
 			#endif	
 			{
 					cout << "There goes the alarm!" << endl;
-					#ifdef WIN32
+					#if defined(WIN32) || defined(__CYGWIN32__)
 						PlayMP3("voice/alarm.mp3");
 						PlayMP3("voice/alarm_sound.mp3");
 						socket_connect();
@@ -3855,7 +3996,7 @@ void alarm_timer()
 		goto loop;
 }
 
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN32__)
 	void socket_connect()
 		{
 		    WSADATA wsa;
