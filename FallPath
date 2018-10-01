@@ -1,0 +1,26 @@
+#Generated using Station v1.0
+CPPFLAGS="-static -static-libgcc -static-libstdc++ -Wwrite-strings -Wdeprecated-declarations -Wfatal-errors"
+CFLAGS="-static -static-libgcc -static-libstdc++ -Wwrite-strings -Wdeprecated-declarations -Wfatal-errors"
+CCOM="gcc"
+CPPCOM="g++"
+INSTALLPREFIX="Lara/"
+LINKING="-lchilkat-9.5.0 -lgdi32 -lcrypt32 -lws2_32 -lwsock32 -ldnsapi -lwinmm -lwininet -lmingw32 -lopencv_core343.dll -lopencv_objdetect343.dll -lopencv_highgui343.dll -lopencv_imgproc343.dll -lopencv_imgcodecs343.dll -lopencv_videoio343.dll -lopencv_video343.dll -lboost_system -lboost_serialization -lboost_atomic -lboost_chrono -lboost_thread -lpython37 -lzbar -lsfml-audio -lsfml-network -lsfml-main -lsfml-system -lcurl.dll -lcryptopp -ltesseract.dll -lmpi -lmpicxx -lfmpich2g -lpocketsphinx -lsphinxbase"
+INCLUDES="include/"
+LIBDIR="C:\Development_tools\Interpreters\Python37\libs"
+RES="YES"
+
+CHECK:
+	COUTPUTNAME="Lara-C"
+	CINPUTS="Lara.cpp;include\download.cpp;include\IRC\Thread.cpp;include\IRC\IRCClient.cpp;include\IRC\IRCSocket.cpp;include\IRC\IRCHandler.cpp;include\qr_code\Bitbuffer.cpp;include\qr_code\QrCode.cpp;include\qr_code\QrSegment.cpp;include\SerialPort.cpp;include\Emotions.cpp;"
+
+BUILD:
+	BOUTPUTNAME="Lara"
+	BINPUTS="Lara.cpp;include\download.cpp;include\IRC\Thread.cpp;include\IRC\IRCClient.cpp;include\IRC\IRCSocket.cpp;include\IRC\IRCHandler.cpp;include\qr_code\Bitbuffer.cpp;include\qr_code\QrCode.cpp;include\qr_code\QrSegment.cpp;include\SerialPort.cpp;include\Emotions.cpp;"
+
+INSTALL:
+	IOUTPUTNAME="Lara\"
+	IINPUTS="Lara"
+
+UNINSTALL:
+	UOUTPUTNAME="Lara\"
+	UINPUTS="Lara"
