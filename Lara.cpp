@@ -2613,18 +2613,18 @@ void wait()
 				{
 					int c = 0;
 					cvNamedWindow("Holo Display", CV_WINDOW_AUTOSIZE);
-					CvCapture* capture3 = cvCreateFileCapture("videos/holo/work.mp4");
-					IplImage* frame3;
+					VideoCapture capture("videos/holo/work.mp4");
 					while(c != 1)
 						{
-							frame3 = cvQueryFrame(capture3);
-							if(!frame3)
+							Mat frame;
+							// Capture frame-by-frame
+							capture >> frame;
+							if(frame.empty())
 								break;
-							cvShowImage("Holo Display", frame3);
+							imshow("Holo Display", frame);
 							cvWaitKey(25);
 						}		
-					cvReleaseImage(&frame3);
-					cvReleaseCapture(&capture3);
+					capture.release();
 				}	
 		}
 
@@ -2634,18 +2634,18 @@ void wait()
 				{	
 					int c = 0;
 					cvNamedWindow("Holo Display", CV_WINDOW_AUTOSIZE);
-					CvCapture* capture = cvCreateFileCapture("videos/holo/wait.mp4");
-					//IplImage* fps;
+					VideoCapture capture("videos/holo/wait.mp4");
 					while(c != 1)
-						{	
-							fps = cvQueryFrame(capture);
-							if(!fps)
+						{
+							Mat frame;
+							// Capture frame-by-frame
+							capture >> frame;
+							if(frame.empty())
 								break;
-							cvShowImage("Holo Display", fps);
+							imshow("Holo Display", frame);
 							cvWaitKey(25);
 						}
-					//cvReleaseImage(&fps);
-					cvReleaseCapture(&capture);
+					capture.release();
 				}
 		}
 
@@ -3895,33 +3895,6 @@ void py_functions(string function)
 					#endif
 					lara();
 				}
-                if(function == "stt")
-				{
-					pFunc = PyObject_GetAttrString(pModule, "STT");
-					pArgs = NULL;
-					pResult = PyObject_CallObject(pFunc, pArgs);
-/*                    #if defined(WIN32) || defined(__CYGWIN32__)
-                        PlayMP3("voice/screenshot.mp3");
-                        sleep(1);
-                        StopMP3("voice/screenshot.mp3");
-                    #else
-                        voice("screenshot.ogg");
-                    #endif*/
-                    cout << pResult  << endl;
-                    /*#if defined(WIN32) || defined(__CYGWIN32__)
-                        PlayMP3("voice/screenshotdone.mp3");
-                        sleep(1);
-                        StopMP3("voice/screenshotdone.mp3");
-                    #else
-                        voice("screenshotdone.ogg");
-                    #endif
-					#if defined(WIN32) || defined(__CYGWIN32__)
-						system("cls");
-					#else
-						system("clear");
-					#endif*/
-					lara();
-				}
 			}	
     Py_Finalize();
 }
@@ -3956,43 +3929,43 @@ void alarm_timer()
 		al.close();
 	#endif
 		//Get Time Variables
-	    char current_time[10];
-	    #if defined(WIN32) || defined(__CYGWIN32__)
+	   char current_time[10];
+	   #if defined(WIN32) || defined(__CYGWIN32__)
 			_strtime(current_time);
 		#endif
     
-	    //get date variables
-	    time_t rawtime;
-	    struct tm* timeinfo;
-	    time(&rawtime);
-	    timeinfo = localtime(&rawtime);
+	   //get date variables
+	   time_t rawtime;
+	   struct tm* timeinfo;
+	   time(&rawtime);
+	   timeinfo = localtime(&rawtime);
 		
 		for(int h = 0;h<200;h++)
-		{
-			string check = currentDateTime();
-            nowtime = check;
-			#if defined(WIN32) || defined(__CYGWIN32__)
-				if(string(current_time) == times[h])
-			#else 
-				if(check == times[h])
-			#endif	
 			{
-					cout << "There goes the alarm!" << endl;
-					#if defined(WIN32) || defined(__CYGWIN32__)
-						PlayMP3("voice/alarm.mp3");
-						PlayMP3("voice/alarm_sound.mp3");
-						socket_connect();
-						getch();
-						StopMP3("voice/alarm.mp3");
-						StopMP3("voice/alarm_sound.mp3");
-					#else
-						unix_alarm("alarm.ogg");
-						socket_connect();
-						getch();
-						music2.stop();
-					#endif
-				}
-		}
+				string check = currentDateTime();
+		      nowtime = check;
+				#if defined(WIN32) || defined(__CYGWIN32__)
+					if(string(current_time) == times[h])
+				#else 
+					if(check == times[h])
+				#endif	
+						{
+							cout << "There goes the alarm!" << endl;
+							#if defined(WIN32) || defined(__CYGWIN32__)
+								PlayMP3("voice/alarm.mp3");
+								PlayMP3("voice/alarm_sound.mp3");
+								socket_connect();
+								getch();
+								StopMP3("voice/alarm.mp3");
+								StopMP3("voice/alarm_sound.mp3");
+							#else
+								unix_alarm("alarm.ogg");
+								socket_connect();
+								getch();
+								music2.stop();
+							#endif
+						}
+			}
 		goto loop;
 }
 
@@ -4012,21 +3985,22 @@ void alarm_timer()
 				{
 					//Nothing
 				}
-				for(int start = 0;start < 30;start++){
-    
-			server.sin_addr.s_addr = inet_addr(ips[start].c_str());
-			server.sin_family = AF_INET;
-			server.sin_port = htons(8080);
-			
-			//Connect to remote server
-			if (connect(s,(struct sockaddr*)&server,sizeof(server)) < 0)
-				{
-					//Nothing
-				}
-			else{
-     break;
-    }
-	}
+				for(int start = 0;start < 30;start++)
+					{
+						server.sin_addr.s_addr = inet_addr(ips[start].c_str());
+						server.sin_family = AF_INET;
+						server.sin_port = htons(8080);
+				
+						//Connect to remote server
+						if (connect(s,(struct sockaddr*)&server,sizeof(server)) < 0)
+							{
+								//Nothing
+							}
+						else
+							{
+								break;
+							}
+					}
 		}
 #else
 	void socket_connect()
@@ -4037,7 +4011,7 @@ void alarm_timer()
 				{
 					host = ips[start].c_str();
 					//connect to host
-					c.conn(host , 8080);
+					c.conn(host,8080);
 				}
 			//send some data
 			c.send_data("Hi");
