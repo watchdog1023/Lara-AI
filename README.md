@@ -12,6 +12,16 @@ Build with -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -l
 # Libs
 The Libaries used are termcolor,qrcodegen,chilkat,zbar,MYSQL connector++,tesseract-ocr,leptonica,curl,websocketpp,pocketsphinx,sphinxbase,mpi,SFML,CUDA(Seperate build file),boost and opencv3
 
+# Flag Explantion
+CUDA - This adds CUDA accelerated functions
+OPENCL - This adds OPENCL accelerated functions
+ALIVE - This is the flag used for to build project ALIVE support
+ALL - This builds all features
+RFID - Adds RFID support via ardunio mircocontroller
+DEBUG - This adds Verbose functions to Lara
+MOTOR - This adds support to drive dc motors via ardunio mircocontroller
+FOUNDER - Founder edition has support for CAD as well as project ALIVE functions,at this time
+
 Custom Compiler Toolchain at:
 
 
