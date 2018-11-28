@@ -25,7 +25,7 @@ RFID - Adds RFID support via ardunio mircocontroller
 
 DEBUG - This adds Verbose functions to Lara
 
-MOTOR - This adds support to drive dc motors via ardunio mircocontroller
+MOTOR - This adds support to drive DC motors via ardunio mircocontroller
 
 FOUNDER - Founder edition has support for CAD as well as project ALIVE functions,at this time
 ___
