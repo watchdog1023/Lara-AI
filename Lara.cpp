@@ -2,11 +2,16 @@
 //Built using Mingw32 Build Mr Robot
 //Modded Lexa code
 
-//Check for C++ Compiler{
+//Check for C++ Compiler
 #ifndef __cplusplus
 	#error A C++ compiler is required!
-#endif 
-//}
+#endif
+//Definations
+#define Pocketsphinx "5prealpha"
+#define sphinx "5prealpha"
+#ifdef FOUNDER
+	#define ALIVE
+#endif
 #include<iostream>
 #include<sstream>
 #include<fstream>
@@ -203,7 +208,7 @@
 //Ruby Environment
 //#include<ruby/ruby.h>
 //Java Environment
-#include<jni.h>
+//#include<jni.h>
 //Encryption Headers
 /*#include<cryptopp/osrng.h>
 #include<cryptopp/modes.h>
@@ -250,15 +255,18 @@
 #endif*/
 //Boost Version
 #include<boost/version.hpp>
-//Emotions detection
-#include "include/Emotions.h"
+#ifdef ALIVE
+	//Emotions detection
+	#include "include/Emotions.h"
+#endif
+//OPENGL
+#ifdef OPENCL
+	#define CL_USE_DEPRECATED_OPENCL_2_0_APIS
+	#include<CL/cl.hpp>
+#endif
 
 //Parameters
 #pragma comment(lib, "wsock32.lib")
-
-//Definations
-#define Pocketsphinx "5prealpha"
-#define sphinx "5prealpha"
 
 using namespace std;
 using namespace cv;
@@ -294,6 +302,9 @@ using namespace sql;
 #if defined(WIN32) || defined(__CYGWIN32__)
 	using namespace zbar;
 #endif
+#ifdef OPENCL
+	using namespace cl;
+#endif
 
 //Volatile Bool
 volatile bool running;
@@ -316,6 +327,23 @@ string decrypt(string const& msg, string const& key)
     {
         return encrypt(msg, key); 
     }
+	 
+string GetStdoutFromCommand(string cmd)
+{
+	string data;
+	FILE * stream;
+	const int max_buffer = 256;
+	char buffer[max_buffer];
+	cmd.append(" 2>&1");
+	stream = popen(cmd.c_str(), "r");
+	if(stream)
+		{
+			while (!feof(stream))
+				if (fgets(buffer, max_buffer, stream) != NULL) data.append(buffer);
+					pclose(stream);
+		}
+	return data;
+}
 
 #if defined(WIN32) || defined(__CYGWIN32__)  
 	string ExePath()
@@ -516,6 +544,15 @@ void alarm_timer();
 #endif
 #ifdef CUDA
     void run();
+#endif
+#ifdef FOUNDER
+	void cad();
+#endif
+#ifdef __linux__
+	void syscheck();
+#endif
+#ifdef ALIVE
+	void temperature_check();
 #endif
 void socket_connect();
 
@@ -1009,6 +1046,7 @@ int main(int argc, char* argv[])
                     init_start();
                 }
         }
+	#ifdef ALIVE
 	if(string(argv[1]) == "body")
 		{
 			boost::thread emo{&emot_reg};
@@ -1111,6 +1149,7 @@ int main(int argc, char* argv[])
                         }
         
 		}
+	#endif
     if (string(argv[1]) == "hand")
         {
             #if defined(WIN32) || defined(__CYGWIN32__)
@@ -1518,9 +1557,9 @@ void lara()
         {
             loop:
                 int int_many_dice;
-				stringstream ss_many_dice;
-				ss_many_dice >> int_many_dice;
-				string many_dice = ss_many_dice.str();
+					stringstream ss_many_dice;
+					ss_many_dice >> int_many_dice;
+					string many_dice = ss_many_dice.str();
                 #if defined(WIN32) || defined(__CYGWIN32__)
                     PlayMP3("voice/how_many_dice.mp3");
                 #else
@@ -3859,44 +3898,44 @@ void py_NN(string state)
 void py_functions(string function)
 {
 	PyObject *pName, *pModule, *pFunc;
-    PyObject *pArgs;
-    PyObject* pResult;
+   PyObject *pArgs;
+   PyObject* pResult;
 
 	Py_Initialize();
 		pName = PyUnicode_DecodeFSDefault("functions");
 		pModule = PyImport_Import(pName);
 		Py_DECREF(pName);
-	    if (pModule != NULL)
+	   if (pModule != NULL)
 			{
 				if(function == "screenshot")
-				{
-					pFunc = PyObject_GetAttrString(pModule, "getscreenshot");
-					pArgs = NULL;
-					PyObject_CallObject(pFunc, pArgs);
-                    #if defined(WIN32) || defined(__CYGWIN32__)
+					{
+						pFunc = PyObject_GetAttrString(pModule, "getscreenshot");
+						pArgs = NULL;
+						PyObject_CallObject(pFunc, pArgs);
+							#if defined(WIN32) || defined(__CYGWIN32__)
                         PlayMP3("voice/screenshot.mp3");
                         sleep(1);
                         StopMP3("voice/screenshot.mp3");
-                    #else
+							#else
                         voice("screenshot.ogg");
-                    #endif
-                    cout << "Screenshot saved in screenshot folder" << endl;
-                    #if defined(WIN32) || defined(__CYGWIN32__)
-                        PlayMP3("voice/screenshotdone.mp3");
+							#endif
+							cout << "Screenshot saved in screenshot folder" << endl;
+							#if defined(WIN32) || defined(__CYGWIN32__)
+								PlayMP3("voice/screenshotdone.mp3");
                         sleep(1);
                         StopMP3("voice/screenshotdone.mp3");
-                    #else
+							#else
                         voice("screenshotdone.ogg");
-                    #endif
-					#if defined(WIN32) || defined(__CYGWIN32__)
-						system("cls");
-					#else
-						system("clear");
-					#endif
-					lara();
-				}
+						   #endif
+							#if defined(WIN32) || defined(__CYGWIN32__)
+								system("cls");
+							#else
+								system("clear");
+							#endif
+							lara();
+					}
 			}	
-    Py_Finalize();
+   Py_Finalize();
 }
 
 void alarm_timer()
@@ -4018,4 +4057,58 @@ void alarm_timer()
 			//done
 			return;
 		}
+#endif
+
+#ifdef ALIVE
+	#ifdef __arm__
+		void temperature_check()
+			{
+				bool venting = false;
+				const int relaypin = 10;
+				wiringPiSetupPhy();
+				pinMode(relaypin,OUTPUT);
+			   while(1)
+			      {
+						float systemp;
+			         float millideg;
+			         FILE *thermal;
+			         int n;
+			         thermal = fopen("/sys/class/thermal/thermal_zone0/temp");
+			         n = fscanf(thermal,"%f",&millideg);
+			         fclose(thermal);
+			         systemp = millideg / 1000;
+			         //printf("CPU temperature is %f degrees C\n",systemp);
+			         if(systemp > 50)
+			            {
+								venting = true;
+								digitalWrite(relaypin,HIGH);
+			               continue;
+				         }
+						if(systemp < 50 && venting == true)
+							{
+								digitalWrite(relaypin,LOW);
+			               continue;
+							}
+			      }
+			}
+	#endif
+#endif
+
+#ifdef __linux__
+void syscheck()
+{
+	string cpu = GetStdoutFromCommand("uname -p");
+	string os = GetStdoutFromCommand("uname -o");
+	string machine = GetStdoutFromCommand("uname -m");
+	string node = GetStdoutFromCommand("uname -n");
+	string kernal_name = GetStdoutFromCommand("uname -s");
+}
+#endif
+
+#ifdef FOUNDER
+void cad()
+{
+	//				                mirco missile heads  						    										rectangle                                                                                                cube             
+	string shapes[] = {"module mirco_missile_heads()\n{\ncylinder(55,6);\n}\n","module rectangle()\n{\nunion()\n{\ncube(6);\ntranslate([0,4,0]) cube(6);\ntranslate([0,-4,0]) cube(6);\n}\n}\n","module cube_std()\n{\ncube(6);\n}\n"}
+}
 #endif
