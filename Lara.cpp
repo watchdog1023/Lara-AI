@@ -4065,7 +4065,7 @@ void alarm_timer()
 			{
 				bool venting = false;
 				const int relaypin = 10;
-				wiringPiSetupPhy();
+				wiringPiSetupPhys();
 				pinMode(relaypin,OUTPUT);
 			   while(1)
 			      {
