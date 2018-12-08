@@ -1,4 +1,6 @@
 # Lara-AI
+[![Build Status](https://travis-ci.org/watchdog1023/Lara-AI.svg?branch=master)](https://travis-ci.org/watchdog1023/Lara-AI)
+
 compile with -fpermissive -Wwrite-strings -Wdeprecated-declarations -Wfatal-errors flags 
 
 NB:Linux users should use mpic++ to compile 
