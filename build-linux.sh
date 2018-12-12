@@ -1,5 +1,5 @@
 #!/bin/sh
-function pause(){
+function pause() {
    read -p "$*"
 }
 function os_type
