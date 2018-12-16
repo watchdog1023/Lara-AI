@@ -80,9 +80,6 @@ case `uname` in
      return; 
      }
      ;;
-  Darwin )
-     DARWIN=1
-     ;;
 esac
 }  
 if [  -e /usr/bin/pip2 ]; then
