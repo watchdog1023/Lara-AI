@@ -54,7 +54,9 @@ case `uname` in
      }
      
      which zypper && { 
-     echo opensuse; 
+     echo opensuse;
+     zypper update;
+     zypper install gcc-c++ 
      
      return; 
      }
