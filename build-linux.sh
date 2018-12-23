@@ -42,10 +42,10 @@ case `uname` in
      sudo make install;
      cd ..;
      fi;
-     if[ ! -e /usr/bin/python3 ]; then 
-     #yum install https://centos7.iuscommunity.org/ius-release.rpm;
-     yum install python36u; 
-     fi;
+     #if[ ! -e /usr/bin/python3 ];
+     #then #yum install https://centos7.iuscommunity.org/ius-release.rpm;
+     #yum install python36u; 
+     #fi;
      if[ ! -e /usr/bin/pip3];
      then yum -y install python36u-pip;
      ln -sf /usr/bin/pip3.6 /usr/bin/pip3;
