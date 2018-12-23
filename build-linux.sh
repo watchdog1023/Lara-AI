@@ -43,7 +43,7 @@ case `uname` in
      cd ..;
      fi;
      if[ ! -e /usr/bin/python3 ]; then 
-     yum install https://centos7.iuscommunity.org/ius-release.rpm;
+     #yum install https://centos7.iuscommunity.org/ius-release.rpm;
      yum install python36u; 
      fi;
      if[ ! -e /usr/bin/pip3];
