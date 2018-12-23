@@ -1,4 +1,5 @@
 language: cpp
 compiler: gcc
 script:
+  - pwd
   - sh build-linux.sh
