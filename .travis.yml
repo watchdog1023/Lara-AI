@@ -1,6 +1,7 @@
 language: cpp
 compiler: gcc
 script:
+  - uname -a
   - sudo apt update
   - sudo apt install dos2unix -y
   - dos2unix build-linux.sh
