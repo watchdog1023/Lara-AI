@@ -1,0 +1,3 @@
+[submodule "openscad"]
+	path = openscad
+	url = https://github.com/openscad/openscad.git
