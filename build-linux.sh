@@ -12,13 +12,13 @@ case `uname` in
      echo centos;
      yum group install "Development Tools";
      yum install kernel-devel;
-     if [ ! -e /usr/bin/g++]; 
+     if [ ! -e /usr/bin/g++ ]; 
      then yum install gcc-c++;
      fi;
      if [ ! -e /usr/bin/wget ];
      then yum install wget;
      fi;
-     if [ ! -e /usr/bin/mpic++];
+     if [ ! -e /usr/bin/mpic++ ];
      then wget -c http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz;
      tar xfv autoconf-2.69.tar.xz;
      cd autoconf-2.69/;
@@ -69,7 +69,7 @@ case `uname` in
      if[ ! -e /usr/bin/python3 ]; 
      then apt install python3; 
      fi;
-     if[ ! -e /usr/bin/pip3];
+     if[ ! -e /usr/bin/pip3 ];
      then apt install python3-pip;
      fi;
      if[ ! -e /usr/bin/g++ ];
