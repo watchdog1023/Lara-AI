@@ -4,4 +4,5 @@ script:
   - sudo apt update
   - sudo apt install dos2unix -y
   - dos2unix build-linux.sh
-  - sh build-linux.sh
+  - chmod -v 777 build-linux.sh
+  - ./build-linux.sh
