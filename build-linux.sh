@@ -4,7 +4,7 @@ function pause() {
 }
 function os_type
 {
-case `uname` in
+case $uname in
   Linux )
      LINUX=1
      
@@ -100,7 +100,7 @@ g++ -time -c include/IRC/IRCHandler.cpp -o IRCHandler.o -Wfatal-errors
 g++ -time -c include/qr_code/Bitbuffer.cpp -o Bitbuffer.o -Wfatal-errors
 g++ -time -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
 g++ -time -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
-g++ -time -fpermissive -c include\Emotions.cpp -o Emotions.o -Wfatal-errors
+g++ -time -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
 g++ -time -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lchilkat-9.5.0 -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad 2> LaraB.txt
 if [ ! -e ./lara ];then
     echo "Code Not Sane";
@@ -117,6 +117,6 @@ else
     g++ -v -time -c include/qr_code/Bitbuffer.cpp -o Bitbuffer.o -Wfatal-errors
     g++ -v -time -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
     g++ -v -time -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
-    g++ -v -time -fpermissive -c include\Emotions.cpp -o Emotions.o -Wfatal-errors
+    g++ -v -time -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
     g++ -time -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lchilkat-9.5.0 -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad
 fi 
