@@ -62,8 +62,8 @@ case $uname in
      
      which apt-get && { 
      echo debian;
-     if[ ! -e /usr/bin/mpic++ ]; 
-     then apt install mpich; 
+     if[ ! -e /usr/bin/mpic++ ]; then 
+     apt install mpich; 
      fi; 
      if[ ! -e /usr/bin/python3 ]; 
      then apt install python3; 
