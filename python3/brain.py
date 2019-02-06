@@ -56,4 +56,3 @@ x =tf.placeholder(tf.float32, [None, n_dim])
 W = tf.Variable(tf.zeros([n_dim, n_class]))
 b = tf.Variable(tf.zeros([n_class]))
 y_ =tf.placeholder(tf.float, [None , n_class])
-
