@@ -64,3 +64,7 @@ https://github.com/watchdog1023/Lara-AI-Android-App
 Python3 with pip is requied to make Lara
 
 To use voice rec please pass "-hmm model/en-us/en-us -lm model/en-us/en-us.lm.bin -dict model/en-us/cmudict-en-us.dict" to lara program
+
+# Support
+If you want to help support this project please donate:
+BTC:14ubfeivC8GTE8FUr9gFfmSugmKVJQwtxL
