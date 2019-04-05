@@ -41,7 +41,11 @@ https://drive.google.com/open?id=0ByLm512z8MOiZURjcEJxazc3YWM
 # Build Status
 Windows:PASS
 
-Linux:PASS
+LINUX:PASS
+  Debian:PASS
+  GhostOS:Pending
+  CentOS:Pending
+  OpenSUSE:Pending
 
 MacOSX:Pending
 
@@ -51,6 +55,10 @@ Raspbian:PASS
 Windows:PASS
 
 LINUX:PASS
+  Debian:PASS
+  GhostOS:Pending
+  CentOS:Pending
+  OpenSUSE:Pending
 
 MacOSX:Pending
 
