@@ -43,13 +43,13 @@ Windows:PASS
 
 LINUX:PASS
 
-  Debian:PASS
+  - Debian:PASS
 
-  GhostOS:Pending
+  - GhostOS:Pending
   
-  CentOS:Pending
+  - CentOS:Pending
   
-  OpenSUSE:Pending
+  - OpenSUSE:Pending
 
 MacOSX:Pending
 
