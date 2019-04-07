@@ -145,7 +145,7 @@ void video()
     destroyAllWindows();
 }
 
-void sound(String state)
+void sound(string state)
 {
     if(state == "enter")
         {
