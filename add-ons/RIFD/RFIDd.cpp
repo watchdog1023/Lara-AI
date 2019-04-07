@@ -50,7 +50,12 @@ using namespace boost;
 thread_group tgroup;
 
 //Portname must contain these backslashes, and remember to replace the following com port
+#ifdef WIN32
 char *port_name = "\\\\.\\COM2";
+#else
+char *port_name = "/dev/ttyACM0";
+#endif
+
 
 //String for incoming data
 char incomingData[MAX_DATA_LENGTH];
