@@ -15,12 +15,19 @@ void loop()
 {
   if (RFID.available() > 0) 
     {
-        for(int t = 0;t < 25;t++)
+        for(int t = 0;t < 14;t++)
            {
              i = RFID.read();
              rfidarray[t] = i;
              Serial.print(rfidarray[t]);
            }
+        delay(5000);
+        RFID.flush();
+        RFID.end();
+        delay(5000);
     }
-}
-
+  else
+    {
+        RFID.begin(9600);
+    }
+  }
