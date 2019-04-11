@@ -51,7 +51,7 @@ LINUX:PASS
   
   - OpenSUSE:Pending
 
-MacOSX:Pending
+MacOSX:Failing
 
 Raspbian:PASS
 
@@ -68,7 +68,7 @@ LINUX:PASS
   
   - OpenSUSE:Pending
 
-MacOSX:Pending
+MacOSX:Failing
 
 Raspbian :PASS
 
