@@ -1,4 +1,4 @@
-### NOTE
+# NOTE
 This lib is from https://github.com/minium/bitcoin-api-cpp ,all credit goes to them
 
 Bitcoin API
