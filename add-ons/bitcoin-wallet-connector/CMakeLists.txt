@@ -4,7 +4,7 @@ PROJECT(libbitcoin-api-cpp)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 # Set compiler settings
-SET(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall")
+SET(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall -O3")
 
 # Set version number
 SET(MAJOR_VERSION 0)
