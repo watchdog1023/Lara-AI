@@ -6,6 +6,9 @@
 #ifndef __cplusplus
 	#error A C++ compiler is required!
 #endif
+#ifdef __clang__
+	#error Lara will not compile with clang,please use gcc
+#endif
 //Definations
 #define Pocketsphinx "5prealpha"
 #define sphinx "5prealpha"
