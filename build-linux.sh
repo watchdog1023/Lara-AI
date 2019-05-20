@@ -62,17 +62,13 @@ case $uname in
      
      which apt-get && { 
      echo debian;
-     if[ ! -e /usr/bin/mpic++ ]; then
-     apt install mpich; 
+     if[ ! -e /usr/bin/mpic++ ]; then apt install mpich; 
      fi; 
-     if[ ! -e /usr/bin/python3 ]; then 
-     apt install python3; 
+     if[ ! -e /usr/bin/python3 ]; then apt install python3; 
      fi;
-     if[ ! -e /usr/bin/pip3 ]; then 
-     apt install python3-pip;
+     if[ ! -e /usr/bin/pip3 ]; then apt install python3-pip;
      fi;
-     if[ ! -e /usr/bin/g++ ]; then 
-     apt install build-essential make;
+     if[ ! -e /usr/bin/g++ ]; then apt install build-essential make;
      fi
      return; 
      }
