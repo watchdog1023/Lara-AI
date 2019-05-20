@@ -2,7 +2,7 @@ language: cpp
 compiler: gcc
 script:
   - sudo apt update
-  - sudo apt install dos2unix -y
+  - sudo apt install dos2unix bash -y
   - dos2unix build-linux.sh
   - chmod -v 777 build-linux.sh
   - cat build-linux.sh
