@@ -83,6 +83,7 @@ cd build
 cmake ..
 make
 sudo make install
+cd ../..
 if [  -e /usr/bin/pip2 ]; then
    pip install --upgrade pip
    pip install pyscreenshot selenium datetime
