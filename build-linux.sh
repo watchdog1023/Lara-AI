@@ -62,16 +62,16 @@ function pause () {
      which apt-get && {
      echo debian;
      if [ ! -e /usr/bin/mpic++ ]; then
-        apt install mpich;
+        sudo apt install mpich;
      fi;
      if [  -e /usr/bin/python3 ]; then
-        apt install python3;
+        sudo apt install python3;
      fi;
      if [  -e /usr/bin/pip3 ]; then
-        apt install python3-pip;
+        sudo apt install python3-pip;
      fi;
      if [  -e /usr/bin/g++ ]; then
-        apt install build-essential make;
+        sudo apt install build-essential make;
      fi
      return;
      }
