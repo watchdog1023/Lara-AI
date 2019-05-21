@@ -73,8 +73,10 @@ which yum && {
      return;
      }
 wget -c https://github.com/opencv/opencv/archive/3.4.3.zip
-wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -o contrib-343.zip
+wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -O contrib-343.zip
 unzip 3.4.3.zip
+cd opencv-3.4.3/
+unzip ../contrib-343.zip
 if [  -e /usr/bin/pip2 ]; then
    pip install --upgrade pip
    pip install pyscreenshot selenium datetime
