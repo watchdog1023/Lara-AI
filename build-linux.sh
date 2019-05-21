@@ -2,13 +2,7 @@
 function pause () {
    read -p "$*"
 }
-
-#function os_type ()
-#{
-#case $uname in 
-     #Linux )
-     #LINUX=1
-     which yum && {
+which yum && {
      echo centos;
      yum group install "Development Tools";
      yum install kernel-devel;
@@ -73,17 +67,12 @@ function pause () {
      if [  -e /usr/bin/g++ ]; then
         sudo apt install build-essential make;
      fi
-     return;
+sudo apt install libopencv-dev;
      }
      which dnf && {
      echo Fedora;
      return;
      }
-#     ;;
-#esac
-#}
-
-#os_type 
 
 if [  -e /usr/bin/pip2 ]; then
    pip install --upgrade pip
