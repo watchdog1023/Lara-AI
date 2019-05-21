@@ -81,6 +81,8 @@ mv ../opencv_contrib-3.4.3/* .
 mkdir build
 cd build
 cmake ..
+make
+sudo make install
 if [  -e /usr/bin/pip2 ]; then
    pip install --upgrade pip
    pip install pyscreenshot selenium datetime
