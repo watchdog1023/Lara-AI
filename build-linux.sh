@@ -105,11 +105,11 @@ g++ -time -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
 g++ -time -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lchilkat-9.5.0 -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad 2> LaraB.txt
 if [ ! -e ./lara ];then
     echo "Code Not Sane";
-    pause 'Press [Enter] key to continue...'
+    #pause 'Press [Enter] key to continue...'
 else
     rm -vr lara *.o
     echo "Code is Sane";
-    pause 'Press [Enter] key to continue...'
+    #pause 'Press [Enter] key to continue...'
     mpic++ -v -fpermissive -std=c++14 -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors
     g++ -v -time -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
     g++ -v -time -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
