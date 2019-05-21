@@ -1,17 +1,18 @@
+#!/bin/bash
 function pause () {
    read -p "$*"
 }
-function os_type
+
+function os_type ()
 {
-case $uname in
-  Linux )
+case $uname in 
+     Linux )
      LINUX=1
-     
-     which yum && { 
+     which yum && {
      echo centos;
      yum group install "Development Tools";
      yum install kernel-devel;
-     if [ ! -e /usr/bin/g++ ]; 
+     if [ ! -e /usr/bin/g++ ];
      then yum install gcc-c++;
      fi;
      if [ ! -e /usr/bin/wget ];
@@ -43,42 +44,47 @@ case $uname in
      fi;
      #if[ ! -e /usr/bin/python3 ];
      #then #yum install https://centos7.iuscommunity.org/ius-release.rpm;
-     #yum install python36u; 
+     #yum install python36u;
      #fi;
      #if[ ! -e /usr/bin/pip3];
      #then yum -y install python36u-pip;
      #ln -sf /usr/bin/pip3.6 /usr/bin/pip3;
      #fi;
-     return; 
+     return;
      }
-     
-     which zypper && { 
+
+     which zypper && {
      echo opensuse;
      zypper update;
-     zypper install gcc-c++ 
-     
-     return; 
+     zypper install gcc-c++
+     return;
      }
-     
-     which apt-get && { 
+     which apt-get && {
      echo debian;
-     if[ ! -e /usr/bin/mpic++ ]; then apt install mpich; 
-     fi; 
-     if[ ! -e /usr/bin/python3 ]; then apt install python3; 
+     if [ ! -e /usr/bin/mpic++ ]; then
+        apt install mpich;
      fi;
-     if[ ! -e /usr/bin/pip3 ]; then apt install python3-pip;
+     if [  -e /usr/bin/python3 ]; then
+        apt install python3;
      fi;
-     if[ ! -e /usr/bin/g++ ]; then apt install build-essential make;
+     if [  -e /usr/bin/pip3 ]; then
+        apt install python3-pip;
+     fi;
+     if [  -e /usr/bin/g++ ]; then
+        apt install build-essential make;
      fi
-     return; 
+     return;
      }
-     which dnf && { 
-     echo Fedora; 
-     return; 
+     which dnf && {
+     echo Fedora;
+     return;
      }
      ;;
 esac
-}  
+}
+
+os_type
+
 if [  -e /usr/bin/pip2 ]; then
    pip install --upgrade pip
    pip install pyscreenshot selenium datetime
@@ -114,4 +120,4 @@ else
     g++ -v -time -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
     g++ -v -time -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
     g++ -time -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lchilkat-9.5.0 -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad
-fi 
+fi
