@@ -77,7 +77,7 @@ wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -O contrib-34
 unzip 3.4.3.zip
 unzip contrib-343.zip
 cd opencv-3.4.3/
-mv -vr ../opencv_contrib-3.4.3/* .
+mv -v ../opencv_contrib-3.4.3/* .
 mkdir build
 cd build
 cmake ..
