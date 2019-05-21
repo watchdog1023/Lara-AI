@@ -3,8 +3,8 @@ function pause () {
    read -p "$*"
 }
 
-function os_type ()
-{
+#function os_type ()
+#{
 case $uname in 
      Linux )
      LINUX=1
@@ -81,9 +81,9 @@ case $uname in
      }
      ;;
 esac
-}
+#}
 
-os_type 
+#os_type 
 
 if [  -e /usr/bin/pip2 ]; then
    pip install --upgrade pip
