@@ -83,7 +83,7 @@ case $uname in
 esac
 }
 
-os_type
+os_type 
 
 if [  -e /usr/bin/pip2 ]; then
    pip install --upgrade pip
