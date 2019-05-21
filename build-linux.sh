@@ -5,9 +5,9 @@ function pause () {
 
 #function os_type ()
 #{
-case $uname in 
-     Linux )
-     LINUX=1
+#case $uname in 
+     #Linux )
+     #LINUX=1
      which yum && {
      echo centos;
      yum group install "Development Tools";
@@ -79,8 +79,8 @@ case $uname in
      echo Fedora;
      return;
      }
-     ;;
-esac
+#     ;;
+#esac
 #}
 
 #os_type 
