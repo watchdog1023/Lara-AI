@@ -75,8 +75,8 @@ which yum && {
      }
 wget -c https://github.com/opencv/opencv/archive/3.4.3.zip
 wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -O contrib-343.zip
-unzip 3.4.3.zip
-unzip contrib-343.zip
+unzip -qq 3.4.3.zip
+unzip -qq contrib-343.zip
 cd opencv-3.4.3/
 mv -v ../opencv_contrib-3.4.3/* .
 mkdir build
