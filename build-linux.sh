@@ -2,6 +2,7 @@
 function pause () {
    read -p "$*"
 }
+echo $uname
 which yum && {
      echo centos;
      yum group install "Development Tools";
