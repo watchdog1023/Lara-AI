@@ -73,25 +73,29 @@ which yum && {
      echo Fedora;
      return;
      }
-     if [ ! -e opencv-3.4.3/ ]; then 
-         wget -c https://github.com/opencv/opencv/archive/3.4.3.zip
-         wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -O contrib-343.zip
-         unzip -qq 3.4.3.zip
-         unzip -qq contrib-343.zip
-         cd opencv-3.4.3/
-         mv -v ../opencv_contrib-3.4.3/* .
-         mkdir build
-         cd build
-         cmake -quiet ..
-         make -j4
-         sudo make install
-         cd ../..
-      else
-         cd opencv-3.4.3/
-         cd build
-         sudo make install
-         cd ../..
-      fi
+if [ ! -e opencv-3.4.3/ ]; then 
+   wget -c https://github.com/opencv/opencv/archive/3.4.3.zip
+   wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -O contrib-343.zip
+   unzip -qq 3.4.3.zip
+   unzip -qq contrib-343.zip
+   cd opencv-3.4.3/
+   mv -v ../opencv_contrib-3.4.3/* .
+   mkdir build
+   cd build
+   cmake -quiet ..
+   make -j4
+   sudo make install
+   cd ../..
+else
+   cd opencv-3.4.3/
+   cd build
+   sudo make install
+   cd ../..
+fi
+if [! -e chilkat-9.5.0-x86_64-linux-gcc/]; then
+   wget -c https://chilkatdownload.com/9.5.0.78/chilkat-9.5.0-x86_64-linux-gcc.tar.gz
+   tar xfv chilkat-9.5.0-x86_64-linux-gcc.tar.gz
+fi
 if [  -e /usr/bin/pip2 ]; then
    pip install --upgrade pip
    pip install pyscreenshot selenium datetime
@@ -100,7 +104,7 @@ if [  -e /usr/bin/pip3 ]; then
    pip3 install --upgrade pip
    pip3 install pyscreenshot selenium datetime
 fi
-mpic++ -fpermissive -std=c++14 -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
+mpic++ -fpermissive -std=c++14 -I"./chilkat-9.5.0-x86_64-linux-gcc/include/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
 g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
@@ -109,7 +113,7 @@ g++ -time -std=c++14 -c include/qr_code/BitBuffer.cpp -o Bitbuffer.o -Wfatal-err
 g++ -time -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
 g++ -time -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
 g++ -time -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
-g++ -time -std=c++14  -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lchilkat-9.5.0 -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad 2> LaraB.txt
+g++ -time -std=c++14  -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -L"./chilkat-9.5.0-x86_64-linux-gcc/lib" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lchilkat-9.5.0 -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad 2> LaraB.txt
 if [ ! -e ./lara ];then
     echo "Code Not Sane";
     cat LaraB.txt
