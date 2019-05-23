@@ -1,5 +1,6 @@
 language: cpp
 compiler: gcc
+dist: xenial
 script:
   - sudo apt update
   - sudo apt install dos2unix bash g++-8 -y
