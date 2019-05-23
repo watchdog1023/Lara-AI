@@ -73,18 +73,25 @@ which yum && {
      echo Fedora;
      return;
      }
-wget -c https://github.com/opencv/opencv/archive/3.4.3.zip
-wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -O contrib-343.zip
-unzip -qq 3.4.3.zip
-unzip -qq contrib-343.zip
-cd opencv-3.4.3/
-mv -v ../opencv_contrib-3.4.3/* .
-mkdir build
-cd build
-cmake -quiet ..
-make -j4
-sudo make install
-cd ../..
+     if [ ! -e opencv-3.4.3/ ]; then 
+         wget -c https://github.com/opencv/opencv/archive/3.4.3.zip
+         wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -O contrib-343.zip
+         unzip -qq 3.4.3.zip
+         unzip -qq contrib-343.zip
+         cd opencv-3.4.3/
+         mv -v ../opencv_contrib-3.4.3/* .
+         mkdir build
+         cd build
+         cmake -quiet ..
+         make -j4
+         sudo make install
+         cd ../..
+      else
+         cd opencv-3.4.3/
+         cd build
+         sudo make install
+         cd ../..
+      fi
 if [  -e /usr/bin/pip2 ]; then
    pip install --upgrade pip
    pip install pyscreenshot selenium datetime
