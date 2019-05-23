@@ -97,10 +97,10 @@ if [ ! -e chilkat-9.5.0-x86_64-linux-gcc/ ]; then
    tar xf chilkat-9.5.0-x86_64-linux-gcc.tar.gz
    sudo mv -v chilkat-9.5.0-x86_64-linux-gcc/include chilkat-9.5.0-x86_64-linux-gcc/chilkat
 fi
-#if
-wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
-tar xfv mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
-#fi
+if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
+   wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
+   tar xfv mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
+fi
 if [  -e /usr/bin/pip2 ]; then
    pip install --upgrade pip
    pip install pyscreenshot selenium datetime
