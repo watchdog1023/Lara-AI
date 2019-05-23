@@ -98,7 +98,7 @@ g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCHandler.cpp -o IRCHandler.o -Wfatal-errors
-g++ -time -std=c++14 -c include/qr_code/Bitbuffer.cpp -o Bitbuffer.o -Wfatal-errors
+g++ -time -std=c++14 -c include/qr_code/BitBuffer.cpp -o Bitbuffer.o -Wfatal-errors
 g++ -time -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
 g++ -time -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
 g++ -time -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
@@ -116,7 +116,7 @@ else
     g++ -v -time -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
     g++ -v -time -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
     g++ -v -time -c include/IRC/IRCHandler.cpp -o IRCHandler.o -Wfatal-errors
-    g++ -v -time -c include/qr_code/Bitbuffer.cpp -o Bitbuffer.o -Wfatal-errors
+    g++ -v -time -c include/qr_code/BitBuffer.cpp -o Bitbuffer.o -Wfatal-errors
     g++ -v -time -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
     g++ -v -time -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
     g++ -v -time -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
