@@ -82,7 +82,7 @@ mv -v ../opencv_contrib-3.4.3/* .
 mkdir build
 cd build
 cmake -quiet ..
-make
+make -j4
 sudo make install
 cd ../..
 if [  -e /usr/bin/pip2 ]; then
