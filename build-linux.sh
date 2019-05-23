@@ -56,7 +56,7 @@ which yum && {
      which apt-get && {
      echo debian;
      if [ ! -e /usr/bin/mpic++ ]; then
-        sudo apt install mpich;
+        sudo apt install libmpich-dev;
      fi;
      if [  -e /usr/bin/python3 ]; then
         sudo apt install python3;
@@ -100,7 +100,7 @@ if [  -e /usr/bin/pip3 ]; then
    pip3 install --upgrade pip
    pip3 install pyscreenshot selenium datetime
 fi
-mpicc -fpermissive -std=c++14 -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
+mpic++ -fpermissive -std=c++14 -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
 g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
