@@ -67,7 +67,7 @@ which yum && {
      if [  -e /usr/bin/g++ ]; then
         sudo apt install build-essential make;
      fi
-     sudo apt-get install libboost-dev;
+     sudo apt-get install libboost-dev libsfml-dev;
      }
      which dnf && {
      echo Fedora;
