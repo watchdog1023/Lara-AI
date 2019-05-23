@@ -92,11 +92,11 @@ else
    sudo make install
    cd ../..
 fi
-#if [ ! -e chilkat-9.5.0-x86_64-linux-gcc/]; then
+if [ ! -e chilkat-9.5.0-x86_64-linux-gcc/]; then
    wget -c https://chilkatdownload.com/9.5.0.78/chilkat-9.5.0-x86_64-linux-gcc.tar.gz
    tar xfv chilkat-9.5.0-x86_64-linux-gcc.tar.gz
    sudo mv -v chilkat-9.5.0-x86_64-linux-gcc/include chilkat-9.5.0-x86_64-linux-gcc/chilkat
-#fi
+fi
 if [  -e /usr/bin/pip2 ]; then
    pip install --upgrade pip
    pip install pyscreenshot selenium datetime
