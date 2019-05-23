@@ -3,6 +3,7 @@ compiler: gcc
 dist: xenial
 
 cache:
+  apt: true
   directories:
     - opencv-3.4.3/
 
