@@ -67,7 +67,7 @@ which yum && {
      if [  -e /usr/bin/g++ ]; then
         sudo apt install build-essential make;
      fi
-     apt-get install libboost-dev;
+     sudo apt-get install libboost-dev;
      }
      which dnf && {
      echo Fedora;
@@ -81,7 +81,7 @@ cd opencv-3.4.3/
 mv -v ../opencv_contrib-3.4.3/* .
 mkdir build
 cd build
-cmake ..
+cmake -quiet ..
 make
 sudo make install
 cd ../..
