@@ -1,6 +1,11 @@
 language: cpp
 compiler: gcc
 dist: xenial
+
+cache:
+  directories:
+    - opencv-3.4.3/
+
 script:
   - sudo apt update
   - sudo apt install dos2unix bash g++-8 -y
