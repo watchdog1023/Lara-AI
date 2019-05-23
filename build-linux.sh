@@ -95,6 +95,7 @@ fi
 #if [ ! -e chilkat-9.5.0-x86_64-linux-gcc/]; then
    wget -c https://chilkatdownload.com/9.5.0.78/chilkat-9.5.0-x86_64-linux-gcc.tar.gz
    tar xfv chilkat-9.5.0-x86_64-linux-gcc.tar.gz
+   sudo mv -v chilkat-9.5.0-x86_64-linux-gcc/include chilkat-9.5.0-x86_64-linux-gcc/chilkat
 #fi
 if [  -e /usr/bin/pip2 ]; then
    pip install --upgrade pip
@@ -104,7 +105,7 @@ if [  -e /usr/bin/pip3 ]; then
    pip3 install --upgrade pip
    pip3 install pyscreenshot selenium datetime
 fi
-mpic++ -fpermissive -std=c++14 -I"./chilkat-9.5.0-x86_64-linux-gcc/include/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
+mpic++ -fpermissive -std=c++14 -I"./chilkat-9.5.0-x86_64-linux-gcc/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
 g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
