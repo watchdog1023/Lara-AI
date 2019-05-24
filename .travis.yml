@@ -4,6 +4,7 @@ dist: xenial
 
 cache:
   apt: true
+  pip: true
   directories:
     - opencv-3.4.3/
     - chilkat-9.5.0-x86_64-linux-gcc/
@@ -17,4 +18,5 @@ script:
   - sudo apt install dos2unix bash g++ -y
   - dos2unix build-linux.sh
   - chmod -v 777 build-linux.sh
-  - ./build-linux.sh
+  - ls /usr/local/include/pocketsphinx/
+  #- ./build-linux.sh
