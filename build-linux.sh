@@ -58,14 +58,17 @@ which yum && {
      if [ ! -e /usr/bin/mpic++ ]; then
         sudo apt install libmpich-dev;
      fi;
-     if [  -e /usr/bin/python3 ]; then
+     if [ ! -e /usr/bin/python3 ]; then
         sudo apt install python3;
      fi;
-     if [  -e /usr/bin/pip3 ]; then
+     if [ ! -e /usr/bin/pip3 ]; then
         sudo apt install python3-pip;
      fi;
-     if [  -e /usr/bin/g++ ]; then
+     if [ ! -e /usr/bin/g++ ]; then
         sudo apt install build-essential make;
+     fi
+     if [ ! -e /usr/bin/swig ]; then
+        sudo apt install swig;
      fi
      sudo apt-get install libboost-dev libsfml-dev libtesseract-dev;
      }
