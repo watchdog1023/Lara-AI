@@ -99,13 +99,38 @@ if [ ! -e chilkat-9.5.0-x86_64-linux-gcc/ ]; then
 fi
 if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
    wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
-   tar xfv mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
+   tar xf mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
 fi
-#if
+#fi [ ! -e ]
 wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
 mkdir libtensorflow-cpu-linux-x86_64-1.13.1
 tar xfv https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
 #fi
+
+#fi [ ! -e sphinxbase-5prealpha/ ]
+wget -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
+tar xfv sphinxbase-5prealpha.tar.gz
+cd sphinxbase-5prealpha
+./configure
+make
+sudo make install
+cd ..
+#else
+#cd sphinxbase-5prealpha
+#sudo make install
+#cd ..
+#fi
+
+#fi [ ! -e pocketsphinx-5prealpha/ ]
+wget -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
+tar xfv pocketsphinx-5prealpha.tar.gz
+cd pocketsphinx-5prealpha
+./configure
+make
+sudo make install
+cd ..
+#fi
+
 if [  -e /usr/bin/pip2 ]; then
    pip install --upgrade pip
    pip install pyscreenshot selenium datetime
@@ -114,7 +139,7 @@ if [  -e /usr/bin/pip3 ]; then
    pip3 install --upgrade pip
    pip3 install pyscreenshot selenium datetime
 fi
-mpic++ -fpermissive -std=c++14 -I"./include/" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"./chilkat-9.5.0-x86_64-linux-gcc/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
+mpic++ -fpermissive -std=c++14 -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"./chilkat-9.5.0-x86_64-linux-gcc/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
 g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
