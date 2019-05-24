@@ -104,45 +104,46 @@ if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
    wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
    tar xf mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
 fi
-#fi [ ! -e ]
-wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
-mkdir libtensorflow-cpu-linux-x86_64-1.13.1
-tar xfv libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
-#fi
-
-#fi [ ! -e sphinxbase-5prealpha/ ]
-wget -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
-tar xfv sphinxbase-5prealpha.tar.gz
-cd sphinxbase-5prealpha
-./configure
-make
-sudo make install
-cd ..
-#else
-#cd sphinxbase-5prealpha
-#sudo make install
-#cd ..
-#fi
-
-#fi [ ! -e pocketsphinx-5prealpha/ ]
-wget -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
-tar xfv pocketsphinx-5prealpha.tar.gz
-cd pocketsphinx-5prealpha
-./configure
-make
-sudo make install
-cd ..
-#fi
-
+fi [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]
+   wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
+   mkdir libtensorflow-cpu-linux-x86_64-1.13.1
+   tar xf libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
+fi
+fi [ ! -e sphinxbase-5prealpha/ ]
+   wget -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
+   tar xf sphinxbase-5prealpha.tar.gz
+   cd sphinxbase-5prealpha
+   ./configure
+   make
+   sudo make install
+   cd ..
+else
+   cd sphinxbase-5prealpha
+   sudo make install
+   cd ..
+fi
+fi [ ! -e pocketsphinx-5prealpha/ ]
+   wget -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
+   tar xf pocketsphinx-5prealpha.tar.gz
+   cd pocketsphinx-5prealpha
+   ./configure
+   make
+   sudo make install
+   cd ..
+else
+   cd pocketsphinx-5prealpha
+   sudo make install
+   cd ..
+fi
 if [  -e /usr/bin/pip2 ]; then
-   pip install --upgrade pip
-   pip install setuptools
-   pip install pyscreenshot selenium datetime 
+   sudo pip install --upgrade pip
+   sudo pip install setuptools
+   sudo pip install pyscreenshot selenium datetime 
 fi
 if [  -e /usr/bin/pip3 ]; then
-   pip3 install --upgrade pip
-   pip3 install setuptools
-   pip3 install pyscreenshot selenium datetime
+   sudo pip3 install --upgrade pip
+   sudo pip3 install setuptools
+   sudo pip3 install pyscreenshot selenium datetime
 fi
 mpic++ -fpermissive -std=c++14 -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"./chilkat-9.5.0-x86_64-linux-gcc/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
 g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
@@ -156,16 +157,21 @@ g++ -time -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-
 g++ -time -std=c++14 -L"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bitlib64" -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -L"./chilkat-9.5.0-x86_64-linux-gcc/lib" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lchilkat-9.5.0 -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad 2> LaraB.txt
 if [ ! -e ./lara ];then
     echo "Code Not Sane";
+    echo "========================Build Stage Output========================================"
     cat LaraB.txt
+    echo "========================Compile Stage Output======================================"
     cat LaraC.txt
-    return 1;
+    echo "=================================================================================="
+    exit 1;
     if [ $TRAVIS_BRANCH != "master" ]; then
       pause 'Press [Enter] key to continue...'
     fi
 else
     rm -vr lara *.o
     echo "Code is Sane";
-    #pause 'Press [Enter] key to continue...'
+    if [ $TRAVIS_BRANCH != "master" ]; then
+      pause 'Press [Enter] key to continue...'
+    fi
     mpic++ -v -fpermissive -std=c++14 -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors
     g++ -v -time -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
     g++ -v -time -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
