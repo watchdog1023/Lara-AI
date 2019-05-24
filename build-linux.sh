@@ -136,10 +136,12 @@ cd ..
 
 if [  -e /usr/bin/pip2 ]; then
    pip install --upgrade pip
-   pip install pyscreenshot selenium datetime
+   pip install setuptools
+   pip install pyscreenshot selenium datetime 
 fi
 if [  -e /usr/bin/pip3 ]; then
    pip3 install --upgrade pip
+   pip3 install setuptools
    pip3 install pyscreenshot selenium datetime
 fi
 mpic++ -fpermissive -std=c++14 -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"./chilkat-9.5.0-x86_64-linux-gcc/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
