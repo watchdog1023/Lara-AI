@@ -107,7 +107,7 @@ fi
 #fi [ ! -e ]
 wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
 mkdir libtensorflow-cpu-linux-x86_64-1.13.1
-tar xfv https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
+tar xfv libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
 #fi
 
 #fi [ ! -e sphinxbase-5prealpha/ ]
