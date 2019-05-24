@@ -15,7 +15,8 @@ cache:
 
 script:
   - sudo apt update
-  - sudo apt install dos2unix bash g++ -y
+  - sudo apt install dos2unix bash g++ md5sum -y
   - dos2unix build-linux.sh
   - chmod -v 777 build-linux.sh
-  - ./build-linux.sh
+  - md5sum Lara.cpp
+#  - ./build-linux.sh
