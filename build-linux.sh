@@ -104,12 +104,12 @@ if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
    wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
    tar xf mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
 fi
-fi [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]
+if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]
    wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
    mkdir libtensorflow-cpu-linux-x86_64-1.13.1
    tar xf libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
 fi
-fi [ ! -e sphinxbase-5prealpha/ ]
+if [ ! -e sphinxbase-5prealpha/ ]
    wget -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
    tar xf sphinxbase-5prealpha.tar.gz
    cd sphinxbase-5prealpha
@@ -122,7 +122,7 @@ else
    sudo make install
    cd ..
 fi
-fi [ ! -e pocketsphinx-5prealpha/ ]
+if [ ! -e pocketsphinx-5prealpha/ ]
    wget -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
    tar xf pocketsphinx-5prealpha.tar.gz
    cd pocketsphinx-5prealpha
