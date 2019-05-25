@@ -56,7 +56,18 @@ which yum && {
      which apt-get && {
      echo debian;
      if [ ! -e /usr/bin/mpic++ ]; then
-        sudo apt-get install libmpich-dev;
+      if [ $TRAVIS_BRANCH != "master" ]; then
+         wget -c http://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz;
+         tar xf mpich-3.3.tar.gz;
+         cd mpich-3.3/;
+         ./configure;
+         make;
+         sudo make install;
+         cd ../
+         mpic++ -v;
+       else
+         sudo apt-get install libmpich-dev;
+      fi
      fi;
      if [ ! -e /usr/bin/python3 ]; then
         sudo apt-get install python3;
@@ -145,10 +156,7 @@ if [  -e /usr/bin/pip3 ]; then
    sudo -H pip3 install setuptools
    sudo -H pip3 install pyscreenshot selenium datetime
 fi
-#sudo rm /usr/local/include/sphinxbase/prim_type.h
-#sudo cp -v prim_type.h /usr/local/include/sphinxbase/prim_type.h
-#mpic++
-g++-8 -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"./chilkat-9.5.0-x86_64-linux-gcc/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
+mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"./chilkat-9.5.0-x86_64-linux-gcc/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
 g++-8 -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
 g++-8 -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
 g++-8 -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
