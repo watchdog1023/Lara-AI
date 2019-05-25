@@ -60,7 +60,7 @@ which yum && {
          wget -c http://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz;
          tar xf mpich-3.3.tar.gz;
          cd mpich-3.3/;
-         ./configure;
+         ./configure --disable-fortran;
          make CXX="g++-8" CC="gcc-8" FC="gfortran-8";
          sudo make install;
          cd ../
