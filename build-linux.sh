@@ -226,7 +226,7 @@ sudo echo "#define MAX_INT32		((int32) 0x7fffffff)" >> prim_type.h
 sudo echo "#define MAX_INT16		((int16) 0x00007fff)" >> prim_type.h
 sudo echo "#define MAX_INT8		((int8)  0x0000007f)" >> prim_type.h
 sudo echo "" >> prim_type.h
-sudo echo "#define MAX_NEG_INT32		((int32) 0x80000000" >> prim_type.h
+sudo echo "#define MAX_NEG_INT32		((int32) 0x80000000)" >> prim_type.h
 sudo echo "#define MAX_NEG_INT16		((int16) 0xffff8000)" >> prim_type.h
 sudo echo "#define MAX_NEG_INT8		((int8)  0xffffff80)" >> prim_type.h
 sudo echo "" >> prim_type.h
@@ -254,7 +254,7 @@ sudo echo "" >> prim_type.h
 sudo echo "" >> prim_type.h
 sudo echo "#ifdef __cplusplus" >> prim_type.h
 sudo echo "}" >> prim_type.h
-sudo echo "#endif" >> prim_type.h
+#sudo echo "#endif" >> prim_type.h
 sudo echo "" >> prim_type.h
 sudo echo "#endif" >> prim_type.h
 
