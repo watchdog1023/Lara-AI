@@ -56,7 +56,7 @@ which yum && {
      which apt-get && {
      echo debian;
      if [ ! -e /usr/bin/mpic++ ]; then
-      if [ $TRAVIS_BRANCH != "master" ]; then
+      if [ $TRAVIS_BRANCH == "master" ]; then
          wget -c http://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz;
          tar xf mpich-3.3.tar.gz;
          cd mpich-3.3/;
