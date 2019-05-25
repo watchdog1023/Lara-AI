@@ -61,7 +61,7 @@ which yum && {
          tar xf mpich-3.3.tar.gz;
          cd mpich-3.3/;
          ./configure;
-         make;
+         make CXX="g++-8" CC="gcc-8";
          sudo make install;
          cd ../
          mpic++ -v;
