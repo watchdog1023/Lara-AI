@@ -267,7 +267,7 @@
 	#include<CL/cl.hpp>
 #endif
 //My Source Checksum signature header
-#include "include/my_checksum.h"
+//#include "include/my_checksum.h"
 
 //Parameters
 #pragma comment(lib, "wsock32.lib")
