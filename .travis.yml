@@ -1,6 +1,13 @@
 language: cpp
-compiler: gcc
+os: linux
 dist: xenial
+compiler: gcc
+  addons:
+    apt:
+      sources: ['ubuntu-toolchain-r-test']
+      packages: ['g++-8']
+  env:
+  - CXX=g++-8    
 
 cache:
   apt: true
@@ -15,7 +22,7 @@ cache:
 
 script:
   - sudo apt update
-  - sudo apt install dos2unix bash g++ -y
+  - sudo apt-get install dos2unix bash g++ -y
   - dos2unix build-linux.sh
   - chmod -v 777 build-linux.sh
   - ./build-linux.sh
