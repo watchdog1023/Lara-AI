@@ -154,9 +154,9 @@ sudo echo "* @file prim_type.h" >> prim_type.h
 sudo echo "* @brief Basic type definitions used in Sphinx. " >> prim_type.h
 sudo echo "*/" >> prim_type.h
 sudo echo "" >> prim_type.h
-sudo echo "#ifdef __cplusplus" >> prim_type.h
-sudo echo "extern "C" {" >> prim_type.h
-sudo echo "#endif" >> prim_type.h
+#sudo echo "#ifdef __cplusplus" >> prim_type.h
+#sudo echo "extern "C" {" >> prim_type.h
+#sudo echo "#endif" >> prim_type.h
 sudo echo "#if 0" >> prim_type.h
 sudo echo "} /* Fool Emacs into not indenting things. */" >> prim_type.h
 sudo echo "#endif" >> prim_type.h
@@ -252,8 +252,8 @@ sudo echo "#define MIN_NEG_FLOAT32		((float32) (-MIN_POS_FLOAT32))" >> prim_type
 sudo echo "#define MIN_NEG_FLOAT64		((float64) (-MIN_POS_FLOAT64))" >> prim_type.h
 sudo echo "" >> prim_type.h
 sudo echo "" >> prim_type.h
-sudo echo "#ifdef __cplusplus" >> prim_type.h
-sudo echo "}" >> prim_type.h
+#sudo echo "#ifdef __cplusplus" >> prim_type.h
+#sudo echo "}" >> prim_type.h
 #sudo echo "#endif" >> prim_type.h
 sudo echo "" >> prim_type.h
 sudo echo "#endif" >> prim_type.h
