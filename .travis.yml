@@ -29,7 +29,6 @@ script:
   - sudo apt update
   - sudo apt-get install dos2unix bash -y
   - if [ "$CXX" = "g++" ]; then export CXX="g++-8" CC="gcc-8"; fi
-  - ${CXX} --version
   - dos2unix build-linux.sh
   - chmod -v 777 build-linux.sh
   - ./build-linux.sh
