@@ -32,5 +32,4 @@ script:
   - sudo apt-get install dos2unix bash -y
   - dos2unix build-linux.sh
   - chmod -v 777 build-linux.sh
-  - cat /usr/include/x86_64-linux-gnu/sys/types.h
-  #- ./build-linux.sh
+  - ./build-linux.sh
