@@ -86,7 +86,7 @@ which yum && {
      if [ ! -e /usr/bin/swig ]; then
         sudo apt-get install swig;
      fi
-     sudo apt-get install libboost-dev libsfml-dev libtesseract-dev;
+     sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev;
      }
      which dnf && {
      echo Fedora;
