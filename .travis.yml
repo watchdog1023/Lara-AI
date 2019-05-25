@@ -9,6 +9,7 @@ addons:
     packages: 
       - g++-8
       - gcc-8
+      - gfortran-8
   env:
     - CXX='g++-8'
     - CC='gcc-8' 
