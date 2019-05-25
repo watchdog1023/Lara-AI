@@ -120,7 +120,7 @@
 #elif __APPLE__
     #include<mpi.h>
 #else
-    #include<mpi/mpi.h>
+    #include<mpi.h>
 #endif
 #include<boost/mpi.hpp>
 //MYSQL database
