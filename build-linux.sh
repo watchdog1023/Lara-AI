@@ -161,6 +161,13 @@ if [  -e /usr/bin/pip3 ]; then
    sudo -H pip3 install setuptools
    sudo -H pip3 install pyscreenshot selenium datetime
 fi
+mkdir data/obj_detect/
+cd data/obj_detect/
+wget https://pjreddie.com/media/files/yolov3.weights
+wget https://github.com/pjreddie/darknet/blob/master/cfg/yolov3.cfg?raw=true -O ./yolov3.cfg
+wget https://github.com/pjreddie/darknet/blob/master/data/coco.names?raw=true -O ./coco.names
+cd ../..
+ls data/obj_detect/
 sudo cp include/prim_type.h /usr/local/include/sphinxbase/prim_type.h
 sudo ldconfig
 mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"./chilkat-9.5.0-x86_64-linux-gcc/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
