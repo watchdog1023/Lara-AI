@@ -6,6 +6,18 @@ pip install --upgrade pip
 pip3 install --upgrade pip
 pip install pyscreenshot selenium datetime
 pip3 install pyscreenshot selenium datetime
+if [ ! -e data/obj_detect/ ]; then
+   mkdir data/obj_detect/
+fi
+if [ ! -e data/obj_detect/yolov3.weights ]; then
+   wget https://pjreddie.com/media/files/yolov3.weights -O ./data/obj_detect/yolov3.weights
+fi
+if [ ! -e data/obj_detect/yolov3.cfg ]; then
+   wget https://github.com/pjreddie/darknet/blob/master/cfg/yolov3.cfg?raw=true -O ./data/obj_detect/yolov3.cfg
+fi
+if [ ! -e data/obj_detect/coco.names ]; then
+   wget https://github.com/pjreddie/darknet/blob/master/data/coco.names?raw=true -O ./data/obj_detect/coco.names
+fi
 mpic++ -fpermissive -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include/linux" -v -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
 g++ -time -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
 g++ -time -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
