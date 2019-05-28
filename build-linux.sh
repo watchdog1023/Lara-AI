@@ -161,25 +161,43 @@ if [  -e /usr/bin/pip3 ]; then
    sudo -H pip3 install setuptools
    sudo -H pip3 install pyscreenshot selenium datetime
 fi
-mkdir data/obj_detect/
-cd data/obj_detect/
-wget https://pjreddie.com/media/files/yolov3.weights
-wget https://github.com/pjreddie/darknet/blob/master/cfg/yolov3.cfg?raw=true -O ./yolov3.cfg
-wget https://github.com/pjreddie/darknet/blob/master/data/coco.names?raw=true -O ./coco.names
-cd ../..
-ls data/obj_detect/
+if [ ! -e data/obj_detect/ ]; then
+   mkdir data/obj_detect/
+fi
+if [ ! -e data/obj_detect/yolov3.weights ]; then
+   wget https://pjreddie.com/media/files/yolov3.weights -O ./data/obj_detect/yolov3.weights
+fi
+if [ ! -e data/obj_detect/yolov3.cfg ]; then
+   wget https://github.com/pjreddie/darknet/blob/master/cfg/yolov3.cfg?raw=true -O ./data/obj_detect/yolov3.cfg
+fi
+if [ ! -e data/obj_detect/coco.names ]; then
+   wget https://github.com/pjreddie/darknet/blob/master/data/coco.names?raw=true -O ./data/obj_detect/coco.names
+fi
 sudo cp include/prim_type.h /usr/local/include/sphinxbase/prim_type.h
 sudo ldconfig
-mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"./chilkat-9.5.0-x86_64-linux-gcc/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
-g++-8 -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
-g++-8 -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
-g++-8 -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
-g++-8 -time -std=c++14 -c include/IRC/IRCHandler.cpp -o IRCHandler.o -Wfatal-errors
-g++-8 -time -std=c++14 -c include/qr_code/BitBuffer.cpp -o Bitbuffer.o -Wfatal-errors
-g++-8 -time -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
-g++-8 -time -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
-g++-8 -time -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
-g++-8 -time -std=c++14 -L"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib64" -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -L"./chilkat-9.5.0-x86_64-linux-gcc/lib" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lchilkat-9.5.0 -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad 2> LaraB.txt
+if [ $TRAVIS_BRANCH == "master" ]; then
+   mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"./chilkat-9.5.0-x86_64-linux-gcc/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
+   g++-8 -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
+   g++-8 -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
+   g++-8 -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
+   g++-8 -time -std=c++14 -c include/IRC/IRCHandler.cpp -o IRCHandler.o -Wfatal-errors
+   g++-8 -time -std=c++14 -c include/qr_code/BitBuffer.cpp -o Bitbuffer.o -Wfatal-errors
+   g++-8 -time -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
+   g++-8 -time -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
+   g++-8 -time -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
+   g++-8 -time -std=c++14 -L"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib64" -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -L"./chilkat-9.5.0-x86_64-linux-gcc/lib" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lchilkat-9.5.0 -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad 2> LaraB.txt
+else
+   mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"./chilkat-9.5.0-x86_64-linux-gcc/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
+   g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
+   g++ -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
+   g++ -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
+   g++ -time -std=c++14 -c include/IRC/IRCHandler.cpp -o IRCHandler.o -Wfatal-errors
+   g++ -time -std=c++14 -c include/qr_code/BitBuffer.cpp -o Bitbuffer.o -Wfatal-errors
+   g++ -time -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
+   g++ -time -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
+   g++ -time -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
+   g++ -time -std=c++14 -L"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib64" -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -L"./chilkat-9.5.0-x86_64-linux-gcc/lib" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lchilkat-9.5.0 -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad 2> LaraB.txt
+fi
 if [ ! -e ./lara ]; then
     echo "Code Not Sane";
     echo "========================Build Stage Output========================================"
@@ -198,16 +216,29 @@ else
     if [ $TRAVIS_BRANCH != "master" ]; then
       pause 'Press [Enter] key to continue...'
     fi
-    mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"./chilkat-9.5.0-x86_64-linux-gcc/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors
-    g++-8 -v -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
-    g++-8 -v -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
-    g++-8 -v -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
-    g++-8 -v -std=c++14 -c include/IRC/IRCHandler.cpp -o IRCHandler.o -Wfatal-errors
-    g++-8 -v -std=c++14 -c include/qr_code/BitBuffer.cpp -o Bitbuffer.o -Wfatal-errors
-    g++-8 -v -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
-    g++-8 -v -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
-    g++-8 -v -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
-    g++-8 -v -std=c++14 -L"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib64" -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -L"./chilkat-9.5.0-x86_64-linux-gcc/lib" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lchilkat-9.5.0 -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad
+    if [ $TRAVIS_BRANCH == "master" ]; then
+      mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"./chilkat-9.5.0-x86_64-linux-gcc/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors
+      g++-8 -v -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
+      g++-8 -v -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
+      g++-8 -v -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
+      g++-8 -v -std=c++14 -c include/IRC/IRCHandler.cpp -o IRCHandler.o -Wfatal-errors
+      g++-8 -v -std=c++14 -c include/qr_code/BitBuffer.cpp -o Bitbuffer.o -Wfatal-errors
+      g++-8 -v -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
+      g++-8 -v -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
+      g++-8 -v -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
+      g++-8 -v -std=c++14 -L"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib64" -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -L"./chilkat-9.5.0-x86_64-linux-gcc/lib" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lchilkat-9.5.0 -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad
+    else
+      mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"./chilkat-9.5.0-x86_64-linux-gcc/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors
+      g++ -v -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
+      g++ -v -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
+      g++ -v -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
+      g++ -v -std=c++14 -c include/IRC/IRCHandler.cpp -o IRCHandler.o -Wfatal-errors 
+      g++ -v -std=c++14 -c include/qr_code/BitBuffer.cpp -o Bitbuffer.o -Wfatal-errors
+      g++ -v -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
+      g++ -v -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
+      g++ -v -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
+      g++ -v -std=c++14 -L"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib64" -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -L"./chilkat-9.5.0-x86_64-linux-gcc/lib" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lchilkat-9.5.0 -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad
+    fi
     if [ -e ./lara ]; then
      exit 0
     fi
