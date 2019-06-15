@@ -66,9 +66,19 @@ which yum && {
             sudo make install;
             cd ../
           else
-            cd mpich-3.3/;
-            sudo make install;
-            cd ../
+            if [ "$(ls -A mpich-3.3/)" ]; then
+               cd mpich-3.3/;
+               sudo make install;
+               cd ../
+            else
+               wget -c http://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz;
+               tar xf mpich-3.3.tar.gz;
+               cd mpich-3.3/;
+               ./configure --disable-fortran;
+               make CXX="g++-8" CC="gcc-8" FC="gfortran-8";
+               sudo make install;
+               cd ../
+            fi
           fi
        else
          sudo apt-get install libmpich-dev;
@@ -92,7 +102,7 @@ which yum && {
      echo Fedora;
      return;
      }
-#if [ ! -e opencv-3.4.3/ ]; then 
+if [ ! -e opencv-3.4.3/ ]; then 
    wget -c https://github.com/opencv/opencv/archive/3.4.3.zip
    wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -O contrib-343.zip
    unzip -qq 3.4.3.zip
@@ -105,28 +115,43 @@ which yum && {
    make -j4
    sudo make install
    cd ../..
-#else
-#   cd opencv-3.4.3/
-#   cd build
-#   sudo make install
-#   cd ../..
-#fi
-#if [ ! -e chilkat-9.5.0-x86_64-linux-gcc/ ]; then
+else
+   if [ "$(ls -A opencv-3.4.3/)" ]; then
+      cd opencv-3.4.3/
+      cd build
+      sudo make install
+      cd ../..
+   else
+      wget -c https://github.com/opencv/opencv/archive/3.4.3.zip
+      wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -O contrib-343.zip
+      unzip -qq 3.4.3.zip
+      unzip -qq contrib-343.zip
+      cd opencv-3.4.3/
+      mv -v ../opencv_contrib-3.4.3/* .
+      mkdir build
+      cd build
+      cmake -quiet ..
+      make -j4
+      sudo make install
+      cd ../..
+   fi
+fi
+if [ ! -e chilkat-9.5.0-x86_64-linux-gcc/ ]; then
    wget -c https://chilkatdownload.com/9.5.0.78/chilkat-9.5.0-x86_64-linux-gcc.tar.gz
    tar xf chilkat-9.5.0-x86_64-linux-gcc.tar.gz
    sudo mv -v chilkat-9.5.0-x86_64-linux-gcc/include chilkat-9.5.0-x86_64-linux-gcc/chilkat
-#fi
-#if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
+fi
+if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
    wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
    tar xf mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
-#fi
-#if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
+fi
+if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
    wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
    mkdir libtensorflow-cpu-linux-x86_64-1.13.1
    tar xf libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
-#fi
+fi
 #if [ ! -e sphinxbase-5prealpha/ ]; then
-   wget -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
+   wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
    tar xf sphinxbase-5prealpha.tar.gz
    cd sphinxbase-5prealpha
    ./configure
@@ -134,12 +159,22 @@ which yum && {
    sudo make install
    cd ..
 #else
-#   cd sphinxbase-5prealpha
-#   sudo make install
-#   cd ..
+#  if [ "$(ls -A sphinxbase-5prealpha/)" ]; then
+#     cd sphinxbase-5prealpha
+#     sudo make install
+#     cd ..
+#  else
+#      wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
+#      tar xf sphinxbase-5prealpha.tar.gz
+#      cd sphinxbase-5prealpha
+#      ./configure
+#      make
+#      sudo make install
+#      cd ..
+#  fi
 #fi
 #if [ ! -e pocketsphinx-5prealpha/ ]; then
-   wget -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
+   wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
    tar xf pocketsphinx-5prealpha.tar.gz
    cd pocketsphinx-5prealpha
    ./configure
@@ -147,9 +182,19 @@ which yum && {
    sudo make install
    cd ..
 #else
-#   cd pocketsphinx-5prealpha
-#   sudo make install
-#   cd ..
+#  if [ "$(ls -A pocketsphinx-5prealpha/)" ]; then
+#     cd pocketsphinx-5prealpha
+#     sudo make install
+#     cd ..
+#  else
+#     wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
+#     tar xf pocketsphinx-5prealpha.tar.gz
+#     cd pocketsphinx-5prealpha
+#     ./configure
+#     make
+#     sudo make install
+#     cd ..
+#  fi
 #fi
 if [  -e /usr/bin/pip2 ]; then
    sudo -H pip install --upgrade pip
@@ -175,7 +220,6 @@ if [ ! -e data/obj_detect/coco.names ]; then
 fi
 sudo cp include/prim_type.h /usr/local/include/sphinxbase/prim_type.h
 sudo ldconfig
-pwd
 if [ $TRAVIS_BRANCH == "master" ]; then
    mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"./chilkat-9.5.0-x86_64-linux-gcc/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
    g++-8 -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
