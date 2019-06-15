@@ -57,7 +57,7 @@ which yum && {
      echo debian;
      if [ ! -e /usr/bin/mpic++ ]; then
       if [ $TRAVIS_BRANCH == "master" ]; then
-         if [ ! -e mpich-3.3/ ]; then
+         #if [ ! -e mpich-3.3/ ]; then
             wget -c http://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz;
             tar xf mpich-3.3.tar.gz;
             cd mpich-3.3/;
@@ -65,13 +65,11 @@ which yum && {
             make CXX="g++-8" CC="gcc-8" FC="gfortran-8";
             sudo make install;
             cd ../
-            pwd;
-          else
-            cd mpich-3.3/;
-            sudo make install;
-            cd ../
-            pwd;
-          fi
+          #else
+          #  cd mpich-3.3/;
+          #  sudo make install;
+          #  cd ../
+          #fi
        else
          sudo apt-get install libmpich-dev;
       fi
@@ -94,7 +92,7 @@ which yum && {
      echo Fedora;
      return;
      }
-if [ ! -e opencv-3.4.3/ ]; then 
+#if [ ! -e opencv-3.4.3/ ]; then 
    wget -c https://github.com/opencv/opencv/archive/3.4.3.zip
    wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -O contrib-343.zip
    unzip -qq 3.4.3.zip
@@ -107,27 +105,27 @@ if [ ! -e opencv-3.4.3/ ]; then
    make -j4
    sudo make install
    cd ../..
-else
-   cd opencv-3.4.3/
-   cd build
-   sudo make install
-   cd ../..
-fi
-if [ ! -e chilkat-9.5.0-x86_64-linux-gcc/ ]; then
+#else
+#   cd opencv-3.4.3/
+#   cd build
+#   sudo make install
+#   cd ../..
+#fi
+#if [ ! -e chilkat-9.5.0-x86_64-linux-gcc/ ]; then
    wget -c https://chilkatdownload.com/9.5.0.78/chilkat-9.5.0-x86_64-linux-gcc.tar.gz
    tar xf chilkat-9.5.0-x86_64-linux-gcc.tar.gz
    sudo mv -v chilkat-9.5.0-x86_64-linux-gcc/include chilkat-9.5.0-x86_64-linux-gcc/chilkat
-fi
-if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
+#fi
+#if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
    wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
    tar xf mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
-fi
-if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
+#fi
+#if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
    wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
    mkdir libtensorflow-cpu-linux-x86_64-1.13.1
    tar xf libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
-fi
-if [ ! -e sphinxbase-5prealpha/ ]; then
+#fi
+#if [ ! -e sphinxbase-5prealpha/ ]; then
    wget -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
    tar xf sphinxbase-5prealpha.tar.gz
    cd sphinxbase-5prealpha
@@ -135,12 +133,12 @@ if [ ! -e sphinxbase-5prealpha/ ]; then
    make
    sudo make install
    cd ..
-else
-   cd sphinxbase-5prealpha
-   sudo make install
-   cd ..
-fi
-if [ ! -e pocketsphinx-5prealpha/ ]; then
+#else
+#   cd sphinxbase-5prealpha
+#   sudo make install
+#   cd ..
+#fi
+#if [ ! -e pocketsphinx-5prealpha/ ]; then
    wget -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
    tar xf pocketsphinx-5prealpha.tar.gz
    cd pocketsphinx-5prealpha
@@ -148,11 +146,11 @@ if [ ! -e pocketsphinx-5prealpha/ ]; then
    make
    sudo make install
    cd ..
-else
-   cd pocketsphinx-5prealpha
-   sudo make install
-   cd ..
-fi
+#else
+#   cd pocketsphinx-5prealpha
+#   sudo make install
+#   cd ..
+#fi
 if [  -e /usr/bin/pip2 ]; then
    sudo -H pip install --upgrade pip
    sudo -H pip install setuptools
