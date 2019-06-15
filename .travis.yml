@@ -18,14 +18,14 @@ addons:
 cache:
   apt: true
   pip: true
-  #directories:
-  #  - opencv-3.4.3/
-  #  - chilkat-9.5.0-x86_64-linux-gcc/
-  #  - mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/
-  #  - libtensorflow-cpu-linux-x86_64-1.13.1/
-  #  - sphinxbase-5prealpha/
-  #  - pocketsphinx-5prealpha/
-  #  - mpich-3.3/
+  directories:
+    - opencv-3.4.3/
+    - chilkat-9.5.0-x86_64-linux-gcc/
+    - mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/
+    - libtensorflow-cpu-linux-x86_64-1.13.1/
+    - sphinxbase-5prealpha/
+    - pocketsphinx-5prealpha/
+    - mpich-3.3/
 
 script:
   - sudo apt update
