@@ -55,6 +55,7 @@ which yum && {
      }
      which apt-get && {
      echo debian;
+     pwd;
      if [ ! -e /usr/bin/mpic++ ]; then
       if [ $TRAVIS_BRANCH == "master" ]; then
          if [ ! -e mpich-3.3/ ]; then
