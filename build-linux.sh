@@ -55,7 +55,6 @@ which yum && {
      }
      which apt-get && {
      echo debian;
-     pwd;
      if [ ! -e /usr/bin/mpic++ ]; then
       if [ $TRAVIS_BRANCH == "master" ]; then
          if [ ! -e mpich-3.3/ ]; then
@@ -66,10 +65,12 @@ which yum && {
             make CXX="g++-8" CC="gcc-8" FC="gfortran-8";
             sudo make install;
             cd ../
+            pwd;
           else
             cd mpich-3.3/;
             sudo make install;
             cd ../
+            pwd;
           fi
        else
          sudo apt-get install libmpich-dev;
