@@ -150,7 +150,7 @@ if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
    mkdir libtensorflow-cpu-linux-x86_64-1.13.1
    tar xf libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
 fi
-#if [ ! -e sphinxbase-5prealpha/ ]; then
+if [ ! -e sphinxbase-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
    tar xf sphinxbase-5prealpha.tar.gz
    cd sphinxbase-5prealpha
@@ -158,22 +158,22 @@ fi
    make
    sudo make install
    cd ..
-#else
-#  if [ "$(ls -A sphinxbase-5prealpha/)" ]; then
-#     cd sphinxbase-5prealpha
-#     sudo make install
-#     cd ..
-#  else
-#      wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
-#      tar xf sphinxbase-5prealpha.tar.gz
-#      cd sphinxbase-5prealpha
-#      ./configure
-#      make
-#      sudo make install
-#      cd ..
-#  fi
-#fi
-#if [ ! -e pocketsphinx-5prealpha/ ]; then
+else
+  if [ "$(ls -A sphinxbase-5prealpha/)" ]; then
+     cd sphinxbase-5prealpha
+     sudo make install
+     cd ..
+  else
+      wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
+      tar xf sphinxbase-5prealpha.tar.gz
+      cd sphinxbase-5prealpha
+      ./configure
+      make
+      sudo make install
+      cd ..
+  fi
+fi
+if [ ! -e pocketsphinx-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
    tar xf pocketsphinx-5prealpha.tar.gz
    cd pocketsphinx-5prealpha
@@ -181,21 +181,21 @@ fi
    make
    sudo make install
    cd ..
-#else
-#  if [ "$(ls -A pocketsphinx-5prealpha/)" ]; then
-#     cd pocketsphinx-5prealpha
-#     sudo make install
-#     cd ..
-#  else
-#     wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
-#     tar xf pocketsphinx-5prealpha.tar.gz
-#     cd pocketsphinx-5prealpha
-#     ./configure
-#     make
-#     sudo make install
-#     cd ..
-#  fi
-#fi
+else
+  if [ "$(ls -A pocketsphinx-5prealpha/)" ]; then
+     cd pocketsphinx-5prealpha
+     sudo make install
+     cd ..
+  else
+     wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
+     tar xf pocketsphinx-5prealpha.tar.gz
+     cd pocketsphinx-5prealpha
+     ./configure
+     make
+     sudo make install
+     cd ..
+  fi
+fi
 if [  -e /usr/bin/pip2 ]; then
    sudo -H pip install --upgrade pip
    sudo -H pip install setuptools
