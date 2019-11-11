@@ -4,9 +4,9 @@ dist: xenial
 compiler: gcc
 addons:
   apt:
-    sources: 
+    sources:
       - ubuntu-toolchain-r-test
-    packages: 
+    packages:
       - g++-8
       - gcc-8
       - gfortran-8
