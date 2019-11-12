@@ -137,7 +137,7 @@ else
    fi
 fi
 if [ ! -e chilkat-9.5.0-x86_64-linux-gcc/ ]; then
-   wget -c https://chilkatdownload.com/9.5.0.78/chilkat-9.5.0-x86_64-linux-gcc.tar.gz
+   wget -c https://chilkatdownload.com/9.5.0.80/chilkat-9.5.0-x86_64-linux-gcc.tar.gz
    tar xf chilkat-9.5.0-x86_64-linux-gcc.tar.gz
    sudo mv -v chilkat-9.5.0-x86_64-linux-gcc/include chilkat-9.5.0-x86_64-linux-gcc/chilkat
 fi
