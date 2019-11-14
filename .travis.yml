@@ -29,7 +29,7 @@ cache:
 
 script:
   - sudo apt update
-  - sudo apt-get install dos2unix bash -y
+  - sudo apt-get install dos2unix bash tree -y
   - dos2unix build-linux.sh
   - chmod -v 777 build-linux.sh
   - ./build-linux.sh
