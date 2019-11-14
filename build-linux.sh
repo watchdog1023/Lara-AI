@@ -136,11 +136,11 @@ else
       cd ../..
    fi
 fi
-#if [ ! -e chilkat-9.5.0-x86_64-linux-gcc/ ]; then
+if [ ! -e chilkat-9.5.0-x86_64-linux-gcc/ ]; then
    wget -c https://chilkatdownload.com/9.5.0.80/chilkat-9.5.0-x86_64-linux-gcc.tar.gz
    tar xf chilkat-9.5.0-x86_64-linux-gcc.tar.gz
    sudo mv -v chilkat-9.5.0-x86_64-linux-gcc/include chilkat-9.5.0-x86_64-linux-gcc/chilkat
-#fi
+fi
 if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
    wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
    tar xf mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
@@ -221,7 +221,6 @@ fi
 sudo cp include/prim_type.h /usr/local/include/sphinxbase/prim_type.h
 sudo ldconfig
 #sudo tree
-: '
 if [ $TRAVIS_BRANCH == "master" ]; then
    mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"./chilkat-9.5.0-x86_64-linux-gcc/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
    g++-8 -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
@@ -290,4 +289,3 @@ else
      exit 0
     fi
 fi
-'
