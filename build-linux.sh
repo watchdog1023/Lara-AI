@@ -2,6 +2,7 @@
 function pause () {
    read -p "$*"
 }
+: ' 
 which yum && {
      echo centos;
      yum group install "Development Tools";
@@ -218,6 +219,7 @@ fi
 if [ ! -e data/obj_detect/coco.names ]; then
    wget https://github.com/pjreddie/darknet/blob/master/data/coco.names?raw=true -O ./data/obj_detect/coco.names
 fi
+'
 sudo cp include/prim_type.h /usr/local/include/sphinxbase/prim_type.h
 sudo ldconfig
 sudo tree
