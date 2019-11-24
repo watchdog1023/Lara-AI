@@ -59,7 +59,7 @@ matrix:
     script:
       - sudo apt update
       - sudo apt-get install dos2unix bash tree -y
-      - dos2unix build-linux.sh
-      - chmod -v 777 build-linux.sh
+      - dos2unix build-pi.sh
+      - chmod -v 777 build-pi.sh
       - ./build-pi.sh
       
