@@ -41,7 +41,7 @@ fi
 if [ ! -e /usr/bin/swig ]; then
    sudo apt-get install swig;
 fi
-sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libcurl-dev;
+sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libcurl4-openssl-dev;
 sudo -H pip install --upgrade pip
 sudo -H pip3 install --upgrade pip
 sudo -H pip install pyscreenshot selenium datetime
