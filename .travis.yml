@@ -39,3 +39,27 @@ matrix:
     os : wndows
     script:
       - winpty.exe -Xallow-non-tty -Xplain "build-windows.bat"
+  - name: "Lara On Pi"
+    os : linux
+    arch: arm64
+    dist: xenial
+    compiler: gcc
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - g++-8
+          - gcc-8
+          - gfortran-8
+        env:
+          - CXX='g++-8'
+          - CC='gcc-8'
+          - CFLAGS='-DNRUNS=100000000'
+    script:
+      - sudo apt update
+      - sudo apt-get install dos2unix bash tree -y
+      - dos2unix build-linux.sh
+      - chmod -v 777 build-linux.sh
+      - ./build-linux.sh
+      
