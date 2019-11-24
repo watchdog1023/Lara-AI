@@ -2,6 +2,27 @@
 function pause(){
    read -p "$*"
 }
+if [ ! -e chilkat-9.5.0-aarch64-linux/ ]; then
+   wget -c https://chilkatdownload.com/9.5.0.80/chilkat-9.5.0-aarch64-linux.tar.gz
+   tar xf chilkat-9.5.0-aarch64-linux.tar.gz
+   sudo mv -v chilkat-9.5.0-aarch64-linux/include chilkat-9.5.0-aarch64-linux/chilkat
+fi
+if [ ! -e mysql-connector-c++-8.0.18-src/ ]; then
+   wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.18-src.tar.gz
+   tar xf mysql-connector-c++-8.0.18-src.tar.gz
+   cd mysql-connector-c++-8.0.18-src/
+   mkdir build
+   cd build
+   cmake ..
+   make
+   sudo make install
+   cd ../..
+else
+   cd mysql-connector-c++-8.0.18-src/
+   cd build
+   sudo make install
+   cd ../..
+fi
 if [ ! -e sphinxbase-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
    tar xf sphinxbase-5prealpha.tar.gz
