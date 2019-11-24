@@ -2,8 +2,9 @@
 function pause(){
    read -p "$*"
 }
+apt install libpython3-dev
 if [ ! -e /usr/bin/python3 ]; then
-   sudo apt-get install python3 libpython3-dev;
+   sudo apt-get install python3;
 fi;
 if [ ! -e chilkat-9.5.0-aarch64-linux/ ]; then
    wget -c https://chilkatdownload.com/9.5.0.80/chilkat-9.5.0-aarch64-linux.tar.gz
