@@ -2,6 +2,9 @@
 function pause(){
    read -p "$*"
 }
+if [ ! -e /usr/bin/python3 ]; then
+   sudo apt-get install python3 libpython3-dev;
+fi;
 if [ ! -e chilkat-9.5.0-aarch64-linux/ ]; then
    wget -c https://chilkatdownload.com/9.5.0.80/chilkat-9.5.0-aarch64-linux.tar.gz
    tar xf chilkat-9.5.0-aarch64-linux.tar.gz
@@ -96,9 +99,6 @@ if [ $TRAVIS_BRANCH == "master" ]; then
 else
    sudo apt-get install libmpich-dev;
 fi
-if [ ! -e /usr/bin/python3 ]; then
-   sudo apt-get install python3;
-fi;
 if [ ! -e /usr/bin/pip3 ]; then
    sudo apt-get install python3-pip;
 fi;
