@@ -29,7 +29,6 @@ if [ $TRAVIS_BRANCH == "master" ]; then
 else
    sudo apt-get install libmpich-dev;
 fi
-fi;
 if [ ! -e /usr/bin/python3 ]; then
    sudo apt-get install python3;
 fi;
