@@ -40,4 +40,5 @@ matrix:
     os : wndows
     language: cpp
     script:
+      - dir
       - build-windows.bat
