@@ -2,7 +2,7 @@
 function pause(){
    read -p "$*"
 }
-apt install libpython3-dev
+sudo apt install libpython3-dev
 if [ ! -e /usr/bin/python3 ]; then
    sudo apt-get install python3;
 fi;
