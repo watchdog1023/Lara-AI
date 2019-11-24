@@ -1,4 +1,7 @@
 language: cpp
+cache:
+  apt: true
+  pip: true
 
 matrix:
   include:
@@ -19,8 +22,6 @@ matrix:
           - CC='gcc-8'
           - CFLAGS='-DNRUNS=100000000'
     cache:
-        apt: true
-        pip: true
         directories:
           - opencv-3.4.3/
           - chilkat-9.5.0-x86_64-linux-gcc/
