@@ -39,4 +39,4 @@ matrix:
   - name: "Lara On Wndows"
     os : wndows
     script:
-      - run build-windows.bat
+      - cmd build-windows.bat
