@@ -39,6 +39,7 @@ matrix:
   - name: "Lara On Wndows"
     os : wndows
     script:
+      - chmod -v 777 build-windows.bat
       - ./build-windows.bat
   - name: "Lara On Pi"
     os : linux
