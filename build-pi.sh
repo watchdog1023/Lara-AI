@@ -2,7 +2,16 @@
 function pause(){
    read -p "$*"
 }
-sudo apt install libpython3-dev libpython-dev
+sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libcurl4-openssl-dev install libpython3-dev libpython-dev;
+if [ ! -e /usr/bin/pip3 ]; then
+   sudo apt-get install python3-pip;
+fi;
+if [ ! -e /usr/bin/g++ ]; then
+   sudo apt-get install build-essential make;
+fi
+if [ ! -e /usr/bin/swig ]; then
+   sudo apt-get install swig;
+fi
 if [ ! -e /usr/bin/python3 ]; then
    sudo apt-get install python3;
 fi;
@@ -100,19 +109,7 @@ if [ $TRAVIS_BRANCH == "master" ]; then
 else
    sudo apt-get install libmpich-dev;
 fi
-if [ ! -e /usr/bin/pip3 ]; then
-   sudo apt-get install python3-pip;
-fi;
-if [ ! -e /usr/bin/g++ ]; then
-   sudo apt-get install build-essential make;
-fi
-if [ ! -e /usr/bin/swig ]; then
-   sudo apt-get install swig;
-fi
-sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libcurl4-openssl-dev;
-sudo -H pip install --upgrade pip
 sudo -H pip3 install --upgrade pip
-sudo -H pip install pyscreenshot selenium datetime
 sudo -H pip3 install pyscreenshot selenium datetime
 if [ ! -e data/obj_detect/ ]; then
    mkdir data/obj_detect/
