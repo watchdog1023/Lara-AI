@@ -38,7 +38,5 @@ matrix:
        - ./build-linux.sh
   - name: "Lara On Wndows"
     os : wndows
-    language: cpp
     script:
-      - dir
-      - build-windows.bat
+      - start build-windows.bat
