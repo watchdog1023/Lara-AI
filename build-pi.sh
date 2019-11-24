@@ -30,7 +30,16 @@ g++ -time -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-
 g++ -time -std=c++14  -L"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/jre/lib/arm/server" -o lara Lara.o Thread.o IRCClient.o Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lchilkat-9.5.0 -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad 2> LaraB.txt
 if [ ! -e ./lara ];then
     echo "Code Not Sane";
-    pause 'Press [Enter] key to continue...'
+    echo "========================Build Stage Output========================================"
+    cat LaraB.txt
+    echo "========================Compile Stage Output======================================"
+    cat LaraC.txt
+    echo "=================================================================================="
+    if [ $TRAVIS_BRANCH != "master" ]; then
+      pause 'Press [Enter] key to continue...'
+    else
+      exit 1;
+    fi
 else
     rm -vr lara *.o
     echo "Code is Sane";
