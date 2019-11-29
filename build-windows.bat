@@ -1,4 +1,5 @@
 @echo off
+SET my="%CD%"
 pip install --upgrade pip
 pip3 install --upgrade pip
 pip install pillow selenium datetime
