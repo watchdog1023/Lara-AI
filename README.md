@@ -1,3 +1,5 @@
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/watchdog1023/Lara-AI) 
+
 # Lara-AI
 [![Build Status](https://travis-ci.org/watchdog1023/Lara-AI.svg?branch=master)](https://travis-ci.org/watchdog1023/Lara-AI)
 [![CodeFactor](https://www.codefactor.io/repository/github/watchdog1023/lara-ai/badge/master)](https://www.codefactor.io/repository/github/watchdog1023/lara-ai/overview/master)
