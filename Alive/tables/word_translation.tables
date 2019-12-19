@@ -1,0 +1,44 @@
+walk:
+	forward:
+		->
+			-come
+			-forward
+			-follow
+			-onwards
+			-ahead
+			-advance
+
+	backward:
+		->
+			-go back
+			-recede
+			-reverse
+			-backtrack
+			-backwards
+
+stop:
+	-stop
+	-frezze
+	-relax
+	-halt
+	-finish
+	-standstill
+	-pause
+
+pos:
+	-position
+
+function:
+	-function
+	-purpose
+	-task
+	-role
+	-reason
+
+resume:
+	-resume
+	-restart
+	-start again
+	-recommence
+	-return
+	-carry on
