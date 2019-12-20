@@ -3,6 +3,7 @@ FROM gitpod/workspace-full-vnc
 USER root
 RUN apt update
 RUN apt upgrade -y
+RUN export GITPOD=YES
 USER gitpod
 
 # Install custom tools, runtime, etc. using apt-get
