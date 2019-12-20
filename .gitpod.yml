@@ -1,1 +1,8 @@
-{ image: { file: .gitpod.Dockerfile } }
+image: { file: .gitpod.Dockerfile } 
+ports:
+  - port: 5900
+    onOpen: ignore 
+  - port: 35900
+    onOpen: ignore
+  - port: 6080
+    onOpen: ignore
