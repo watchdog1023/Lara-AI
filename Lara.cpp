@@ -82,7 +82,9 @@
 #include<SFML/Network.hpp>
 #include<iterator>
 //UUID Generaterion
-#include<chilkat/CkCrypt2.h>
+#include <boost/uuid/uuid.hpp>            // uuid class
+#include <boost/uuid/uuid_generators.hpp> // generators
+#include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
 //Tesseract-OCR
 #include<tesseract/baseapi.h>
 //#include<leptonica/allheaders.h>
@@ -2379,13 +2381,12 @@ void update()
 
 void uuid_gen_first()
 {
-    CkCrypt2 crypt;
-    const char *uuid_gen = crypt.generateUuid();
+    boost::uuids::uuid uuid_gen = boost::uuids::random_generator()();
     ofstream myfile("uuid.txt");
-            if (myfile.is_open())
-                {
-                    myfile << uuid_gen << endl;
-                }
+    if (myfile.is_open())
+        {
+            myfile << uuid_gen << endl;
+        }
     memo_check();
 }
 
@@ -2415,82 +2416,6 @@ void spider()
 {
     cout << "Powered by the Watchdog's Hunter System" << endl;
     lara();
-    /*
-    CkSpider spider;
-    CkStringArray seenDomains;
-    CkStringArray seedUrls;
-    seenDomains.put_Unique(true);
-    seedUrls.put_Unique(true);
-
-    string spider_input;
-    PlayMP3( "voice/spider_website.mp3" );
-    cout << "Please input the website to spider:" << endl;
-    getline(cin, spider_input);
-    sleep(4);
-    StopMP3( "voice/spider_website.mp3" );
-    seedUrls.Append(spider_input.c_str());
-    
-    //  Set outbound URL exclude patterns
-    //  URLs matching any of these patterns will not be added to the
-    //  collection of outbound links.
-    spider.AddAvoidOutboundLinkPattern("*?id=*");
-    spider.AddAvoidOutboundLinkPattern("*.mypages.*");
-    spider.AddAvoidOutboundLinkPattern("*.personal.*");
-    spider.AddAvoidOutboundLinkPattern("*.comcast.*");
-    spider.AddAvoidOutboundLinkPattern("*.aol.*");
-    spider.AddAvoidOutboundLinkPattern("*~*");
-
-    //  Use a cache so we don't have to re-fetch URLs previously fetched.
-    spider.put_CacheDir("Cache/spider");
-    spider.put_FetchFromCache(true);
-    spider.put_UpdateCache(true);
-
-    while (seedUrls.get_Count() > 0)
-        {
-            const char *url = seedUrls.pop();
-            spider.Initialize(url);
-     -       //  Spider 5 URLs of this domain.
-            //  but first, save the base domain in seenDomains
-            const char *domain = spider.getUrlDomain(url);
-            seenDomains.Append(spider.getBaseDomain(domain));
-            int i;
-            bool success;
-            for (i = 0; i <= 4; i++)
-                {
-                    success = spider.CrawlNext();
-                    if (success == true)
-                        {
-                            //  Display the URL we just crawled.
-                            std::cout << spider.lastUrl() << "\r\n";
-                            if (spider.get_LastFromCache() != true)
-                                {
-                                    spider.SleepMs(1000);
-                                }
-                        }
-                    else
-                        {
-                            //  cause the loop to exit..
-                            i = 999;
-                        }
-                }
-            //  Add the outbound links to seedUrls, except
-            //  for the domains we've already seen.
-            for (i = 0; i <= spider.get_NumOutboundLinks() - 1; i++)
-                {
-                    url = spider.getOutboundLink(i);
-                    const char *domain = spider.getUrlDomain(url);
-                    const char *baseDomain = spider.getBaseDomain(domain);
-                    if (seenDomains.Contains(baseDomain) == false)
-                        {
-                            //  Don't let our list of seedUrls grow too large.
-                            if (seedUrls.get_Count() < 1000)
-                                {
-                                    seedUrls.Append(url);
-                                }   
-                        }
-                }
-        }
-    */
 }
 
 void webcam_streaming()
