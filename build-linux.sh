@@ -155,8 +155,8 @@ fi
    wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
    tar xf mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
    cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc/* mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/
-   mv -vf mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib64/ mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib/
-   mv -vf mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/* /workspace/Lara-AI/assests/usr/local/
+   cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib64/ mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib/
+   cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/* /workspace/Lara-AI/assests/usr/local/
 #fi
 if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
    wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
