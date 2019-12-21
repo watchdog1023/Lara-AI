@@ -6,3 +6,5 @@ ports:
     onOpen: notify
   - port: 6080
     onOpen: notify
+tasks:
+  - command: export GITPOD=YES

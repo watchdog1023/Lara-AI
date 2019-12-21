@@ -3,8 +3,8 @@ FROM gitpod/workspace-full-vnc
 USER root
 RUN apt update
 RUN apt upgrade -y
-RUN export GITPOD=YES
 USER gitpod
+RUN export GITPOD=YES
 
 # Install custom tools, runtime, etc. using apt-get
 # For example, the command below would install "bastet" - a command line tetris clone:
