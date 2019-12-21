@@ -124,10 +124,10 @@
 		#include<jdbc/cppconn/resultset.h>
 		#include<jdbc/cppconn/statement.h>
 	#else	
-		#include<cppconn/driver.h>
-		#include<cppconn/exception.h>
-		#include<cppconn/resultset.h>
-		#include<cppconn/statement.h>
+		#include<jdbc/cppconn/driver.h>
+		#include<jdbc/cppconn/exception.h>
+		#include<jdbc/cppconn/resultset.h>
+		#include<jdbc/cppconn/statement.h>
 	#endif
 #endif
 #if defined(WIN32) || defined(__CYGWIN32__)
