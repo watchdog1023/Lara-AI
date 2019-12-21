@@ -188,7 +188,7 @@
 #if defined(WIN32) || defined(__CYGWIN32__)
     #include<Python.h>
 #else
-    #include<python3.5m/Python.h>
+    #include<Python.h>
 #endif
 //Ruby Environment
 //#include<ruby/ruby.h>

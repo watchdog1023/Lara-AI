@@ -2,8 +2,8 @@
 function pause () {
    read -p "$*"
 }
-if []; then
-    mkdir assests/
+if [ $GITPOD == "YES" ]; then
+    mkdir assets/
 fi
 which yum && {
      echo centos;
@@ -117,7 +117,7 @@ if [ ! -e opencv-3.4.3/ ]; then
    cmake -quiet ..
    make -j4
    if [ $GITPOD == "YES" ]; then
-    make install DESTDIR="/workspace/Lara-AI/assests/"
+    make install DESTDIR="/workspace/Lara-AI/assets/"
    else
     sudo make install
    fi
@@ -127,7 +127,7 @@ else
       cd opencv-3.4.3/
       cd build
       if [ $GITPOD == "YES" ]; then
-        make install DESTDIR="/workspace/Lara-AI/assests/"
+        make install DESTDIR="/workspace/Lara-AI/assets/"
       else
         sudo make install
       fi
@@ -144,25 +144,31 @@ else
       cmake -quiet ..
       make -j4
       if [ $GITPOD == "YES" ]; then
-        make install DESTDIR="/workspace/Lara-AI/assests/"
+        make install DESTDIR="/workspace/Lara-AI/assets/"
       else
         sudo make install
       fi
       cd ../..
    fi
 fi
-#if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
+if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
    wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
+   if [ -e ! assets/ ]; then
+    mkdir assets/
+    mkdir assets/usr
+    mkdir assets/usr/local
+   fi
    tar xf mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
    cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc/* mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/
    cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib64/ mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib/
-   cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/* /workspace/Lara-AI/assests/usr/local/
-#fi
-if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
+   cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/* /workspace/Lara-AI/assets/usr/local/
+fi
+#if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
    wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
    mkdir libtensorflow-cpu-linux-x86_64-1.13.1
    tar xf libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
-fi
+   cp -vr libtensorflow-cpu-linux-x86_64-1.13.1/* assets/usr/local/
+#fi
 if [ ! -e sphinxbase-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
    tar xf sphinxbase-5prealpha.tar.gz
@@ -170,7 +176,7 @@ if [ ! -e sphinxbase-5prealpha/ ]; then
    ./configure
    make
    if [ $GITPOD == "YES" ]; then
-    make install DESTDIR="/workspace/Lara-AI/assests/"
+    make install DESTDIR="/workspace/Lara-AI/assets/"
    else
     sudo make install
    fi
@@ -179,7 +185,7 @@ else
   if [ "$(ls -A sphinxbase-5prealpha/)" ]; then
      cd sphinxbase-5prealpha
      if [ $GITPOD == "YES" ]; then
-      make install DESTDIR="/workspace/Lara-AI/assests/"
+      make install DESTDIR="/workspace/Lara-AI/assets/"
      else
       sudo make install
      fi
@@ -191,7 +197,7 @@ else
       ./configure
       make
       if [ $GITPOD == "YES" ]; then
-        make install DESTDIR="/workspace/Lara-AI/assests/"
+        make install DESTDIR="/workspace/Lara-AI/assets/"
       else
         sudo make install
       fi
@@ -205,7 +211,7 @@ if [ ! -e pocketsphinx-5prealpha/ ]; then
    ./configure
    make
    if [ $GITPOD == "YES" ]; then
-    make install DESTDIR="/workspace/Lara-AI/assests/"
+    make install DESTDIR="/workspace/Lara-AI/assets/"
    else
     sudo make install
    fi
@@ -214,7 +220,7 @@ else
   if [ "$(ls -A pocketsphinx-5prealpha/)" ]; then
      cd pocketsphinx-5prealpha
      if [ $GITPOD == "YES" ]; then
-       make install DESTDIR="/workspace/Lara-AI/assests/"
+       make install DESTDIR="/workspace/Lara-AI/assets/"
      else
        sudo make install
      fi
@@ -226,7 +232,7 @@ else
      ./configure
      make
      if [ $GITPOD == "YES" ]; then
-       make install DESTDIR="/workspace/Lara-AI/assests/"
+       make install DESTDIR="/workspace/Lara-AI/assets/"
      else
        sudo make install
      fi
@@ -255,11 +261,15 @@ fi
 if [ ! -e data/obj_detect/coco.names ]; then
    wget https://github.com/pjreddie/darknet/blob/master/data/coco.names?raw=true -O ./data/obj_detect/coco.names
 fi
-sudo cp include/prim_type.h /usr/local/include/sphinxbase/prim_type.h
-sudo ldconfig
+if [ $GITPOD != "YES" ]; then 
+    sudo cp include/prim_type.h /usr/local/include/sphinxbase/prim_type.h
+    sudo ldconfig
+elif [ $GITPOD == "YES" ]; then 
+    cp include/prim_type.h assets/usr/local/include/sphinxbase/prim_type.h
+fi
 #sudo tree
 if [ $TRAVIS_BRANCH == "master" ]; then
-   mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/" -I"mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
+   mpic++ -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated 2> LaraC.txt 
    g++-8 -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
    g++-8 -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
    g++-8 -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
@@ -269,8 +279,19 @@ if [ $TRAVIS_BRANCH == "master" ]; then
    g++-8 -time -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
    g++-8 -time -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
    g++-8 -time -std=c++14 -L"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib64" -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad 2> LaraB.txt
+elif [ $GITPOD == "YES" ]; then
+   mpic++ -fpermissive -std=c++14 -I"assets/usr/local/include" -I"assets/usr/local/include/pocketsphinx" -I"assets/usr/local/include/sphinxbase" -I"include/" -I"/usr/include/python3.7" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
+   g++-8 -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
+   g++-8 -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
+   g++-8 -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
+   g++-8 -time -std=c++14 -c include/IRC/IRCHandler.cpp -o IRCHandler.o -Wfatal-errors
+   g++-8 -time -std=c++14 -c include/qr_code/BitBuffer.cpp -o Bitbuffer.o -Wfatal-errors
+   g++-8 -time -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
+   g++-8 -time -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
+   g++-8 -time -std=c++14 -fpermissive -I"assets/usr/local/include" -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
+   g++-8 -time -std=c++14 -L"assets/usr/local/lib" -L"/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.7m -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad 2> LaraB.txt
 else
-   mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
+   mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"assets/usr/local/include" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
    g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
    g++ -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
    g++ -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
@@ -300,7 +321,7 @@ else
       pause 'Press [Enter] key to continue...'
     fi
     if [ $TRAVIS_BRANCH == "master" ]; then
-      mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors
+      mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"assets/usr/local/include" -c Lara.cpp -o Lara.o -Wfatal-errors
       g++-8 -v -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
       g++-8 -v -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
       g++-8 -v -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
@@ -310,8 +331,19 @@ else
       g++-8 -v -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
       g++-8 -v -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
       g++-8 -v -std=c++14 -L"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib64" -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad
+    elif [ $GITPOD == "YES" ]; then
+        mpic++ -fpermissive -std=c++14 -I"assets/usr/local/include" -I"assets/usr/local/include/pocketsphinx" -I"assets/usr/local/include/sphinxbase" -I"include/" -I"/usr/include/python3.7" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
+        g++-8 -v -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
+        g++-8 -v -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
+        g++-8 -v -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
+        g++-8 -v -std=c++14 -c include/IRC/IRCHandler.cpp -o IRCHandler.o -Wfatal-errors
+        g++-8 -v -std=c++14 -c include/qr_code/BitBuffer.cpp -o Bitbuffer.o -Wfatal-errors
+        g++-8 -v -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
+        g++-8 -v -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
+        g++-8 -v -std=c++14 -fpermissive -I"assets/usr/local/include" -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
+        g++-8 -v -std=c++14 -L"assets/usr/local/lib" -L"/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.7m -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad
     else
-      mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"libtensorflow-cpu-linux-x86_64-1.13.1/include" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysql" -I"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/mysqlx" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/linux/" -I"/usr/lib/jvm/java-8-openjdk-amd64/include/" -c Lara.cpp -o Lara.o -Wfatal-errors
+      mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"assets/usr/local/include" -c Lara.cpp -o Lara.o -Wfatal-errors
       g++ -v -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
       g++ -v -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
       g++ -v -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
@@ -323,6 +355,7 @@ else
       g++ -v -std=c++14 -L"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib64" -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad
     fi
     if [ -e ./lara ]; then
+    echo 
      exit 0
     fi
 fi
