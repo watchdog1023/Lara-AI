@@ -151,7 +151,7 @@ else
       cd ../..
    fi
 fi
-if [ -e ! assets/ ]; then
+if [ ! -e  assets/ ]; then
     mkdir -v assets/
     mkdir -v assets/usr/
     mkdir -v assets/usr/local/
