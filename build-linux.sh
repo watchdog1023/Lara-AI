@@ -152,9 +152,9 @@ else
    fi
 fi
 if [ -e ! assets/ ]; then
-    mkdir assets/
-    mkdir assets/usr
-    mkdir assets/usr/local
+    mkdir -v assets/
+    mkdir -v assets/usr/
+    mkdir -v assets/usr/local/
 fi
 #if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
    wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
@@ -359,7 +359,8 @@ else
       g++ -v -std=c++14 -L"./mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib64" -L"/usr/lib/jvm/java-1.5.0-gcj-6-amd64/lib/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad
     fi
     if [ -e ./lara ]; then
-    echo 
-     exit 0
+      clear
+      echo "Build Successful"
+      exit 0
     fi
 fi
