@@ -1,3 +1,4 @@
+#!/bin/bash
 #cleaning the source tree
 rm -vr opencv-3.4.3/
 rm -vr opencv_contrib-3.4.3/
