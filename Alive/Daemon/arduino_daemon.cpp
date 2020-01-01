@@ -5,8 +5,6 @@
 
 using namespace std;
 
-int delay_time = 2000000;
-
 void send_cmd(string cmd)
 {
     FILE *file;
