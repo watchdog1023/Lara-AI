@@ -2,7 +2,7 @@
 
 //Definions
 #define DEBUG 1
-//#define WIN 1 // for input from windows terminal
+#define WIN 1 // for input from windows terminal
 
 //defining the pins
 const int trigPin = 52;
@@ -98,7 +98,7 @@ void loop()
   if (Serial.available() > 0)
   {
     //read the whole string until '\n' delimiter is read
-#ifdef WIN
+#if WIN == 1
     input = Serial.readStringUntil('\r');
 #else
     input = Serial.readStringUntil('\n');
