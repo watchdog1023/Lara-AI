@@ -1115,6 +1115,128 @@ int main(int argc, char* argv[])
                                     goto bvloop;
                                 }
                         }
+						  #ifdef ALIVE
+							else if(voutput == "come")
+								{
+									system("./daemon/ardaemon \"walk forward\"");
+								}
+							else if(voutput == "forward")
+								{
+									system("./daemon/ardaemon \"walk forward\"");
+								}
+							else if(voutput == "follow")
+								{
+									system("./daemon/ardaemon \"walk forward\"");
+								}
+							else if(voutput == "onwards")
+								{
+									system("./daemon/ardaemon \"walk forward\"");
+								}
+							else if(voutput == "ahead")
+								{
+									system("./daemon/ardaemon \"walk forward\"");
+								}
+							else if(voutput == "advance")
+								{
+									system("./daemon/ardaemon \"walk forward\"");
+								}
+							else if(voutput == "go back")
+								{
+									system("./daemon/ardaemon \"walk backward\"");
+								}
+							else if(voutput == "recede")
+								{
+									system("./daemon/ardaemon \"walk backward\"");
+								}
+							else if(voutput == "reverse")
+								{
+									system("./daemon/ardaemon \"walk backward\"");
+								}
+							else if(voutput == "backtrack")
+								{
+									system("./daemon/ardaemon \"walk backward\"");
+								}
+							else if(voutput == "backwards")
+								{
+									system("./daemon/ardaemon \"walk backward\"");
+								}
+							else if(voutput == "stop")
+								{
+									system("./daemon/ardaemon stop");
+								}
+							else if(voutput == "frezze")
+								{
+									system("./daemon/ardaemon stop");
+								}
+							else if(voutput == "relax")
+								{
+									system("./daemon/ardaemon stop");
+								}
+							else if(voutput == "halt")
+								{
+									system("./daemon/ardaemon stop");
+								}
+							else if(voutput == "finish")
+								{
+									system("./daemon/ardaemon stop");
+								}
+							else if(voutput == "standstill")
+								{
+									system("./daemon/ardaemon stop");
+								}
+							else if(voutput == "pause")
+								{
+									system("./daemon/ardaemon stop");
+								}
+							else if(voutput == "position")
+								{
+									system("./daemon/ardaemon pos");
+								}
+							else if(voutput == "function")
+								{
+									system("./daemon/ardaemon function");
+								}
+							else if(voutput == "purpose")
+								{
+									system("./daemon/ardaemon function");
+								}
+							else if(voutput == "task")
+								{
+									system("./daemon/ardaemon function");
+								}
+							else if(voutput == "role")
+								{
+									system("./daemon/ardaemon function");
+								}
+							else if(voutput == "reason")
+								{
+									system("./daemon/ardaemon function");
+								}
+							else if(voutput == "resume")
+								{
+									system("./daemon/ardaemon resume");
+								}
+							else if(voutput == "restart")
+								{
+									system("./daemon/ardaemon resume");
+								}
+							else if(voutput == "start again")
+								{
+									system("./daemon/ardaemon resume");
+								}
+							else if(voutput == "recommence")
+								{
+									system("./daemon/ardaemon resume");
+								}
+							else if(voutput == "return")
+								{
+									system("./daemon/ardaemon resume");
+								}
+							else if(voutput == "carry on")
+								{
+									system("./daemon/ardaemon resume");
+								}
+						  #endif
                     else
                         {
                             #if defined(WIN32) || defined(__CYGWIN32__)
