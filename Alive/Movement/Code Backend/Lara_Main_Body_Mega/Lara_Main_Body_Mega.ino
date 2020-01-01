@@ -2,8 +2,9 @@
 
 //Definions
 #define DEBUG 1
-#define WIN 1 // for input from windows terminal
-
+#ifdef __WINT_TYPE__
+  #define WIN 1 // for input from windows terminal
+#endif
 //defining the pins
 const int trigPin = 52;
 const int echoPin = 53;
