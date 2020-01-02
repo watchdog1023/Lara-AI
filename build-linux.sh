@@ -1,5 +1,5 @@
 #!/bin/bash
-function pause () {
+: 'function pause () {
    read -p "$*"
 }
 if [ $GITPOD == "YES" ]; then
@@ -105,7 +105,7 @@ which yum && {
      echo Fedora;
      return;
      }
-: 'if [ ! -e opencv-3.4.3/ ]; then 
+if [ ! -e opencv-3.4.3/ ]; then 
    wget -c https://github.com/opencv/opencv/archive/3.4.3.zip
    wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -O contrib-343.zip
    unzip -qq 3.4.3.zip
@@ -276,6 +276,7 @@ elif [ $GITPOD == "YES" ]; then
     cp include/prim_type.h assets/usr/local/include/sphinxbase/prim_type.h
 fi'
 tree assets/
+ls
 #sudo tree
 : ' if [ $TRAVIS_BRANCH == "master" ]; then
    mpic++ -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"-I"/usr/include/python3.5"" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated 2> LaraC.txt 
