@@ -176,7 +176,8 @@ if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
    tar xf libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
    cp -vr libtensorflow-cpu-linux-x86_64-1.13.1/* assets/usr/local/
 else
-   cp -vr "libtensorflow-cpu-linux-x86_64-1.13.1/*" assets/usr/local/
+   ls libtensorflow-cpu-linux-x86_64-1.13.1/
+   cp -vr libtensorflow-cpu-linux-x86_64-1.13.1/* assets/usr/local/
 fi
 : ' if [ ! -e sphinxbase-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
