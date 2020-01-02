@@ -1,5 +1,5 @@
 #!/bin/bash
-'''function pause () {
+function pause () {
    read -p "$*"
 }
 if [ $GITPOD == "YES" ]; then
@@ -270,10 +270,10 @@ if [ $GITPOD != "YES" ]; then
     sudo ldconfig
 elif [ $GITPOD == "YES" ]; then 
     cp include/prim_type.h assets/usr/local/include/sphinxbase/prim_type.h
-fi'''
+fi
 tree assets/
 #sudo tree
-'''if [ $TRAVIS_BRANCH == "master" ]; then
+: ' if [ $TRAVIS_BRANCH == "master" ]; then
    mpic++ -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"-I"/usr/include/python3.5"" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated 2> LaraC.txt 
    g++-8 -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
    g++-8 -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
@@ -364,4 +364,4 @@ else
       echo "Build Successful"
       exit 0
     fi
-fi'''
+fi'
