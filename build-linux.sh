@@ -166,11 +166,15 @@ if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
    else
       cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/* assets/usr/local/
    fi
+else
+   cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/* assets/usr/local/
 fi
 if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
    wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
    mkdir libtensorflow-cpu-linux-x86_64-1.13.1
    tar xf libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
+   cp -vr libtensorflow-cpu-linux-x86_64-1.13.1/* assets/usr/local/
+else
    cp -vr libtensorflow-cpu-linux-x86_64-1.13.1/* assets/usr/local/
 fi
 if [ ! -e sphinxbase-5prealpha/ ]; then
