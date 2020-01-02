@@ -164,11 +164,10 @@ if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
    if [ $GITPOD == "YES" ]; then
       cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/* /workspace/Lara-AI/assets/usr/local/
    else
-      cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/* assets/usr/local/
+      cp -vr "mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/*" assets/usr/local/
    fi
 else
-   mv -v "mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/" mysql/
-   cp -vr mysql/* assets/usr/local/
+   cp -vr "mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/*" assets/usr/local/
 fi
 if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
    wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
@@ -176,7 +175,7 @@ if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
    tar xf libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
    cp -vr libtensorflow-cpu-linux-x86_64-1.13.1/* assets/usr/local/
 else
-   cp -vr libtensorflow-cpu-linux-x86_64-1.13.1/* assets/usr/local/
+   cp -vr "libtensorflow-cpu-linux-x86_64-1.13.1/*" assets/usr/local/
 fi
 : ' if [ ! -e sphinxbase-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
