@@ -271,7 +271,7 @@ if [ $GITPOD != "YES" ]; then
 elif [ $GITPOD == "YES" ]; then 
     cp include/prim_type.h assets/usr/local/include/sphinxbase/prim_type.h
 fi
-ls
+ls assets/
 #sudo tree
 if [ $TRAVIS_BRANCH == "master" ]; then
    mpic++ -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"-I"/usr/include/python3.5"" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated 2> LaraC.txt 
