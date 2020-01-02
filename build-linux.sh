@@ -167,7 +167,8 @@ if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
       cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/* assets/usr/local/
    fi
 else
-   cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/* assets/usr/local/
+   mv -v "mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/" mysql/
+   cp -vr mysql/* assets/usr/local/
 fi
 if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
    wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
