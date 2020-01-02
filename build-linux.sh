@@ -105,7 +105,7 @@ which yum && {
      echo Fedora;
      return;
      }
-if [ ! -e opencv-3.4.3/ ]; then 
+: 'if [ ! -e opencv-3.4.3/ ]; then 
    wget -c https://github.com/opencv/opencv/archive/3.4.3.zip
    wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -O contrib-343.zip
    unzip -qq 3.4.3.zip
@@ -150,7 +150,7 @@ else
       fi
       cd ../..
    fi
-fi
+fi'
 if [ ! -e  assets/ ]; then
     mkdir -v assets/
     mkdir -v assets/usr/
@@ -177,7 +177,7 @@ if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
 else
    cp -vr libtensorflow-cpu-linux-x86_64-1.13.1/* assets/usr/local/
 fi
-if [ ! -e sphinxbase-5prealpha/ ]; then
+: ' if [ ! -e sphinxbase-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
    tar xf sphinxbase-5prealpha.tar.gz
    cd sphinxbase-5prealpha
@@ -274,7 +274,7 @@ if [ $GITPOD != "YES" ]; then
     sudo ldconfig
 elif [ $GITPOD == "YES" ]; then 
     cp include/prim_type.h assets/usr/local/include/sphinxbase/prim_type.h
-fi
+fi'
 tree assets/
 #sudo tree
 : ' if [ $TRAVIS_BRANCH == "master" ]; then
