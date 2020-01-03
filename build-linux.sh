@@ -164,7 +164,7 @@ fi
    if [ $GITPOD == "YES" ]; then
       cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/* /workspace/Lara-AI/assets/usr/local/
    else
-      cp -vr "mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/*" assets/usr/local/
+      cp -vr mysql-*/* assets/usr/local/
    fi
 #else
    cp -vr "mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/*" assets/usr/local/
