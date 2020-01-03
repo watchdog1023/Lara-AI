@@ -329,16 +329,16 @@ else
       pause 'Press [Enter] key to continue...'
     fi
     if [ $TRAVIS_BRANCH == "master" ]; then
-        mpic++ -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I -I"/usr/include/python3.5m" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated
-        g++-8 -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
-        g++-8 -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
-        g++-8 -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
-        g++-8 -time -std=c++14 -c include/IRC/IRCHandler.cpp -o IRCHandler.o -Wfatal-errors
-        g++-8 -time -std=c++14 -c include/qr_code/BitBuffer.cpp -o Bitbuffer.o -Wfatal-errors
-        g++-8 -time -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
-        g++-8 -time -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
-        g++-8 -time -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
-        g++-8 -time -std=c++14 -L"assests/usr/lib/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad
+        mpic++ -v -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"/opt/python/3.7.1/include/python3.7m/" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated
+        g++-8 -v -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
+        g++-8 -v -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
+        g++-8 -v -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
+        g++-8 -v -std=c++14 -c include/IRC/IRCHandler.cpp -o IRCHandler.o -Wfatal-errors
+        g++-8 -v -std=c++14 -c include/qr_code/BitBuffer.cpp -o Bitbuffer.o -Wfatal-errors
+        g++-8 -v -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
+        g++-8 -v -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
+        g++-8 -v -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
+        g++-8 -v -std=c++14 -L"assests/usr/lib/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad
     elif [ $GITPOD == "YES" ]; then
         mpic++ -fpermissive -std=c++14 -I"assets/usr/local/include" -I"assets/usr/local/include/pocketsphinx" -I"assets/usr/local/include/sphinxbase" -I"include/" -I"/usr/include/python3.7" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
         g++-8 -v -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
