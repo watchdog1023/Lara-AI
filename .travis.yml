@@ -78,3 +78,11 @@ notifications:
   email:
     on_success: change
     on_failure: change
+    
+allow_failures:
+  - name:
+    - "Lara On Pi"
+    - "Lara On Linux"
+    - "Lara on Windows"
+    
+    
