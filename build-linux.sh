@@ -269,12 +269,12 @@ fi
 if [ ! -e data/obj_detect/coco.names ]; then
    wget https://github.com/pjreddie/darknet/blob/master/data/coco.names?raw=true -O ./data/obj_detect/coco.names
 fi
-if [ $GITPOD != "YES" ]; then 
+if [ $GITPOD == "YES" ]; then 
+    cp include/prim_type.h assets/usr/local/include/sphinxbase/prim_type.h 
+else 
     sudo cp include/prim_type.h /usr/local/include/sphinxbase/prim_type.h
-    sudo ldconfig
-elif [ $GITPOD == "YES" ]; then 
-    cp include/prim_type.h assets/usr/local/include/sphinxbase/prim_type.h
 fi
+sudo ldconfig
 sudo updatedb
 if [ $TRAVIS_BRANCH == "master" ]; then
    mpic++ -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"/opt/python/3.7.1/include/python3.7m/" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated 2> LaraC.txt 
