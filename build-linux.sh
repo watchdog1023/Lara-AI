@@ -1,5 +1,5 @@
 #!/bin/bash
-: 'function pause () {
+function pause () {
    read -p "$*"
 }
 if [ $GITPOD == "YES" ]; then
@@ -150,7 +150,7 @@ else
       fi
       cd ../..
    fi
-fi'
+fi
 if [ ! -e  assets/ ]; then
     mkdir -v assets/
     mkdir -v assets/usr/
@@ -169,15 +169,15 @@ if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
 else
    cp -vr mysql-*/* assets/usr/local/
 fi
-#if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
+if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
    wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
    mkdir libtensorflow-cpu-linux-x86_64-1.13.1
    tar xf libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
    cp -vr libtensorflow-*/* assets/usr/local/
-#else
-#   cp -vr libtensorflow-*/* assets/usr/local/
-#fi
-: ' if [ ! -e sphinxbase-5prealpha/ ]; then
+else
+   cp -vr libtensorflow-*/* assets/usr/local/
+fi
+if [ ! -e sphinxbase-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
    tar xf sphinxbase-5prealpha.tar.gz
    cd sphinxbase-5prealpha
@@ -274,12 +274,8 @@ if [ $GITPOD != "YES" ]; then
     sudo ldconfig
 elif [ $GITPOD == "YES" ]; then 
     cp include/prim_type.h assets/usr/local/include/sphinxbase/prim_type.h
-fi'
-tree assets/
-ls
-ls mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/
-#sudo tree
-: ' if [ $TRAVIS_BRANCH == "master" ]; then
+fi
+if [ $TRAVIS_BRANCH == "master" ]; then
    mpic++ -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"-I"/usr/include/python3.5"" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated 2> LaraC.txt 
    g++-8 -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
    g++-8 -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
@@ -370,4 +366,4 @@ else
       echo "Build Successful"
       exit 0
     fi
-fi'
+fi
