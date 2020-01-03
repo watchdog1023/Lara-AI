@@ -279,7 +279,6 @@ fi'
 tree assets/
 ls
 ls mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/
-tree
 #sudo tree
 : ' if [ $TRAVIS_BRANCH == "master" ]; then
    mpic++ -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"-I"/usr/include/python3.5"" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated 2> LaraC.txt 
