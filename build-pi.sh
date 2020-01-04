@@ -40,19 +40,9 @@ if [ ! -e sphinxbase-5prealpha/ ]; then
    sudo make install
    cd ..
 else
-  if [ "$(ls -A sphinxbase-5prealpha/)" ]; then
-     cd sphinxbase-5prealpha
-     sudo make install
-     cd ..
-  else
-      wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
-      tar xf sphinxbase-5prealpha.tar.gz
-      cd sphinxbase-5prealpha
-      ./configure
-      make
-      sudo make install
-      cd ..
-  fi
+   cd sphinxbase-5prealpha
+   sudo make install
+   cd ..
 fi
 if [ ! -e pocketsphinx-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
@@ -63,19 +53,9 @@ if [ ! -e pocketsphinx-5prealpha/ ]; then
    sudo make install
    cd ..
 else
-  if [ "$(ls -A pocketsphinx-5prealpha/)" ]; then
-     cd pocketsphinx-5prealpha
-     sudo make install
-     cd ..
-  else
-     wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
-     tar xf pocketsphinx-5prealpha.tar.gz
-     cd pocketsphinx-5prealpha
-     ./configure
-     make
-     sudo make install
-     cd ..
-  fi
+   cd pocketsphinx-5prealpha
+   sudo make install
+   cd ..
 fi
 if [ $TRAVIS_BRANCH == "master" ]; then
   if [ ! -e mpich-3.3/ ]; then
