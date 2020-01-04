@@ -4,7 +4,7 @@ cache:
   pip: true
 
 matrix:
-  include:
+  exclude:
   - name: "Lara On Linux"
     os: linux
     dist: xenial
@@ -41,6 +41,7 @@ matrix:
       - chmod -v 777 build-windows.bat
       - dos2unix build-windows.bat
       - ./build-windows.bat
+  include:
   - name: "Lara On Pi"
     os : linux
     arch: arm64
