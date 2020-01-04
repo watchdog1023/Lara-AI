@@ -2,7 +2,7 @@
 function pause(){
    read -p "$*"
 }
-sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libcurl4-openssl-dev install libpython3-dev libpython-dev;
+sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libcurl4-openssl-dev libpython3-dev libpython-dev;
 if [ ! -e /usr/bin/pip3 ]; then
    sudo apt-get install python3-pip;
 fi;
@@ -35,7 +35,7 @@ if [ ! -e sphinxbase-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
    tar xf sphinxbase-5prealpha.tar.gz
    cd sphinxbase-5prealpha
-   ./configure --without-python
+   ./configure
    make
    sudo make install
    cd ..
@@ -48,7 +48,7 @@ if [ ! -e pocketsphinx-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
    tar xf pocketsphinx-5prealpha.tar.gz
    cd pocketsphinx-5prealpha
-   ./configure --without-python
+   ./configure
    make
    sudo make install
    cd ..
