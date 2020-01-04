@@ -60,14 +60,14 @@ matrix:
           - CC='gcc-8'
           - CFLAGS='-DNRUNS=100000000'
     #caching does not work yet
-    #cache:
-    #    directories:
-          #- opencv-3.4.3/
-          #- mysql-connector-c++-8.0.18-src/
-          #- libtensorflow-cpu-linux-x86_64-1.13.1/
-          #- sphinxbase-5prealpha/
-          #- pocketsphinx-5prealpha/
-          #- mpich-3.3/
+    cache:
+        directories:
+          - opencv-3.4.3/
+          - mysql-connector-c++-8.0.18-src/
+          - libtensorflow-cpu-linux-x86_64-1.13.1/
+          - sphinxbase-5prealpha/
+          - pocketsphinx-5prealpha/
+          - mpich-3.3/
     script:
       - sudo apt update
       - sudo apt-get install dos2unix bash tree -y
