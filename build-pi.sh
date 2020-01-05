@@ -85,9 +85,9 @@ else
    sudo apt-get install libmpich-dev;
 fi
 wget -c https://raw.githubusercontent.com/watchdog1023/PI-Scripts/master/get-%26-build-opencv-3.3.1.sh
-chmod -v 777 get-&-build-opencv-3.3.1.sh
+chmod -v 777 "get-&-build-opencv-3.3.1.sh"
 cd ../..
-./get-&-build-opencv-3.3.1.sh
+./"get-&-build-opencv-3.3.1.sh"
 sudo -H pip3 install --upgrade pip
 sudo -H pip3 install pyscreenshot selenium datetime
 if [ ! -e data/obj_detect/ ]; then
