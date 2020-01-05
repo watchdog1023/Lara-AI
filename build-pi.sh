@@ -3,7 +3,7 @@ function pause(){
    read -p "$*"
 }
 sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmysql++-dev libmysqlclient-dev libcurl4-openssl-dev libpython3-dev libpython-dev;
-if [ ! -e /usr/bin/pip3 ]; then
+: 'if [ ! -e /usr/bin/pip3 ]; then
    sudo apt-get install python3-pip;
 fi;
 if [ ! -e /usr/bin/g++ ]; then
@@ -97,8 +97,8 @@ if [ ! -e data/obj_detect/yolov3.cfg ]; then
 fi
 if [ ! -e data/obj_detect/coco.names ]; then
    wget https://github.com/pjreddie/darknet/blob/master/data/coco.names?raw=true -O ./data/obj_detect/coco.names
-fi
-ls /usr/include
+fi'
+ls /usr/include/mysql++
 : 'mpic++ -fpermissive -std=c++14 -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include/linux" -v -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
 g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
