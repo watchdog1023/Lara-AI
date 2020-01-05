@@ -2,7 +2,7 @@
 function pause(){
    read -p "$*"
 }
-sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libcurl4-openssl-dev libpython3-dev libpython-dev;
+sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmysql++-dev libmysqlclient-dev libcurl4-openssl-dev libpython3-dev libpython-dev;
 if [ ! -e /usr/bin/pip3 ]; then
    sudo apt-get install python3-pip;
 fi;
@@ -16,15 +16,15 @@ if [ ! -e /usr/bin/python3 ]; then
    sudo apt-get install python3;
 fi;
 #if [ ! -e mysql-connector-c++-8.0.18-src/ ]; then
-   wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.18-src.tar.gz
-   tar xf mysql-connector-c++-8.0.18-src.tar.gz
-   cd mysql-connector-c++-8.0.18-src/
-   mkdir build
-   cd build
-   cmake ..
-   make
-   sudo make install
-   cd ../..
+#   wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.18-src.tar.gz
+#   tar xf mysql-connector-c++-8.0.18-src.tar.gz
+#   cd mysql-connector-c++-8.0.18-src/
+#   mkdir build
+#   cd build
+#   cmake ..
+#   make
+#   sudo make install
+#   cd ../..
 #else
 #   cd mysql-connector-c++-8.0.18-src/
 #   cd build
