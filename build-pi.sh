@@ -15,7 +15,7 @@ fi
 if [ ! -e /usr/bin/python3 ]; then
    sudo apt-get install python3;
 fi;
-if [ ! -e mysql-connector-c++-8.0.18-src/ ]; then
+#if [ ! -e mysql-connector-c++-8.0.18-src/ ]; then
    wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.18-src.tar.gz
    tar xf mysql-connector-c++-8.0.18-src.tar.gz
    cd mysql-connector-c++-8.0.18-src/
@@ -25,12 +25,12 @@ if [ ! -e mysql-connector-c++-8.0.18-src/ ]; then
    make
    sudo make install
    cd ../..
-else
-   cd mysql-connector-c++-8.0.18-src/
-   cd build
-   sudo make install
-   cd ../..
-fi
+#else
+#   cd mysql-connector-c++-8.0.18-src/
+#   cd build
+#   sudo make install
+#   cd ../..
+#fi
 if [ ! -e sphinxbase-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
    tar xf sphinxbase-5prealpha.tar.gz
