@@ -62,8 +62,7 @@ matrix:
     #caching does not work yet
     cache:
         directories:
-          - opencv-3.4.3/
-          - mysql-connector-c++-8.0.18-src/
+          #- opencv-3.4.3/
           - libtensorflow-cpu-linux-x86_64-1.13.1/
           - sphinxbase-5prealpha/
           - pocketsphinx-5prealpha/
@@ -85,5 +84,7 @@ allow_failures:
     - "Lara On Pi"
     - "Lara On Linux"
     - "Lara on Windows"
-    
-    
+
+ignore:
+  - *.md
+
