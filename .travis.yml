@@ -85,6 +85,6 @@ allow_failures:
     - "Lara On Linux"
     - "Lara on Windows"
 
-ignore:
-  - *.md
+#ignore:
+#  - *.md
 
