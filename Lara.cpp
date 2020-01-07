@@ -13,6 +13,7 @@
 #define sphinx "5prealpha"
 #ifdef FOUNDER
 	#define ALIVE
+    #define IRON_HIDE
 #endif
 #include<iostream>
 #include<sstream>
@@ -1032,59 +1033,65 @@ int main(int argc, char* argv[])
 			boost::thread emo{&emot_reg};
 			boost::thread tim{&alarm_timer};
             tgroup.join_all();
-            bvloop:
-                cout << "Ready to listen,Please press the talk key[~] if you want me to do something" << endl;
-                while(1)
-                    {
-                        if('`' == getch())
-                            {
-                                char const *cfg;
-                                err_set_logfp(NULL);
-                                err_set_debug_level(0);
-                                //-hmm model/en-us/en-us -lm model/en-us/en-us.lm.bin -dict model/en-us/cmudict-en-us.dict
-                                vconfig = cmd_ln_parse_r(NULL, cont_args_def, argc, argv, TRUE);
-                                ps_default_search_args(vconfig);
-                                ps = ps_init(vconfig);
-                                if (ps == NULL)
-                                    {
-                                        cmd_ln_free_r(vconfig);
-                                        return 1;
-                                    }
-                                recognize_from_microphone();
-                                ps_free(ps);
-                                cmd_ln_free_r(vconfig);
-                                break;
-                            }
-                    }
-                    if(voutput == "hello")
+            char const *cfg;
+            err_set_logfp(NULL);
+            err_set_debug_level(0);
+            loop:
+                    cout << "start loop" << endl;
+                    vconfig = cmd_ln_parse_r(NULL, cont_args_def, argc, argv, TRUE);
+                    ps_default_search_args(vconfig);
+                    ps = ps_init(vconfig);
+                    if (ps == NULL)
                         {
-                            #if defined(WIN32) || defined(__CYGWIN32__)
-                                PlayMP3("voice/hello_test.mp3");
-                                sleep(0.5);
-                                StopMP3("voice/hello_test.mp3");
-                            #else
-                                voice("hello_test.ogg");
-                            #endif
-                            goto bvloop;
+                            cmd_ln_free_r(vconfig);
+                            return 1;
                         }
-                    else if((voutput == "time")|| (voutput == "what time is it"))
+                    recognize_from_microphone();
+                    ps_free(ps);
+                    cmd_ln_free_r(vconfig);
+                    if(voutput.find("lara") != std::string::npos)
                         {
-                             #if defined(WIN32) || defined(__CYGWIN32__)
-                                PlayMP3("voice/time.mp3");
-                                sleep(1);
-                                StopMP3("voice/time.mp3");
-                            #else
-                                voice("time.ogg");
-                            #endif
-                            cout << "The Time is:" << nowtime << endl;
-                            #if defined(WIN32) || defined(__CYGWIN32__)
-                                system("cls");
-                            #else
-                                system("clear");
-                            #endif
-                            goto bvloop;
+                            cout << "Yes!" << endl;
+                            AI::TTS("yes");
+                            sleep(1);
+                            goto loop;
                         }
-                    else if(voutput == "who are you")
+                    if(voutput.find("can") != std::string::npos)
+                        {
+                            if(voutput.find("you") != std::string::npos)
+                                {
+                                    if(voutput.find("hear") != std::string::npos)
+                                        {
+                                            if(voutput.find("me") != std::string::npos)
+                                                {
+                                                    AI::TTS("yes i can boss");
+                                                    sleep(1);
+                                                    goto loop;
+                                                }
+                                            else
+                                                {
+                                                    sleep(1);
+                                                    goto loop;
+                                                }
+                                        }
+                                    else
+                                        {
+                                            sleep(1);
+                                            goto loop;    
+                                        }
+                                }
+                            else
+                                {
+                                    sleep(1);
+                                    goto loop;
+                                }
+                        }
+                    if(voutput.find("time") != std::string::npos)
+                        {
+                            string time = time::get_current_time();
+                            cout << "Time is: " + time << endl;
+                        }
+                    if(voutput == "who are you")
                         {
                              #if defined(WIN32) || defined(__CYGWIN32__)
                                 PlayMP3("voice/who.mp3");
@@ -1100,143 +1107,130 @@ int main(int argc, char* argv[])
                             #endif
                             goto bvloop;
                         }
-                    else if(voutput == "quit")
+                    if(voutput.find("quit") != std::string::npos)
                         {
-                            string d;
-                            cout << "Are you Sure?" << endl;
-                            getline(cin,d);
-                            if(d == "y" or d =="yes" or d == "YES" or d == "Y")
-                                {
-                                    cout << "Goodbye" << endl;
-                                    system("exit");
-                                }
-                            else
-                                {
-                                    goto bvloop;
-                                }
-                        }
-						  #ifdef ALIVE
-							else if(voutput == "come")
-								{
-									system("./daemon/ardaemon \"walk forward\"");
-								}
-							else if(voutput == "forward")
-								{
-									system("./daemon/ardaemon \"walk forward\"");
-								}
-							else if(voutput == "follow")
-								{
-									system("./daemon/ardaemon \"walk forward\"");
-								}
-							else if(voutput == "onwards")
-								{
-									system("./daemon/ardaemon \"walk forward\"");
-								}
-							else if(voutput == "ahead")
-								{
-									system("./daemon/ardaemon \"walk forward\"");
-								}
-							else if(voutput == "advance")
-								{
-									system("./daemon/ardaemon \"walk forward\"");
-								}
-							else if(voutput == "go back")
-								{
-									system("./daemon/ardaemon \"walk backward\"");
-								}
-							else if(voutput == "recede")
-								{
-									system("./daemon/ardaemon \"walk backward\"");
-								}
-							else if(voutput == "reverse")
-								{
-									system("./daemon/ardaemon \"walk backward\"");
-								}
-							else if(voutput == "backtrack")
-								{
-									system("./daemon/ardaemon \"walk backward\"");
-								}
-							else if(voutput == "backwards")
-								{
-									system("./daemon/ardaemon \"walk backward\"");
-								}
-							else if(voutput == "stop")
-								{
-									system("./daemon/ardaemon stop");
-								}
-							else if(voutput == "frezze")
-								{
-									system("./daemon/ardaemon stop");
-								}
-							else if(voutput == "relax")
-								{
-									system("./daemon/ardaemon stop");
-								}
-							else if(voutput == "halt")
-								{
-									system("./daemon/ardaemon stop");
-								}
-							else if(voutput == "finish")
-								{
-									system("./daemon/ardaemon stop");
-								}
-							else if(voutput == "standstill")
-								{
-									system("./daemon/ardaemon stop");
-								}
-							else if(voutput == "pause")
-								{
-									system("./daemon/ardaemon stop");
-								}
-							else if(voutput == "position")
-								{
-									system("./daemon/ardaemon pos");
-								}
-							else if(voutput == "function")
-								{
-									system("./daemon/ardaemon function");
-								}
-							else if(voutput == "purpose")
-								{
-									system("./daemon/ardaemon function");
-								}
-							else if(voutput == "task")
-								{
-									system("./daemon/ardaemon function");
-								}
-							else if(voutput == "role")
-								{
-									system("./daemon/ardaemon function");
-								}
-							else if(voutput == "reason")
-								{
-									system("./daemon/ardaemon function");
-								}
-							else if(voutput == "resume")
-								{
-									system("./daemon/ardaemon resume");
-								}
-							else if(voutput == "restart")
-								{
-									system("./daemon/ardaemon resume");
-								}
-							else if(voutput == "start again")
-								{
-									system("./daemon/ardaemon resume");
-								}
-							else if(voutput == "recommence")
-								{
-									system("./daemon/ardaemon resume");
-								}
-							else if(voutput == "return")
-								{
-									system("./daemon/ardaemon resume");
-								}
-							else if(voutput == "carry on")
-								{
-									system("./daemon/ardaemon resume");
-								}
-						  #endif
+                            return 0;
+                        } 
+                    if(voutput.find("come") != std::string::npos)
+					    {
+    						system("./daemon/ardaemon \"walk forward\"");
+					    }
+				    if(voutput.find("forward") != std::string::npos)
+						{
+							system("./daemon/ardaemon \"walk forward\"");
+						}
+					if(voutput.find("follow") != std::string::npos)
+						{
+							system("./daemon/ardaemon \"walk forward\"");
+						}
+					if(voutput.find("onwards") != std::string::npos)
+						{
+							system("./daemon/ardaemon \"walk forward\"");
+						}
+					if(voutput.find("ahead") != std::string::npos)
+					    {
+							system("./daemon/ardaemon \"walk forward\"");
+						}
+					if(voutput.find("advance") != std::string::npos)
+						{
+							system("./daemon/ardaemon \"walk forward\"");
+						}
+					if(voutput.find("go back") != std::string::npos)
+						{
+							system("./daemon/ardaemon \"walk backward\"");
+						}
+					if(voutput.find("recede") != std::string::npos)
+						{
+							system("./daemon/ardaemon \"walk backward\"");
+						}
+					if(voutput.find("reverse") != std::string::npos)
+						{
+							system("./daemon/ardaemon \"walk backward\"");
+					    }
+					if(voutput.find("backtrack") != std::string::npos)
+						{
+							system("./daemon/ardaemon \"walk backward\"");
+						}
+				    if(voutput.find("backwards") != std::string::npos)
+						{
+							system("./daemon/ardaemon \"walk backward\"");
+						}
+					if(voutput.find("stop") != std::string::npos)
+						{
+							system("./daemon/ardaemon stop");
+						}
+					if(voutput.find("frezze") != std::string::npos)
+						{
+							system("./daemon/ardaemon stop");
+						}
+					if(voutput.find("relax") != std::string::npos)
+						{
+						    system("./daemon/ardaemon stop");
+					    }
+					if(voutput.find("halt") != std::string::npos)
+						{
+						    system("./daemon/ardaemon stop");
+						}
+    				if(voutput.find("finish") != std::string::npos)
+						{
+							system("./daemon/ardaemon stop");
+						}
+					if(voutput.find("standstill") != std::string::npos)
+						{
+    						system("./daemon/ardaemon stop");
+						}
+					if(voutput.find("pause") != std::string::npos)
+						{
+							system("./daemon/ardaemon stop");
+						}
+				    if(voutput.find("position") != std::string::npos)
+						{
+							system("./daemon/ardaemon pos");
+						}
+					if(voutput.find("function") != std::string::npos)
+						{
+							system("./daemon/ardaemon function");
+						}
+					if(voutput.find("purpose") != std::string::npos)
+						{
+							system("./daemon/ardaemon function");
+						}
+					if(voutput.find("task") != std::string::npos)
+						{
+							system("./daemon/ardaemon function");
+				    	}
+					if(voutput.find("role") != std::string::npos)
+						{
+							system("./daemon/ardaemon function");
+						}
+					if(voutput.find("reason") != std::string::npos)
+						{
+							system("./daemon/ardaemon function");
+					    }
+				    if(voutput.find("resume") != std::string::npos)
+    					{
+	    					system("./daemon/ardaemon resume");
+						}
+				    if(voutput.find("restart") != std::string::npos)
+						{
+							system("./daemon/ardaemon resume");
+						}
+					if(voutput.find("start again") != std::string::npos)
+						{
+							system("./daemon/ardaemon resume");
+						}
+					if(voutput.find("recommence") != std::string::npos)
+						{
+							system("./daemon/ardaemon resume");
+						}
+					if(voutput.find("return") != std::string::npos)
+						{
+							system("./daemon/ardaemon resume");
+						}
+					if(voutput.find("carry on") != std::string::npos)
+						{
+							system("./daemon/ardaemon resume");
+						}
                     else
                         {
                             #if defined(WIN32) || defined(__CYGWIN32__)
@@ -1247,7 +1241,7 @@ int main(int argc, char* argv[])
                             #else
                                 voice("cant_rec.ogg");
                             #endif
-                            goto bvloop;
+                            goto loop;
                         }
         
 		}
