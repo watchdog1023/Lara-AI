@@ -15,7 +15,7 @@ fi
 if [ ! -e /usr/bin/python3 ]; then
    sudo apt-get install python3;
 fi;
-#if [ ! -e sphinxbase-5prealpha/ ]; then
+if [ ! -e sphinxbase-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
    tar xf sphinxbase-5prealpha.tar.gz
    cd sphinxbase-5prealpha
@@ -23,12 +23,12 @@ fi;
    make
    sudo make install
    cd ..
-#else
-#   cd sphinxbase-5prealpha
-#   sudo make install
-#   cd ..
-#fi
-#if [ ! -e pocketsphinx-5prealpha/ ]; then
+else
+   cd sphinxbase-5prealpha
+   sudo make install
+   cd ..
+fi
+if [ ! -e pocketsphinx-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
    tar xf pocketsphinx-5prealpha.tar.gz
    cd pocketsphinx-5prealpha
@@ -36,11 +36,11 @@ fi;
    make
    sudo make install
    cd ..
-#else
-#   cd pocketsphinx-5prealpha
-#   sudo make install
-#   cd ..
-#fi
+else
+   cd pocketsphinx-5prealpha
+   sudo make install
+   cd ..
+fi
 if [ $TRAVIS_BRANCH == "master" ]; then
   if [ ! -e mpich-3.3/ ]; then
    wget -c http://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz;
@@ -82,6 +82,8 @@ fi
 if [ ! -e data/obj_detect/coco.names ]; then
    wget https://github.com/pjreddie/darknet/blob/master/data/coco.names?raw=true -O ./data/obj_detect/coco.names
 fi
+sudo updatedb
+locate Python.h
 mpic++ -fpermissive -std=c++14 -I"./include" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include/linux" -v -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
 g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
