@@ -4,7 +4,7 @@ cache:
   pip: true
 
 matrix:
-  exclude:
+  include:
   - name: "Lara On Linux"
     os: linux
     dist: xenial
@@ -62,8 +62,6 @@ matrix:
     #caching does not work yet
     cache:
         directories:
-          #- opencv-3.4.3/
-          #- libtensorflow-cpu-linux-x86_64-1.13.1/
           - sphinxbase-5prealpha/
           - pocketsphinx-5prealpha/
           - mpich-3.3/

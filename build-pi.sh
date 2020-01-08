@@ -68,10 +68,6 @@ if [ $TRAVIS_BRANCH == "master" ]; then
 else
    sudo apt-get install libmpich-dev;
 fi
-:'wget -c https://raw.githubusercontent.com/watchdog1023/PI-Scripts/master/get-%26-build-opencv-3.3.1.sh
-chmod -v 777 "get-&-build-opencv-3.3.1.sh"
-./"get-&-build-opencv-3.3.1.sh"
-cd ../..'
 sudo -H pip3 install --upgrade pip
 sudo -H pip3 install pyscreenshot selenium datetime
 if [ ! -e data/obj_detect/ ]; then
@@ -86,8 +82,7 @@ fi
 if [ ! -e data/obj_detect/coco.names ]; then
    wget https://github.com/pjreddie/darknet/blob/master/data/coco.names?raw=true -O ./data/obj_detect/coco.names
 fi
-pwd
-mpic++ -fpermissive -std=c++14 -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include/linux" -v -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
+mpic++ -fpermissive -std=c++14 -I"./include" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include/linux" -v -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
 g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
@@ -95,7 +90,7 @@ g++ -time -std=c++14 -c include/IRC/IRCHandler.cpp -o IRCHandler.o -Wfatal-error
 g++ -time -std=c++14 -c include/qr_code/BitBuffer.cpp -o Bitbuffer.o -Wfatal-errors
 g++ -time -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
 g++ -time -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
-g++ -time -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
+g++ -time -std=c++14 -fpermissive -I"./include"  -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
 g++ -time -std=c++14  -L"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/jre/lib/arm/server" -o lara Lara.o Thread.o IRCClient.o Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad 2> LaraB.txt
 if [ ! -e ./lara ];then
     echo "Code Not Sane";
@@ -113,7 +108,7 @@ else
     rm -vr lara *.o
     echo "Code is Sane";
     pause 'Press [Enter] key to continue...'
-    mpic++ -v -fpermissive -std=c++14 -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include/linux" -v -c Lara.cpp -o Lara.o -Wfatal-errors
+    mpic++ -v -fpermissive -I"./include"  -std=c++14 -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include/linux" -v -c Lara.cpp -o Lara.o -Wfatal-errors
     g++ -v -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
     g++ -v -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
     g++ -v -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
@@ -121,6 +116,6 @@ else
     g++ -v -time -std=c++14 -c include/qr_code/BitBuffer.cpp -o Bitbuffer.o -Wfatal-errors
     g++ -v -time -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
     g++ -v -time -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
-    g++ -v -time -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
+    g++ -v -time -std=c++14 -fpermissive -I"./include" -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
     g++ -v -time -std=c++14  -L"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/jre/lib/arm/server" -o lara Lara.o Thread.o IRCClient.o Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad
 fi
