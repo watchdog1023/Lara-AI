@@ -156,7 +156,7 @@ if [ ! -e  assets/ ]; then
     mkdir -v assets/usr/
     mkdir -v assets/usr/local/
 fi
-#if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
+if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
    wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
    tar xf mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
    cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc/* mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/
@@ -166,17 +166,17 @@ fi
    else
       cp -vr mysql-*/* assets/usr/local/
    fi
-#else
-#   cp -vr mysql-*/* assets/usr/local/
-#fi
-if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
+else
+   cp -vr mysql-*/* assets/usr/local/
+fi
+#if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
    wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
    mkdir libtensorflow-cpu-linux-x86_64-1.13.1
    tar xf libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
    cp -vr libtensorflow-*/* assets/usr/local/
-else
-   cp -vr libtensorflow-*/* assets/usr/local/
-fi
+#else
+#   cp -vr libtensorflow-*/* assets/usr/local/
+#fi
 if [ ! -e sphinxbase-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
    tar xf sphinxbase-5prealpha.tar.gz
@@ -276,6 +276,7 @@ else
 fi
 sudo ldconfig
 sudo updatedb
+locate Python.h
 if [ $1 == "alive" ]; then
     if [ $TRAVIS_BRANCH == "master" ]; then
         mpic++ -DALIVE -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"/opt/python/3.7.1/include/python3.7m/" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated 2> LaraC.txt 
