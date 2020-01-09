@@ -368,6 +368,7 @@ if [ $1 == "alive" ]; then
             echo "Alive Build Successful"
             exit 0
         fi
+    fi
 else
     if [ $TRAVIS_BRANCH == "master" ]; then
         mpic++ -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"/opt/python/3.7.1/include/python3.7m/" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated 2> LaraC.txt 
@@ -461,5 +462,4 @@ else
             exit 0
         fi
     fi
-fi
 fi

@@ -212,7 +212,9 @@
 //    #include<opennn/opennn.h>
 #elif __linux__
     //Tensorflow
-    #include<tensorflow/c/c_api.h>
+    #ifndef ARM
+        #include<tensorflow/c/c_api.h>
+    #endif
 #elif _WIN64
     //Tensorflow
     #include<tensorflow/c/c_api.h>
