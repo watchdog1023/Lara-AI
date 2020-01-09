@@ -83,7 +83,7 @@ if [ ! -e data/obj_detect/coco.names ]; then
    wget https://github.com/pjreddie/darknet/blob/master/data/coco.names?raw=true -O ./data/obj_detect/coco.names
 fi
 sudo updatedb
-locate Python.h
+sudo cp include/prim_type.h /usr/local/include/sphinxbase/prim_type.h
 mpic++ -fpermissive -std=c++14 -I"./include" -I"/usr/include/python3.6m/" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include/linux" -v -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
 g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
