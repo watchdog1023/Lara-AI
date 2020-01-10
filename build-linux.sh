@@ -276,10 +276,9 @@ else
 fi
 sudo ldconfig
 sudo updatedb
-locate Python.h
 if [ $1 == "alive" ]; then
     if [ $TRAVIS_BRANCH == "master" ]; then
-        mpic++ -DALIVE -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"/opt/python/3.7.5/include/python3.7m/" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated 2> LaraC.txt 
+        mpic++ -DALIVE -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"/usr/include/python3.6m/" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated 2> LaraC.txt 
         g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
         g++ -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
         g++ -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
@@ -331,7 +330,7 @@ if [ $1 == "alive" ]; then
             pause 'Press [Enter] key to continue...'
         fi
         if [ $TRAVIS_BRANCH == "master" ]; then
-            mpic++ -DALIVE -v -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"/opt/python/3.7.5/include/python3.7m/" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated
+            mpic++ -DALIVE -v -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"/usr/include/python3.6m/" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated
             g++ -v -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
             g++ -v -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
             g++ -v -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
@@ -372,7 +371,7 @@ if [ $1 == "alive" ]; then
     fi
 else
     if [ $TRAVIS_BRANCH == "master" ]; then
-        mpic++ -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"/opt/python/3.7.1/include/python3.7m/" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated 2> LaraC.txt 
+        mpic++ -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"/usr/include/python3.6m/" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated 2> LaraC.txt 
         g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
         g++ -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
         g++ -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
@@ -424,7 +423,7 @@ else
             pause 'Press [Enter] key to continue...'
         fi
         if [ $TRAVIS_BRANCH == "master" ]; then
-            mpic++ -v -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"/opt/python/3.7.5/include/python3.7m/" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated
+            mpic++ -v -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"/usr/include/python3.6m/" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated
             g++ -v -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
             g++ -v -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
             g++ -v -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
