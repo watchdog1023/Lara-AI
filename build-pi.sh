@@ -2,7 +2,7 @@
 function pause(){
    read -p "$*"
 }
-sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmysql++-dev libmysqlclient-dev libcurl4-openssl-dev libpython3-dev libpython-dev libmysqlcppconn-dev libopencv-dev libopencv-contrib-dev;
+sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmysql++-dev libmysqlclient-dev libcurl4-openssl-dev libpython3-dev libpython-dev libmysqlcppconn-dev;
 if [ ! -e /usr/bin/pip3 ]; then
    sudo apt-get install python3-pip;
 fi;
