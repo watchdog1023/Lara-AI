@@ -16,7 +16,7 @@ g++ -v -time -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
 g++ -v -time -c include/SerialPort.cpp -o SerialPort.o -Wfatal-errors
 windres icon.rc icon.o
 g++ -v -time -static -static-libgcc -static-libstdc++ -L"C:\Development_tools\Interpreters\Python35-32bit\libs" -L"C:\Program Files (x86)\Java\jdk1.8.0_162\lib" -o Lara.exe  icon.o IRCClient.o SerialPort.o IRCSocket.o IRCHandler.o Bitbuffer.o QrCode.o QrSegment.o Thread.o Lara.o download.o -lgdi32 -lcrypt32 -lws2_32 -lwsock32 -ldnsapi -lwinmm -lwininet -lmingw32 -lopencv_core340.dll -lopencv_highgui340.dll -lopencv_imgproc340.dll -lopencv_imgcodecs340.dll -lopencv_videoio340.dll -lopencv_video340.dll -lboost_system -lboost_serialization -lboost_atomic -lboost_chrono -lboost_thread -lopennn -ltinyxml2 -lpython36 -lpython27 -lzbar.dll -lsfml-audio -lsfml-network -lsfml-main -lsfml-system -lcurl -lbitcoinapi -lcryptopp -ljsoncpp -ltesseract400.dll -lmpi -lmpicxx -lfmpich2g -lpocketsphinx -lsphinxbase
-PAUSE
+REM PAUSE
 
 :UnZipFile <ExtractTo> <newzipfile>
 set vbs="%temp%\_.vbs"
