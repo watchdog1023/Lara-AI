@@ -463,4 +463,5 @@ else
         fi
     fi
 fi'
+sudo updatedb
 find libpython3*
