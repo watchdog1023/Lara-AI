@@ -1,5 +1,5 @@
 #!/bin/bash
-function pause () {
+: 'function pause () {
    read -p "$*"
 }
 if [ $GITPOD == "YES" ]; then
@@ -462,4 +462,5 @@ else
             exit 0
         fi
     fi
-fi
+fi'
+locate libpython3*
