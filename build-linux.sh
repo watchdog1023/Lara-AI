@@ -1,5 +1,5 @@
 #!/bin/bash
-: 'function pause () {
+function pause () {
    read -p "$*"
 }
 if [ $GITPOD == "YES" ]; then
@@ -257,6 +257,7 @@ if [  -e /usr/bin/pip3 ]; then
    sudo -H pip3 install setuptools
    sudo -H pip3 install pyscreenshot selenium datetime
 fi
+: '
 if [ ! -e data/obj_detect/ ]; then
    mkdir data/obj_detect/
 fi
