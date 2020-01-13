@@ -463,4 +463,4 @@ else
         fi
     fi
 fi'
-locate libpython3*
+find libpython3*
