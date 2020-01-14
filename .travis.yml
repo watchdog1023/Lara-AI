@@ -44,7 +44,7 @@ matrix:
   - name: "Lara On Pi"
     os : linux
     arch: arm64
-    dist: Bionic
+    dist: Xenial #Bionic dosen't seem to work
     compiler: gcc
     addons:
       apt:
