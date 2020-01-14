@@ -41,6 +41,7 @@ matrix:
       - chmod -v 777 build-windows.bat
       - dos2unix build-windows.bat
       - ./build-windows.bat
+  exclude:
   - name: "Lara On Pi"
     os : linux
     arch: arm64
