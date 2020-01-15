@@ -71,16 +71,15 @@ matrix:
       - dos2unix build-pi.sh
       - chmod -v 777 build-pi.sh
       - ./build-pi.sh
-      
+
 notifications:
   email:
     on_success: change
     on_failure: change
-    
+
 allow_failures:
   - arch:
     - arm64
-    
-#ignore:
-#  - *.md
 
+ignore:
+  - *.md
