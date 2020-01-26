@@ -244,6 +244,7 @@
 #ifdef ALIVE
 	//Emotions detection
 	#include "include/Emotions.h"
+    #include "Titans.h"
 #endif
 //OPENGL
 #ifdef OPENCL
@@ -256,6 +257,7 @@
 //Parameters
 #pragma comment(lib, "wsock32.lib")
 
+using namespace Titan;
 using namespace std;
 using namespace cv;
 #if defined(WIN32) || defined(__CYGWIN32__)
@@ -559,7 +561,7 @@ boost::thread_group tgroup;
 //Const fuctions
 const string currentDateTime()
 {
-    time_t     now = time(0);
+    time_t     now = std::time(0);
     struct tm  tstruct;
     char       buf[80];
     tstruct = *localtime(&now);
@@ -1105,7 +1107,7 @@ int main(int argc, char* argv[])
                             #else
                                 system("clear");
                             #endif
-                            goto bvloop;
+                            goto loop;
                         }
                     if(voutput.find("quit") != std::string::npos)
                         {
@@ -1528,7 +1530,7 @@ void lara()
     //get date variables
     time_t rawtime;
     struct tm* timeinfo;
-    time(&rawtime);
+    std::time(&rawtime);
     timeinfo = localtime(&rawtime);
     if(timeinfo->tm_mday == "25")
         {
@@ -2334,7 +2336,7 @@ void memo_check()
     //get date variables
     time_t     rawtime;
     struct tm* timeinfo;
-    time( &rawtime );
+    std::time( &rawtime );
     timeinfo = localtime( &rawtime );
     
     int tm = timeinfo->tm_mday;
@@ -3116,7 +3118,7 @@ void NN()
 
 void generate_random_number(int lowest,int highest)
 {
-    srand((unsigned)time(0));
+    srand((unsigned)std::time(0));
     int random_integer;
     int range = (highest - lowest) + 1;
     for(int index = 0;index < 20;index++)
@@ -3497,7 +3499,7 @@ void alarm_timer()
 	   //get date variables
 	   time_t rawtime;
 	   struct tm* timeinfo;
-	   time(&rawtime);
+	   std::time(&rawtime);
 	   timeinfo = localtime(&rawtime);
 		
 		for(int h = 0;h<200;h++)
