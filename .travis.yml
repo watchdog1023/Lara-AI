@@ -41,6 +41,36 @@ matrix:
       - chmod -v 777 build-windows.bat
       - dos2unix build-windows.bat
       - ./build-windows.bat
+  - name: "Lara Alive Build"
+    os: linux
+    dist: Bionic
+    compiler: gcc
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - g++-8
+          - gcc-8
+          - gfortran-8
+        env:
+          - CXX='g++-8'
+          - CC='gcc-8'
+          - CFLAGS='-DNRUNS=100000000'
+    cache:
+        directories:
+          - opencv-3.4.3/
+          - mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/
+          - libtensorflow-cpu-linux-x86_64-1.13.1/
+          - sphinxbase-5prealpha/
+          - pocketsphinx-5prealpha/
+          - mpich-3.3/
+    script:
+      - sudo apt update
+      - sudo apt-get install dos2unix bash tree -y
+      - dos2unix build-linux.sh
+      - chmod -v 777 build-linux.sh
+      - ./build-linux.sh alive
   exclude:
   - name: "Lara On Pi"
     os : linux
