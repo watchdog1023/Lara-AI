@@ -4,7 +4,7 @@ USER root
 RUN apt update
 RUN apt upgrade -y
 RUN apt-get install libmpich-dev python3 python3-pip build-essential make swig libboost-all-dev libsfml-dev libtesseract-dev bash splint shellcheck -y
-RUN pip3 install cpplint
+RUN pip3 install cpplint requests
 USER gitpod
 # Install custom tools, runtime, etc. using apt-get
 # For example, the command below would install "bastet" - a command line tetris clone:

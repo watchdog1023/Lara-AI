@@ -260,13 +260,13 @@ if [ $1 == "alive" ]; then
 fi
 if [  -e /usr/bin/pip2 ]; then
    sudo -H pip install --upgrade pip
-   sudo -H pip install setuptools
-   sudo -H pip install pyscreenshot selenium datetime 
+   sudo -H pip install --upgrade setuptools
+   sudo -H pip install --upgrade pyscreenshot selenium datetime requests
 fi
 if [  -e /usr/bin/pip3 ]; then
    sudo -H pip3 install --upgrade pip
-   sudo -H pip3 install setuptools
-   sudo -H pip3 install pyscreenshot selenium datetime
+   sudo -H pip3 install --upgrade setuptools
+   sudo -H pip3 install --upgrade pyscreenshot selenium datetime requests
 fi
 if [ ! -e data/obj_detect/ ]; then
    mkdir data/obj_detect/
