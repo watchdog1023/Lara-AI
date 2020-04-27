@@ -136,6 +136,7 @@
 #else
     #include<mysql/mysql.h>
 #endif
+#include<sqlite3.h> 
 //Video and Image Displaying
 #include<opencv2/highgui/highgui.hpp>
 #include<opencv/cv.h>

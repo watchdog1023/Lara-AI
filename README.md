@@ -19,6 +19,7 @@ The Libaries used are:
   - qrcodegen
   - zbar
   - MYSQL connector++
+  - SQLite3
   - tesseract-ocr
   - leptonica
   - curl
