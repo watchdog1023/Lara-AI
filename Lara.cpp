@@ -252,6 +252,13 @@
 	#define CL_USE_DEPRECATED_OPENCL_2_0_APIS
 	#include<CL/cl.hpp>
 #endif
+//JSON
+#include<jsoncpp/json/json.h>
+#include<jsoncpp/json/reader.h>
+#include<jsoncpp/json/writer.h>
+#include<jsoncpp/json/value.h>
+//Satellite Commuincation
+#include "HTTPRequest.hpp"
 //My Source Checksum signature header
 //#include "include/my_checksum.h"
 
@@ -261,6 +268,8 @@
 using namespace Titan;
 using namespace std;
 using namespace cv;
+using namespace http;
+using namespace Json;
 #if defined(WIN32) || defined(__CYGWIN32__)
 	using namespace qrcodegen;
 #endif

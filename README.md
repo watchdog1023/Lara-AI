@@ -31,6 +31,8 @@ The Libaries used are:
   - CUDA(Seperate build file)
   - boost
   - opencv3
+  - JSONcpp(https://github.com/open-source-parsers/jsoncpp)
+  - HTTPSRequest(https://github.com/elnormous/HTTPRequest
 
 # Flag Explantion
 CUDA - This adds CUDA accelerated functions
