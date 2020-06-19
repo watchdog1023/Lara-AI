@@ -258,7 +258,7 @@
 #include<jsoncpp/json/writer.h>
 #include<jsoncpp/json/value.h>
 //Satellite Commuincation
-#include "HTTPRequest.hpp"
+#include "wraith.hpp"
 //My Source Checksum signature header
 //#include "include/my_checksum.h"
 
