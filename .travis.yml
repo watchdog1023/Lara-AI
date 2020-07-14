@@ -108,10 +108,3 @@ notifications:
   email:
     on_success: change
     on_failure: change
-
-allow_failures:
-  - arch:
-    - arm64
-
-ignore:
-  - *.md
