@@ -35,12 +35,14 @@ matrix:
       - dos2unix build-linux.sh
       - chmod -v 777 build-linux.sh
       - ./build-linux.sh
+  
   - name: "Lara On Windows"
     os : windows
     script:
       - chmod -v 777 build-windows.bat
       - dos2unix build-windows.bat
       - ./build-windows.bat
+  
   - name: "Lara Alive Build"
     os: linux
     dist: Bionic
@@ -71,7 +73,7 @@ matrix:
       - dos2unix build-linux.sh
       - chmod -v 777 build-linux.sh
       - ./build-linux.sh alive
-  exclude:
+  
   - name: "Lara On Pi"
     os : linux
     arch: arm64
