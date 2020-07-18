@@ -105,7 +105,7 @@ which yum && {
      echo Fedora;
      return;
      }
-if [ ! -e opencv-3.4.3/ ]; then 
+#if [ ! -e opencv-3.4.3/ ]; then 
    wget -c https://github.com/opencv/opencv/archive/3.4.3.zip
    wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -O contrib-343.zip
    unzip -qq 3.4.3.zip
@@ -122,41 +122,41 @@ if [ ! -e opencv-3.4.3/ ]; then
     sudo make install
    fi
    cd ../..
-else
-   if [ "$(ls -A opencv-3.4.3/)" ]; then
-      cd opencv-3.4.3/
-      cd build
-      if [ $GITPOD == "YES" ]; then
-        make install DESTDIR="/workspace/Lara-AI/assets/"
-      else
-        sudo make install
-      fi
-      cd ../..
-   else
-      wget -c https://github.com/opencv/opencv/archive/3.4.3.zip
-      wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -O contrib-343.zip
-      unzip -qq 3.4.3.zip
-      unzip -qq contrib-343.zip
-      cd opencv-3.4.3/
-      mv -v ../opencv_contrib-3.4.3/* .
-      mkdir build
-      cd build
-      cmake -quiet ..
-      make -j4
-      if [ $GITPOD == "YES" ]; then
-        make install DESTDIR="/workspace/Lara-AI/assets/"
-      else
-        sudo make install
-      fi
-      cd ../..
-   fi
-fi
-if [ ! -e  assets/ ]; then
+#else
+#   if [ "$(ls -A opencv-3.4.3/)" ]; then
+#      cd opencv-3.4.3/
+#      cd build
+#      if [ $GITPOD == "YES" ]; then
+#        make install DESTDIR="/workspace/Lara-AI/assets/"
+#      else
+#        sudo make install
+#      fi
+#      cd ../..
+#   else
+#      wget -c https://github.com/opencv/opencv/archive/3.4.3.zip
+#      wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -O contrib-343.zip
+#      unzip -qq 3.4.3.zip
+#      unzip -qq contrib-343.zip
+#      cd opencv-3.4.3/
+#      mv -v ../opencv_contrib-3.4.3/* .
+#      mkdir build
+#      cd build
+#      cmake -quiet ..
+#      make -j4
+#      if [ $GITPOD == "YES" ]; then
+#        make install DESTDIR="/workspace/Lara-AI/assets/"
+#      else
+#        sudo make install
+#      fi
+#      cd ../..
+#   fi
+#fi
+#if [ ! -e  assets/ ]; then
     mkdir -v assets/
     mkdir -v assets/usr/
     mkdir -v assets/usr/local/
-fi
-if [ ! -e jsoncpp ]; then
+#fi
+#if [ ! -e jsoncpp ]; then
     git clone https://github.com/open-source-parsers/jsoncpp.git
     cd jsoncpp
     mkdir build
@@ -169,30 +169,30 @@ if [ ! -e jsoncpp ]; then
         mkdir jsoncpp
         mv json jsoncpp/
         cd "/workspace/Lara-AI/assets/usr"
-    else
-        sudo make install
-    fi
-    cd ../..
-else
-    cd jsoncpp
-    rm -vr build
-    git pull
-    mkdir build
-    cd build
-    cmake ..
-    make -j4
-    if [ $GITPOD == "YES" ]; then
-        make install DESTDIR="/workspace/Lara-AI/assets/"
-        cd "/workspace/Lara-AI/assets/usr/local/include"
-        mkdir jsoncpp
-        mv json jsoncpp/
-        cd "/workspace/Lara-AI/assets/usr"
-    else
-        sudo make install
-    fi
-    cd ../..
-fi
-if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
+#    else
+#        sudo make install
+#    fi
+#    cd ../..
+#else
+#    cd jsoncpp
+#    rm -vr build
+#    git pull
+#    mkdir build
+#    cd build
+#    cmake ..
+#    make -j4
+#    if [ $GITPOD == "YES" ]; then
+#        make install DESTDIR="/workspace/Lara-AI/assets/"
+#        cd "/workspace/Lara-AI/assets/usr/local/include"
+#        mkdir jsoncpp
+#        mv json jsoncpp/
+#        cd "/workspace/Lara-AI/assets/usr"
+#    else
+#        sudo make install
+#    fi
+#    cd ../..
+#fi
+#if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
    wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
    tar xf mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
    cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc/* mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/
@@ -202,9 +202,9 @@ if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
    else
       cp -vr mysql-*/* assets/usr/local/
    fi
-else
-   cp -vr mysql-*/* assets/usr/local/
-fi
+#else
+#   cp -vr mysql-*/* assets/usr/local/
+#fi
 #if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
    wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
    mkdir libtensorflow-cpu-linux-x86_64-1.13.1
@@ -213,7 +213,7 @@ fi
 #else
 #   cp -vr libtensorflow-*/* assets/usr/local/
 #fi
-if [ ! -e sphinxbase-5prealpha/ ]; then
+#if [ ! -e sphinxbase-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
    tar xf sphinxbase-5prealpha.tar.gz
    cd sphinxbase-5prealpha
@@ -225,30 +225,30 @@ if [ ! -e sphinxbase-5prealpha/ ]; then
     sudo make install
    fi
    cd ..
-else
-  if [ "$(ls -A sphinxbase-5prealpha/)" ]; then
-     cd sphinxbase-5prealpha
-     if [ $GITPOD == "YES" ]; then
-      make install DESTDIR="/workspace/Lara-AI/assets/"
-     else
-      sudo make install
-     fi
-     cd ..
-  else
-      wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
-      tar xf sphinxbase-5prealpha.tar.gz
-      cd sphinxbase-5prealpha
-      ./configure
-      make
-      if [ $GITPOD == "YES" ]; then
-        make install DESTDIR="/workspace/Lara-AI/assets/"
-      else
-        sudo make install
-      fi
-      cd ..
-  fi
-fi
-if [ ! -e pocketsphinx-5prealpha/ ]; then
+#else
+#  if [ "$(ls -A sphinxbase-5prealpha/)" ]; then
+#     cd sphinxbase-5prealpha
+#     if [ $GITPOD == "YES" ]; then
+#      make install DESTDIR="/workspace/Lara-AI/assets/"
+#     else
+#      sudo make install
+#     fi
+#     cd ..
+#  else
+#      wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
+#      tar xf sphinxbase-5prealpha.tar.gz
+#      cd sphinxbase-5prealpha
+#      ./configure
+#      make
+#      if [ $GITPOD == "YES" ]; then
+#        make install DESTDIR="/workspace/Lara-AI/assets/"
+#      else
+#        sudo make install
+#      fi
+#      cd ..
+#  fi
+#fi
+#if [ ! -e pocketsphinx-5prealpha/ ]; then
    wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
    tar xf pocketsphinx-5prealpha.tar.gz
    cd pocketsphinx-5prealpha
@@ -260,7 +260,7 @@ if [ ! -e pocketsphinx-5prealpha/ ]; then
     sudo make install
    fi
    cd ..
-else
+'''else
   if [ "$(ls -A pocketsphinx-5prealpha/)" ]; then
      cd pocketsphinx-5prealpha
      if [ $GITPOD == "YES" ]; then
@@ -282,8 +282,8 @@ else
      fi
      cd ..
   fi
-fi
-if [ ! -e libtitan ]; then
+fi'''
+#if [ ! -e libtitan ]; then
     git clone https://github.com/Titan-Technology/libtitan.git
     cd libtitan
     git pull
@@ -293,7 +293,7 @@ if [ ! -e libtitan ]; then
     cp -vr libtitans.a /workspace/Lara-AI/assets/usr/local/lib
     cp -vr Titans.h /workspace/Lara-AI/assets/usr/local/include/
     cd ../../
-fi
+#fi
 if [  -e /usr/bin/pip2 ]; then
    sudo -H pip install --upgrade pip
    sudo -H pip install --upgrade setuptools
@@ -323,7 +323,6 @@ else
 fi
 sudo ldconfig
 sudo updatedb
-pwd
 if [ $1 == "alive" ]; then
     if [ $TRAVIS_BRANCH == "master" ]; then
         mpic++ -DALIVE -fpermissive -std=c++14 -I"../libtitan/C++/" -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"/usr/include/python3.6m/" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated 2> LaraC.txt 
