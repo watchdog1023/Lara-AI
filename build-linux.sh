@@ -111,7 +111,7 @@ which yum && {
    unzip -qq 3.4.3.zip
    unzip -qq contrib-343.zip
    cd opencv-3.4.3/
-   mv -v ../opencv_contrib-3.4.3/* .
+   yes | mv -v ../opencv_contrib-3.4.3/* .
    mkdir build
    cd build
    cmake -quiet ..
