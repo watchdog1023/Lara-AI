@@ -35,4 +35,4 @@ def main():
       print(now.isoformat() , ' Bitcoin price = ',price)
       last_price = price #update last_price to be the current price'''
 
-main();
+main()
