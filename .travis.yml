@@ -73,6 +73,7 @@ matrix:
       - dos2unix build-linux.sh
       - chmod -v 777 build-linux.sh
       - ./build-linux.sh alive
+      - tree assets/
   
   - name: "Lara On Pi"
     os : linux
