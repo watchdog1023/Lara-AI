@@ -245,8 +245,9 @@
 #ifdef ALIVE
 	//Emotions detection
 	#include "include/Emotions.h"
-    #include "Titans.h"
 #endif
+//Titan Robotics Lib
+#include "Titans.h"
 //OPENGL
 #ifdef OPENCL
 	#define CL_USE_DEPRECATED_OPENCL_2_0_APIS

@@ -8,9 +8,17 @@ rm -vr pocketsphinx-5prealpha*
 rm -vr sphinxbase-5prealpha*
 rm -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit*
 yes | rm -vr libtensorflow-cpu-linux-x86_64-1.13.1*
-rm -vr assets/
+yes | rm -vr libtitan
+yes | rm -vr jsoncpp
+yes | rm -vr assets/
 rm -vr data/obj_detect/
 rm -vr *.o
+if [ -e lara-alive ]; then
+    rm -vr lara-alive
+fi
+if [ -e lara ]; then
+    rm -vr lara  
+fi
 #rm -vr data/
 rm -vr LaraB.txt LaraC.txt
 clear
