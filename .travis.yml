@@ -29,6 +29,7 @@ matrix:
           - sphinxbase-5prealpha/
           - pocketsphinx-5prealpha/
           - mpich-3.3/
+          - assets/
     script:
       - sudo apt update
       - sudo apt-get install dos2unix bash tree -y
@@ -67,6 +68,7 @@ matrix:
           - sphinxbase-5prealpha/
           - pocketsphinx-5prealpha/
           - mpich-3.3/
+          - assets/
     script:
       - sudo apt update
       - sudo apt-get install dos2unix bash tree -y
@@ -98,6 +100,7 @@ matrix:
           - sphinxbase-5prealpha/
           - pocketsphinx-5prealpha/
           - mpich-3.3/
+          - assets/
     script:
       - sudo apt update
       - sudo apt-get install dos2unix bash tree locate -y
