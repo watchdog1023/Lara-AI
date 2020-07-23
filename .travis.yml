@@ -23,13 +23,13 @@ matrix:
           - CFLAGS='-DNRUNS=100000000'
     cache:
         directories:
-          #- opencv-3.4.3/
-          #- mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/
-          #- libtensorflow-cpu-linux-x86_64-1.13.1/
-          #- sphinxbase-5prealpha/
-          #- pocketsphinx-5prealpha/
-          #- mpich-3.3/
-          #- assets/
+          - opencv-3.4.3/
+          - mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/
+          - libtensorflow-cpu-linux-x86_64-1.13.1/
+          - sphinxbase-5prealpha/
+          - pocketsphinx-5prealpha/
+          - mpich-3.3/
+          - assets/
     script:
       - sudo apt update
       - sudo apt-get install dos2unix bash tree -y
