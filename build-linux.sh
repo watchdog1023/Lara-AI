@@ -114,7 +114,7 @@ if [ ! -e opencv-3.4.3/ ]; then
    mv -vf ../opencv_contrib-3.4.3/* .
    mkdir build
    cd build
-   cmake -quiet ..
+   cmake -quiet -DBUILD_SHARED_LIBS=OFF ..
    make -j4
    if [ $GITPOD == "YES" ]; then
     make install DESTDIR="/workspace/Lara-AI/assets/"
@@ -141,7 +141,7 @@ else
       mv -v ../opencv_contrib-3.4.3/* .
       mkdir build
       cd build
-      cmake -quiet ..
+      cmake -quiet -DBUILD_SHARED_LIBS=OFF ..
       make -j4
       if [ $GITPOD == "YES" ]; then
         make install DESTDIR="/workspace/Lara-AI/assets/"
@@ -161,7 +161,7 @@ if [ ! -e jsoncpp ]; then
     cd jsoncpp
     mkdir build
     cd build
-    cmake ..
+    cmake -DBUILD_SHARED_LIBS=OFF ..
     make -j4
     if [ $GITPOD == "YES" ]; then
         make install DESTDIR="/workspace/Lara-AI/assets/"
@@ -179,7 +179,7 @@ else
     git pull
     mkdir build
     cd build
-    cmake ..
+    cmake -DBUILD_SHARED_LIBS=OFF ..
     make -j4
     if [ $GITPOD == "YES" ]; then
         make install DESTDIR="/workspace/Lara-AI/assets/"
