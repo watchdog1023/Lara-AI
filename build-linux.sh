@@ -505,7 +505,7 @@ else
             g++ -v -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
             g++ -v -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
             g++ -v -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
-            g++ -v -std=c++14 -L"assets/usr/local/lib" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.7m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp
+            g++ -v -std=c++14 -L"assets/usr/local/lib" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.7m -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp
         fi
         if [ -e ./lara ]; then
             clear
