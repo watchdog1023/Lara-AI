@@ -115,7 +115,7 @@ if [ $ENV_TYPE != "Docker"]; then
       mv -vf ../opencv_contrib-3.4.3/* .
       mkdir build
       cd build
-      cmake -quiet -DBUILD_SHARED_LIBS=OFF ..
+      cmake -quiet ..
       make -j4
       if [ $GITPOD == "YES" ]; then
        make install DESTDIR="/workspace/Lara-AI/assets/"
@@ -142,7 +142,7 @@ if [ $ENV_TYPE != "Docker"]; then
          mv -v ../opencv_contrib-3.4.3/* .
          mkdir build
          cd build
-         cmake -quiet -DBUILD_SHARED_LIBS=OFF ..
+         cmake -quiet ..
          make -j4
          if [ $GITPOD == "YES" ]; then
            make install DESTDIR="/workspace/Lara-AI/assets/"
