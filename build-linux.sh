@@ -284,19 +284,19 @@ if [ $ENV_TYPE != "Docker"]; then
         cd ..
      fi
    fi
-fi
-if [ ! -e libtitan ]; then
-    git clone https://github.com/Titan-Technology/libtitan.git
-    cd libtitan
-    git pull
-    cd C++/
-    chmod -v 777 make.sh
-    ./make.sh
-    if [ $GITPOD == "YES" ]; then
-      cp -vr libtitans.a /workspace/Lara-AI/assets/usr/local/lib
-      cp -vr Titans.h /workspace/Lara-AI/assets/usr/local/include/
-    fi
-    cd ../../
+   if [ ! -e libtitan ]; then
+       git clone https://github.com/Titan-Technology/libtitan.git
+       cd libtitan
+       git pull
+       cd C++/
+       chmod -v 777 make.sh
+       ./make.sh
+       if [ $GITPOD == "YES" ]; then
+         cp -vr libtitans.a /workspace/Lara-AI/assets/usr/local/lib
+         cp -vr Titans.h /workspace/Lara-AI/assets/usr/local/include/
+       fi
+       cd ../../
+   fi
 fi
 if [  -e /usr/bin/pip2 ]; then
    sudo -H pip install --upgrade pip
