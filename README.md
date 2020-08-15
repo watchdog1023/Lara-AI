@@ -100,6 +100,11 @@ Python3 with pip is requied to make Lara
 
 To use voice rec please pass "-hmm model/en-us/en-us -lm model/en-us/en-us.lm.bin -dict model/en-us/cmudict-en-us.dict" to lara program
 
+# Family
+Oldest Sister - Lexa-AI (https://github.com/watchdog1023/Lexa-AI)
+Second Oldest Sister - Raven-AI (https://github.com/watchdog1023/Raven-AI)
+Youngest Sister - Ciri-AI (https://github.com/watchdog1023/Ciri-AI)
+
 # Support
 If you want to help support this project please donate:
 
