@@ -138,9 +138,14 @@
 #endif
 #include<sqlite3.h> 
 //Video and Image Displaying
-#include<opencv2/highgui/highgui.hpp>
-#include<opencv/cv.h>
-#include<opencv/highgui.h>
+#ifdef CV_VERSION > 4
+	#include<opencv4/opencv2/highgui/highgui.hpp>
+	#include<opencv4/opencv2/highgui/highgui.hpp>
+#else
+	#include<opencv2/highgui/highgui.hpp>
+	#include<opencv/cv.h>
+	#include<opencv/highgui.h>
+#endif
 //Hand Recognition
 #include<opencv/cxcore.h>
 //IRC Commuication
@@ -160,7 +165,11 @@
 #if defined(WIN32) || defined(__CYGWIN32__)
 	#include<zbar.h>
 #endif
-#include<opencv2/imgproc/imgproc.hpp>
+#ifdef CV_VERSION > 4
+	#include<opencv4/imgproc/imgproc.hpp>
+#else
+	#include<opencv2/imgproc/imgproc.hpp>
+#endif
 //SDL Creation
 //#include<SDL/SDL.h>
 //#include<SDL2/SDL.h>
