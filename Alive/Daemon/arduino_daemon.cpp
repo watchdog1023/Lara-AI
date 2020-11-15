@@ -2,8 +2,11 @@
 #include<stdio.h>
 #include<string>
 #include<unistd.h>
+#include<iostream>
+#include<fstream>
 
 using namespace std;
+
 
 void send_cmd(string cmd)
 {
@@ -15,5 +18,16 @@ void send_cmd(string cmd)
 
 int main(int argc,char* argv[])
 {
-send_cmd(argv[1]);
+    ifstream port("/dev/ttyACM0");
+    if(!port)
+        {
+            #ifdef DEBUG
+                cout << "I can't connect to the Device" << endl;
+            #endif
+            return false;
+        }
+    else
+        {
+            send_cmd(argv[1]);
+        }
 }
