@@ -1,0 +1,38 @@
+#Phrase:"xxx yyy zzz" -> the full human phrase
+#{
+#   |xxx -> fisrt word in the phrase is recogized by lara and follows the tree(first branch)
+#   |---> yyy -> second word in tree(second branch)
+#   |------> zzz -> third word in the phrase (third branch)
+#}
+# There could be an theorical infinite branchs in the tree,however there is a performance penalty
+# This doc just out lines the thought process of the voice rec system(high level overview) 
+
+Phrase:"can you hear me"
+    {
+        |can
+        |---> you
+        |------> hear
+        |---------> me
+    }
+
+Phrase:"lara"
+{
+    |lara
+}
+
+Phrase:"time"
+{
+    |time
+}
+
+Phrase:"who are you"
+{
+    |who
+    |--->are
+    |------>you
+}
+
+Phrase:""
+{
+
+}
