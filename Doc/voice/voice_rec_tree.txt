@@ -3,6 +3,7 @@
 #   |xxx -> fisrt word in the phrase is recogized by lara and follows the tree(first branch)
 #   |---> yyy -> second word in tree(second branch)
 #   |------> zzz -> third word in the phrase (third branch)
+#   |< aaa -> answer
 #}
 # There could be an theorical infinite branchs in the tree,however there is a performance penalty
 # This doc just out lines the thought process of the voice rec system(high level overview) 
@@ -13,16 +14,19 @@ Phrase:"can you hear me"
         |---> you
         |------> hear
         |---------> me
+        |< yes
     }
 
 Phrase:"lara"
 {
     |lara
+    |< yes
 }
 
 Phrase:"time"
 {
     |time
+    |< %time%
 }
 
 Phrase:"who are you"
@@ -37,12 +41,14 @@ Phrase:"how are you"
     |how
     |--->are
     |------>you
+    |< i am lara
 }
 
 Phrase:"get started"
 {
     |you
     |--->started
+    |< you can ask me to <....>
 }
 
 Phrase:"what can you do"
@@ -51,12 +57,14 @@ Phrase:"what can you do"
     |--->can
     |------>you
     |--------->do
+    |< i can do many things like set timers,reminders and control titan devices
 }
 
 Phrase:"good morning"
 {
     |good
     |--->morning
+    |< good morning
 }
 
 Phrase:"tell me a joke"
@@ -65,6 +73,7 @@ Phrase:"tell me a joke"
     |--->me
     |------>a
     |--------->joke
+    |< %joke%
 }
 
 Phrase:"sing me a song"
@@ -73,6 +82,7 @@ Phrase:"sing me a song"
     |--->me
     |------>a 
     |--------->song
+    |< %song%
 }
 
 Phrase:"let’s play a game"
@@ -81,6 +91,7 @@ Phrase:"let’s play a game"
     |--->play
     |------>a 
     |--------->game
+    |< %game%
 }
 
 Phrase:"set a timer for 10 minutes"
@@ -91,6 +102,7 @@ Phrase:"set a timer for 10 minutes"
     |---------->for
     |------------->10
     |---------------->minutes
+    |< timer set [set timer in background]
 }
 
 Phrase:"what should I make for dinner"
@@ -101,6 +113,7 @@ Phrase:"what should I make for dinner"
     |--------->make
     |------------>for
     |--------------->dinner
+    |< %recipes% 
 }
 
 Phrase:"how many ounces are in a pound"
@@ -112,18 +125,21 @@ Phrase:"how many ounces are in a pound"
     |------------>in
     |--------------->a 
     |------------------>pound
+    |< 16 ounces in 1 pound
 }
 
 Phrase:"good afternoon"
 {
     |good
     |--->afternoon
+    |< good afternoon
 }
 
 Phrase:"let’s chat"
 {
     |let’s
     |--->chat
+    |< %talking points%
 }
 
 Phrase:"what can you show me"
@@ -133,4 +149,5 @@ Phrase:"what can you show me"
     |------>you
     |--------->show
     |------------>me
+    |< i can do many things like this %rng event%
 }
