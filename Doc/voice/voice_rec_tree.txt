@@ -34,67 +34,103 @@ Phrase:"who are you"
 
 Phrase:"how are you"
 {
-    |
-    |
-    |
+    |how
+    |--->are
+    |------>you
 }
 
 Phrase:"get started"
 {
-
+    |you
+    |--->started
 }
 
 Phrase:"what can you do"
 {
-
+    |what
+    |--->can
+    |------>you
+    |--------->do
 }
 
 Phrase:"good morning"
 {
-
+    |good
+    |--->morning
 }
 
 Phrase:"tell me a joke"
 {
-
+    |tell
+    |--->me
+    |------>a
+    |--------->joke
 }
 
 Phrase:"sing me a song"
 {
-
+    |sing
+    |--->me
+    |------>a 
+    |--------->song
 }
 
 Phrase:"let’s play a game"
 {
-
+    |let’s
+    |--->play
+    |------>a 
+    |--------->game
 }
 
 Phrase:"set a timer for 10 minutes"
 {
-
+    |set
+    |--->a 
+    |------>timer
+    |---------->for
+    |------------->10
+    |---------------->minutes
 }
 
 Phrase:"what should I make for dinner"
 {
-
+    |what
+    |--->should
+    |------>i
+    |--------->make
+    |------------>for
+    |--------------->dinner
 }
 
 Phrase:"how many ounces are in a pound"
 {
-
+    |how
+    |--->many
+    |------>ounces
+    |--------->are
+    |------------>in
+    |--------------->a 
+    |------------------>pound
 }
 
 Phrase:"good afternoon"
 {
-
+    |good
+    |--->afternoon
 }
 
 Phrase:"let’s chat"
 {
-
+    |let’s
+    |--->chat
 }
 
 Phrase:"what can you show me"
 {
-
+    |what
+    |--->can
+    |------>you
+    |--------->show
+    |------------>me
 }
