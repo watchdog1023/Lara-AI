@@ -5,7 +5,7 @@ function pause () {
 if [ $GITPOD == "YES" ]; then
     mkdir assets/
 fi
-if [ $ENV_TYPE != "Docker"]; then
+#if [ $ENV_TYPE != "Docker"]; then
    which yum && {
         echo centos;
         yum group install "Development Tools";
@@ -297,7 +297,7 @@ if [ $ENV_TYPE != "Docker"]; then
        fi
        cd ../../
    fi
-fi
+#fi
 if [  -e /usr/bin/pip2 ]; then
    sudo -H pip install --upgrade pip
    sudo -H pip install --upgrade setuptools
