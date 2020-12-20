@@ -152,11 +152,11 @@ fi
          cd ../..
       fi
    fi
-   if [ ! -e  assets/ ]; then
+   #if [ ! -e  assets/ ]; then
        mkdir -v assets/
        mkdir -v assets/usr/
        mkdir -v assets/usr/local/
-   fi
+   #fi
    if [ ! -e jsoncpp ]; then
        git clone https://github.com/open-source-parsers/jsoncpp.git
        cd jsoncpp
