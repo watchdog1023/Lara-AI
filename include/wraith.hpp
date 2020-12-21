@@ -2,10 +2,10 @@
 #include<sstream>
 #include<stdio.h>
 #include<string>
-#include<jsoncpp/json/json.h>
-#include<jsoncpp/json/reader.h>
-#include<jsoncpp/json/writer.h>
-#include<jsoncpp/json/value.h>
+#include<json/json.h>
+#include<json/reader.h>
+#include<json/writer.h>
+#include<json/value.h>
 #include "HTTPRequest.hpp"
 
 using namespace std;
