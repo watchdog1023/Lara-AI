@@ -263,10 +263,10 @@
 	#include<CL/cl.hpp>
 #endif
 //JSON
-#include<jsoncpp/json/json.h>
-#include<jsoncpp/json/reader.h>
-#include<jsoncpp/json/writer.h>
-#include<jsoncpp/json/value.h>
+#include<json/json.h>
+#include<json/reader.h>
+#include<json/writer.h>
+#include<json/value.h>
 //Satellite Commuincation
 #include "wraith.hpp"
 //My Source Checksum signature header
