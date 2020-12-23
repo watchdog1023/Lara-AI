@@ -5,7 +5,7 @@ function pause () {
 if [ $GITPOD == "YES" ]; then
     mkdir assets/
 fi
-#if [ $ENV_TYPE != "Docker"]; then
+if [ -z ${PREBUILD+x} ]; then
    which yum && {
         echo centos;
         yum group install "Development Tools";
@@ -193,27 +193,6 @@ fi
        fi
        cd ../..
    fi
-   if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
-      wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
-      tar xf mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
-      cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc/* mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/
-      cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib64/ mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib/
-      if [ $GITPOD == "YES" ]; then
-         cp -vr mysql-*/* /workspace/Lara-AI/assets/usr/local/
-      else
-         cp -vr mysql-*/* assets/usr/local/
-      fi
-   else
-      cp -vr mysql-*/* assets/usr/local/
-   fi
-   if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
-      wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
-      mkdir libtensorflow-cpu-linux-x86_64-1.13.1
-      tar xf libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
-      cp -vr libtensorflow-*/* assets/usr/local/
-   else
-      cp -vr libtensorflow-*/* assets/usr/local/
-   fi
    if [ ! -e sphinxbase-5prealpha/ ]; then
       wget --no-check-certificate -c https://tenet.dl.sourceforge.net/project/cmusphinx/sphinxbase/5prealpha/sphinxbase-5prealpha.tar.gz
       tar xf sphinxbase-5prealpha.tar.gz
@@ -284,20 +263,41 @@ fi
         cd ..
      fi
    fi
-   if [ ! -e libtitan ]; then
-       git clone https://github.com/Titan-Technology/libtitan.git
-       cd libtitan
-       git pull
-       cd C++/
-       chmod -v 777 make.sh
-       ./make.sh
-       if [ $GITPOD == "YES" ]; then
-         cp -vr libtitans.a /workspace/Lara-AI/assets/usr/local/lib
-         cp -vr Titans.h /workspace/Lara-AI/assets/usr/local/include/
-       fi
-       cd ../../
-   fi
-#fi
+fi
+if [ ! -e libtitan ]; then
+    git clone https://github.com/Titan-Technology/libtitan.git
+    cd libtitan
+    git pull
+    cd C++/
+    chmod -v 777 make.sh
+    ./make.sh
+    if [ $GITPOD == "YES" ]; then
+        cp -vr libtitans.a /workspace/Lara-AI/assets/usr/local/lib
+        cp -vr Titans.h /workspace/Lara-AI/assets/usr/local/include/
+    fi
+    cd ../../
+fi
+if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
+    wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
+    tar xf mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
+    cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc/* mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/
+    cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib64/ mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib/
+    if [ $GITPOD == "YES" ]; then
+        cp -vr mysql-*/* /workspace/Lara-AI/assets/usr/local/
+    else
+        cp -vr mysql-*/* assets/usr/local/
+    fi
+else
+    cp -vr mysql-*/* assets/usr/local/
+fi
+if [ ! -e libtensorflow-cpu-linux-x86_64-1.13.1/ ]; then
+    wget -c https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz
+    mkdir libtensorflow-cpu-linux-x86_64-1.13.1
+    tar xf libtensorflow-cpu-linux-x86_64-1.13.1.tar.gz -C libtensorflow-cpu-linux-x86_64-1.13.1
+    cp -vr libtensorflow-*/* assets/usr/local/
+else
+    cp -vr libtensorflow-*/* assets/usr/local/
+fi
 if [  -e /usr/bin/pip2 ]; then
    sudo -H pip install --upgrade pip
    sudo -H pip install --upgrade setuptools
@@ -338,7 +338,7 @@ if [ $1 == "alive" ]; then
         g++ -time -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
         g++ -time -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
         g++ -time -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
-        g++ -time -std=c++14 -L"../libtian/C++" -L"assests/usr/lib/" -o lara-alive Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.6m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp_static -ljsoncpp 2> LaraB.txt
+        g++ -time -std=c++14 -L"libtian/C++" -L"assests/usr/lib/" -o lara-alive Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.6m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp_static -ljsoncpp 2> LaraB.txt
     elif [ $GITPOD == "YES" ]; then
         mpic++ -DALIVE -fpermissive -std=c++14 -I"../libtitan/C++/" -I"assets/usr/local/include" -I"assets/usr/local/include/pocketsphinx" -I"assets/usr/local/include/sphinxbase" -I"include/" -I"/usr/include/python3.7" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
         g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
@@ -349,7 +349,7 @@ if [ $1 == "alive" ]; then
         g++ -time -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
         g++ -time -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
         g++ -time -std=c++14 -fpermissive -I"assets/usr/local/include" -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
-        g++ -time -std=c++14 -L"../libtian/C++/" -L"assets/usr/local/lib" -L"/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu/" -o lara-alive Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.7m -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp_static -ljsoncpp 2> LaraB.txt
+        g++ -time -std=c++14 -L"libtian/C++/" -L"assets/usr/local/lib" -L"/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu/" -o lara-alive Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.7m -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp_static -ljsoncpp 2> LaraB.txt
     else
         mpic++ -DALIVE -fpermissive -std=c++14 -I"/usr/include/python3.7m/" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"assets/usr/local/include" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
         g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
@@ -390,7 +390,7 @@ if [ $1 == "alive" ]; then
             g++ -v -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
             g++ -v -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
             g++ -v -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
-            g++ -v -std=c++14 -L"assests/usr/lib/" -o lara-alive Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.6m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp_static -ljsoncpp
+            g++ -v -std=c++14 -L"libtian/C++" -L"assests/usr/lib/" -o lara-alive Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.6m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp_static -ljsoncpp
         elif [ $GITPOD == "YES" ]; then
             mpic++ -DALIVE -fpermissive -std=c++14 -I"libtitan/C++/" -I"assets/usr/local/include" -I"assets/usr/local/include/pocketsphinx" -I"assets/usr/local/include/sphinxbase" -I"include/" -I"/usr/include/python3.7" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
             g++ -v -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
@@ -412,7 +412,7 @@ if [ $1 == "alive" ]; then
             g++ -v -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
             g++ -v -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
             g++ -v -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
-            g++ -v -std=c++14 -L"assets/usr/local/lib" -o lara-alive Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp_static -ljsoncpp
+            g++ -v -std=c++14 -L"libtian/C++" -L"assets/usr/local/lib" -o lara-alive Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.5m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp_static -ljsoncpp
         fi
         if [ -e ./lara-alive ]; then
             clear
@@ -431,7 +431,7 @@ else
         g++ -time -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
         g++ -time -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
         g++ -time -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
-        g++ -time -std=c++14 -L"assests/usr/lib/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.6m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp_static -ljsoncpp 2> LaraB.txt
+        g++ -time -std=c++14 -L"libtian/C++" -L"assests/usr/lib/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.6m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp_static -ljsoncpp 2> LaraB.txt
     elif [ $GITPOD == "YES" ]; then
         mpic++ -fpermissive -std=c++14 -I"libtitan/C++/" -I"assets/usr/local/include" -I"assets/usr/local/include/pocketsphinx" -I"assets/usr/local/include/sphinxbase" -I"include/" -I"/usr/include/python3.7" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
         g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
@@ -442,7 +442,7 @@ else
         g++ -time -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
         g++ -time -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
         g++ -time -std=c++14 -fpermissive -I"assets/usr/local/include" -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
-        g++ -time -std=c++14 -L"assets/usr/local/lib" -L"/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.7m -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp_static -ljsoncpp 2> LaraB.txt
+        g++ -time -std=c++14 -L"libtian/C++" -L"assets/usr/local/lib" -L"/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.7m -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp_static -ljsoncpp 2> LaraB.txt
     elif [ $ENV_TYPE == "Docker" ]; then 
         mpic++ -fpermissive -DCV_VERSION=4 -std=c++14 -I"libtitan/C++/" -I"/usr/include/python3.7m/" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"assets/usr/local/include" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
         g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
@@ -494,7 +494,7 @@ else
             g++ -v -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
             g++ -v -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
             g++ -v -std=c++14 -fpermissive -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
-            g++ -v -std=c++14 -L"assests/usr/lib/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.6m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp_static -ljsoncpp
+            g++ -v -std=c++14 -L"libtian/C++" -L"assests/usr/lib/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.6m -lmpicxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp
         elif [ $GITPOD == "YES" ]; then
             mpic++ -fpermissive -std=c++14 -I"libtitan/C++/" -I"assets/usr/local/include" -I"assets/usr/local/include/pocketsphinx" -I"assets/usr/local/include/sphinxbase" -I"include/" -I"/usr/include/python3.7" -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
             g++ -v -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
@@ -505,7 +505,7 @@ else
             g++ -v -std=c++14 -c include/qr_code/QrCode.cpp -o QrCode.o -Wfatal-errors
             g++ -v -std=c++14 -c include/qr_code/QrSegment.cpp -o QrSegment.o -Wfatal-errors
             g++ -v -std=c++14 -fpermissive -I"assets/usr/local/include" -c include/Emotions.cpp -o Emotions.o -Wfatal-errors
-            g++ -v -std=c++14 -L"assets/usr/local/lib" -L"/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.7m -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp_static -ljsoncpp
+            g++ -v -std=c++14 -L"libtian/C++" -L"assets/usr/local/lib" -L"/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu/" -o lara Lara.o Thread.o IRCClient.o  Bitbuffer.o QrCode.o QrSegment.o Emotions.o IRCSocket.o IRCHandler.o -lopencv_core -lopencv_objdetect -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lpthread -lsfml-audio -lsfml-network  -lsfml-system -lcurl -lboost_system -lboost_thread -lboost_serialization -lmpi -lpython3.7m -lmpi_cxx -lncurses -lpocketsphinx -lsphinxbase -lsphinxad -ltitans -ljsoncpp_static -ljsoncpp
         else
             mpic++ -fpermissive -std=c++14 -I"/usr/include/python3.7m/" -I"libtitan/C++/" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"assets/usr/local/include" -c Lara.cpp -o Lara.o -Wfatal-errors
             g++ -v -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
