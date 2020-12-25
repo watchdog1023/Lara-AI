@@ -4,7 +4,7 @@ cache:
   pip: true
 
 matrix:
-  include:
+  exclude:
   - name: "Lara On Linux"
     os: linux
     dist: focal
@@ -107,6 +107,7 @@ matrix:
       - dos2unix build-pi.sh
       - chmod -v 777 build-pi.sh
       - ./build-pi.sh
+  include:
   - name: "Lara on Linux (Pre Built Deps)"
     os: linux
     dist: focal
@@ -133,8 +134,8 @@ matrix:
       - sudo apt update
       - sudo apt-get install dos2unix bash tree locate -y
       - sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmpich-dev libpulse-dev libopenexr24 -y
-      - updatedb
-      - locate Python.h
+      - sudo updatedb
+      - sudo locate Python.h
       #- wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/jsoncpp_3.13.2-1_amd64.deb
       #- wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/libtitan_1.2-1_amd64.deb
       #- wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/sphinxbase_5prealpha-1_amd64.deb
