@@ -132,7 +132,7 @@ matrix:
       - export PREBUILD=YES
       - sudo apt update
       - sudo apt-get install dos2unix bash tree -y
-      - sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev -y
+      - sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmpich-dev -y
       - wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/jsoncpp_3.13.2-1_amd64.deb
       - wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/libtitan_1.2-1_amd64.deb
       - wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/sphinxbase_5prealpha-1_amd64.deb
