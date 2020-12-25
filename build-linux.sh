@@ -329,6 +329,7 @@ else
 fi
 sudo ldconfig
 sudo updatedb
+ls assets/usr/local/lib
 if [ $1 == "alive" ]; then
     if [ $TRAVIS_BRANCH == "master" ]; then
         mpic++ -DALIVE -fpermissive -std=c++14 -I"libtitan/C++/" -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include" -I"/usr/local/include/sphinxbase/" -I"./include/" -I"/usr/include/python3.6m/" -c Lara.cpp -o Lara.o -Wfatal-errors -Wdeprecated 2> LaraC.txt 
