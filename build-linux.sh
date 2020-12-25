@@ -263,8 +263,7 @@ if [ -z ${PREBUILD+x} ]; then
         cd ..
      fi
    fi
-fi
-if [ ! -e libtitan ]; then
+   if [ ! -e libtitan ]; then
     git clone https://github.com/Titan-Technology/libtitan.git
     cd libtitan
     git pull
@@ -276,6 +275,7 @@ if [ ! -e libtitan ]; then
         cp -vr Titans.h /workspace/Lara-AI/assets/usr/local/include/
     fi
     cd ../../
+   fi
 fi
 if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
     wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
