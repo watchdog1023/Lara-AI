@@ -150,7 +150,7 @@ matrix:
       - sudo rm *.deb
       - dos2unix build-linux.sh
       - chmod -v 777 build-linux.sh
-      - ./build-linux.sh'''
+      - ./build-linux.sh
 
 
 notifications:
