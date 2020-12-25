@@ -274,11 +274,10 @@ if [ -z ${PREBUILD+x} ]; then
         cp -vr libtitans.a /workspace/Lara-AI/assets/usr/local/lib
         cp -vr Titans.h /workspace/Lara-AI/assets/usr/local/include/
     fi
+    cp -vr libtitans.a assets/usr/local/lib
+    cp -vr Titans.h assets/usr/local/include
     cd ../../
    fi
-   echo "============================================================="
-   pwd
-   echo "============================================================="
 fi
 if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
     wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
