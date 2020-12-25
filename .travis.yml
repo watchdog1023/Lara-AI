@@ -7,7 +7,7 @@ matrix:
   include:
   - name: "Lara On Linux"
     os: linux
-    dist: Bionic
+    dist: focal
     compiler: gcc
     addons:
       apt:
@@ -109,7 +109,7 @@ matrix:
       - ./build-pi.sh
   - name: "Lara on Linux (Pre Built Deps)"
     os: linux
-    dist: Bionic
+    dist: focal
     compiler: gcc
     addons:
       apt:
