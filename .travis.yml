@@ -135,23 +135,22 @@ matrix:
       - sudo apt-get install dos2unix bash tree locate -y
       - sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmpich-dev libpulse-dev libopenexr24 -y
       - sudo updatedb
-      - sudo locate Python.h
-      #- wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/jsoncpp_3.13.2-1_amd64.deb
-      #- wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/libtitan_1.2-1_amd64.deb
-      #- wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/sphinxbase_5prealpha-1_amd64.deb
-      #- wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/pocketsphinx_5prealpha-1_amd64.deb
-      #- wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/sqlite3_3330000-1_amd64.deb
-      #- wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/opencv-3.4.3_amd64.deb
-      #- sudo dpkg -i jsoncpp_3.13.2-1_amd64.deb
-      #- sudo dpkg -i libtitan_1.2-1_amd64.deb
-      #- sudo dpkg -i sphinxbase_5prealpha-1_amd64.deb
-      #- sudo dpkg -i pocketsphinx_5prealpha-1_amd64.deb
-      #- sudo dpkg -i sqlite3_3330000-1_amd64.deb
-      #- sudo dpkg -i opencv-3.4.3_amd64.deb
-      #- sudo rm *.deb
-      #- dos2unix build-linux.sh
-      #- chmod -v 777 build-linux.sh
-      #- ./build-linux.sh'''
+      - wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/jsoncpp_3.13.2-1_amd64.deb
+      - wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/libtitan_1.2-1_amd64.deb
+      - wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/sphinxbase_5prealpha-1_amd64.deb
+      - wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/pocketsphinx_5prealpha-1_amd64.deb
+      - wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/sqlite3_3330000-1_amd64.deb
+      - wget -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/opencv-3.4.3_amd64.deb
+      - sudo dpkg -i jsoncpp_3.13.2-1_amd64.deb
+      - sudo dpkg -i libtitan_1.2-1_amd64.deb
+      - sudo dpkg -i sphinxbase_5prealpha-1_amd64.deb
+      - sudo dpkg -i pocketsphinx_5prealpha-1_amd64.deb
+      - sudo dpkg -i sqlite3_3330000-1_amd64.deb
+      - sudo dpkg -i opencv-3.4.3_amd64.deb
+      - sudo rm *.deb
+      - dos2unix build-linux.sh
+      - chmod -v 777 build-linux.sh
+      - ./build-linux.sh'''
 
 
 notifications:
