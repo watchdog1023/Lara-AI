@@ -276,6 +276,9 @@ if [ -z ${PREBUILD+x} ]; then
     fi
     cd ../../
    fi
+   echo "============================================================="
+   pwd
+   echo "============================================================="
 fi
 if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
     wget -c https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
