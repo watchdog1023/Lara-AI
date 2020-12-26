@@ -112,18 +112,6 @@ matrix:
     os: linux
     dist: focal
     compiler: gcc
-    addons:
-      apt:
-        sources:
-          - ubuntu-toolchain-r-test
-        packages:
-          - g++-8
-          - gcc-8
-          - gfortran-8
-        env:
-          - CXX='g++-8'
-          - CC='gcc-8'
-          - CFLAGS='-DNRUNS=100000000'
     #cache:
         #directories:
           #- mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/
@@ -132,6 +120,7 @@ matrix:
     script:
       - export PREBUILD=YES
       - sudo apt update
+      - sudo apt install g++ gcc -y
       - sudo apt-get install dos2unix bash tree locate -y
       - sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmpich-dev libpulse-dev libopenexr24 -y
       - sudo updatedb
