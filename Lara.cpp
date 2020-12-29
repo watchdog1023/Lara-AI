@@ -1020,6 +1020,8 @@ bool idle = true;
 boost::thread ty;
 boost::thread tfs;
 boost::thread tw;
+boost::thread t;
+boost::thread tu;
 
 int main(int argc, char* argv[])
 {
@@ -1488,23 +1490,18 @@ void timer(string quit)
 {
     if(quit == "YES")
         {
-            goto end;
+           #if defined(WIN32) || defined(__CYGWIN32__)
+                TerminateThread(t.native_handle(), 0);
+				TerminateThread(tw.native_handle(), 0);
+            #else
+                pthread_cancel(t.native_handle());
+				pthread_cancel(tw.native_handle());
+            #endif
+            return 0;
         }
-	boost::thread tu{&alarm_timer};
-    boost::thread t{&lara};
+	tu = boost::thread(boost:bind(&alarm_timer);
+    t = boost::thread(boost:bind(&lara);;
     tgroup.join_all();
-    end:
-        if(quit == "YES")
-                {
-                    #if defined(WIN32) || defined(__CYGWIN32__)
-                        TerminateThread(t.native_handle(), 0);
-						TerminateThread(tw.native_handle(), 0);
-                    #else
-                        pthread_cancel(t.native_handle());
-						pthread_cancel(tw.native_handle());
-                    #endif
-                    return 0;
-                }
     //Start timer
 	clock_t startTime = clock();
 	int secondsPassed;
