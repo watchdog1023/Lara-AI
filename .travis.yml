@@ -4,35 +4,31 @@ cache:
   pip: true
 
 matrix:
-  exclude:
+  include:
   - name: "Lara On Linux"
     os: linux
     dist: focal
     compiler: gcc
-    addons:
-      apt:
-        sources:
-          - ubuntu-toolchain-r-test
-        packages:
-          - g++-8
-          - gcc-8
-          - gfortran-8
-        env:
-          - CXX='g++-8'
-          - CC='gcc-8'
-          - CFLAGS='-DNRUNS=100000000'
-    #cache:
-    #    directories:
-          #- opencv-3.4.3/
-          #- mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/
-          #- libtensorflow-cpu-linux-x86_64-1.13.1/
-          #- sphinxbase-5prealpha/
-          #- pocketsphinx-5prealpha/
-          #- mpich-3.3/
-          #- assets/
     script:
+      - export PREBUILD=YES
       - sudo apt update
-      - sudo apt-get install dos2unix bash tree -y
+      - sudo apt install g++ gcc -y
+      - sudo apt-get install dos2unix bash tree locate -y
+      - sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmpich-dev libpulse-dev libopenexr24 -y
+      - sudo updatedb
+      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/jsoncpp_3.13.2-1_amd64.deb
+      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/libtitan_1.2-1_amd64.deb
+      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/sphinxbase_5prealpha-1_amd64.deb
+      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/pocketsphinx_5prealpha-1_amd64.deb
+      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/sqlite3_3330000-1_amd64.deb
+      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/opencv-3.4.3_amd64.deb
+      - sudo dpkg -i jsoncpp_3.13.2-1_amd64.deb
+      - sudo dpkg -i libtitan_1.2-1_amd64.deb
+      - sudo dpkg -i sphinxbase_5prealpha-1_amd64.deb
+      - sudo dpkg -i pocketsphinx_5prealpha-1_amd64.deb
+      - sudo dpkg -i sqlite3_3330000-1_amd64.deb
+      - sudo dpkg -i opencv-3.4.3_amd64.deb
+      - sudo rm *.deb
       - dos2unix build-linux.sh
       - chmod -v 777 build-linux.sh
       - ./build-linux.sh
@@ -46,36 +42,31 @@ matrix:
   
   - name: "Lara Alive Build"
     os: linux
-    dist: Bionic
+    dist: focal
     compiler: gcc
-    addons:
-      apt:
-        sources:
-          - ubuntu-toolchain-r-test
-        packages:
-          - g++-8
-          - gcc-8
-          - gfortran-8
-        env:
-          - CXX='g++-8'
-          - CC='gcc-8'
-          - CFLAGS='-DNRUNS=100000000'
-    cache:
-        directories:
-          - opencv-3.4.3/
-          - mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/
-          - libtensorflow-cpu-linux-x86_64-1.13.1/
-          - sphinxbase-5prealpha/
-          - pocketsphinx-5prealpha/
-          - mpich-3.3/
-          - assets/
     script:
+      - export PREBUILD=YES
       - sudo apt update
-      - sudo apt-get install dos2unix bash tree -y
+      - sudo apt install g++ gcc -y
+      - sudo apt-get install dos2unix bash tree locate -y
+      - sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmpich-dev libpulse-dev libopenexr24 -y
+      - sudo updatedb
+      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/jsoncpp_3.13.2-1_amd64.deb
+      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/libtitan_1.2-1_amd64.deb
+      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/sphinxbase_5prealpha-1_amd64.deb
+      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/pocketsphinx_5prealpha-1_amd64.deb
+      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/sqlite3_3330000-1_amd64.deb
+      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/opencv-3.4.3_amd64.deb
+      - sudo dpkg -i jsoncpp_3.13.2-1_amd64.deb
+      - sudo dpkg -i libtitan_1.2-1_amd64.deb
+      - sudo dpkg -i sphinxbase_5prealpha-1_amd64.deb
+      - sudo dpkg -i pocketsphinx_5prealpha-1_amd64.deb
+      - sudo dpkg -i sqlite3_3330000-1_amd64.deb
+      - sudo dpkg -i opencv-3.4.3_amd64.deb
+      - sudo rm *.deb
       - dos2unix build-linux.sh
       - chmod -v 777 build-linux.sh
       - ./build-linux.sh alive
-      - tree assets/
   
   - name: "Lara On Pi"
     os : linux
@@ -107,40 +98,6 @@ matrix:
       - dos2unix build-pi.sh
       - chmod -v 777 build-pi.sh
       - ./build-pi.sh
-  include:
-  - name: "Lara on Linux (Pre Built Deps)"
-    os: linux
-    dist: focal
-    compiler: gcc
-    #cache:
-        #directories:
-          #- mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/
-          #- libtensorflow-cpu-linux-x86_64-1.13.1/
-          #- assets/
-    script:
-      - export PREBUILD=YES
-      - sudo apt update
-      - sudo apt install g++ gcc -y
-      - sudo apt-get install dos2unix bash tree locate -y
-      - sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmpich-dev libpulse-dev libopenexr24 -y
-      - sudo updatedb
-      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/jsoncpp_3.13.2-1_amd64.deb
-      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/libtitan_1.2-1_amd64.deb
-      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/sphinxbase_5prealpha-1_amd64.deb
-      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/pocketsphinx_5prealpha-1_amd64.deb
-      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/sqlite3_3330000-1_amd64.deb
-      - wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/opencv-3.4.3_amd64.deb
-      - sudo dpkg -i jsoncpp_3.13.2-1_amd64.deb
-      - sudo dpkg -i libtitan_1.2-1_amd64.deb
-      - sudo dpkg -i sphinxbase_5prealpha-1_amd64.deb
-      - sudo dpkg -i pocketsphinx_5prealpha-1_amd64.deb
-      - sudo dpkg -i sqlite3_3330000-1_amd64.deb
-      - sudo dpkg -i opencv-3.4.3_amd64.deb
-      - sudo rm *.deb
-      - dos2unix build-linux.sh
-      - chmod -v 777 build-linux.sh
-      - ./build-linux.sh
-
 
 notifications:
   email:
