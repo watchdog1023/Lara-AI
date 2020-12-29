@@ -96,10 +96,9 @@ matrix:
       - sudo apt update
       - sudo apt-get install dos2unix bash tree locate -y
       - sudo updatedb
-      - locate Python.h
-      #- dos2unix build-pi.sh
-      #- chmod -v 777 build-pi.sh
-      #- ./build-pi.sh
+      - dos2unix build-pi.sh
+      - chmod -v 777 build-pi.sh
+      - ./build-pi.sh
 
 notifications:
   email:
