@@ -1499,8 +1499,8 @@ void timer(string quit)
             #endif
             return 0;
         }
-	tu = boost::thread(boost::bind(&alarm_timer);
-    t = boost::thread(boost::bind(&lara);;
+	tu = boost::thread(boost::bind(&alarm_timer));
+    t = boost::thread(boost::bind(&lara));
     tgroup.join_all();
     //Start timer
 	clock_t startTime = clock();
