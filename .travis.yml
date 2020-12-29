@@ -4,7 +4,7 @@ cache:
   pip: true
 
 matrix:
-  include:
+  exclude:
   - name: "Lara On Linux"
     os: linux
     dist: focal
@@ -67,7 +67,7 @@ matrix:
       - dos2unix build-linux.sh
       - chmod -v 777 build-linux.sh
       - ./build-linux.sh alive
-  
+include:  
   - name: "Lara On Pi"
     os : linux
     arch: arm64
@@ -95,9 +95,11 @@ matrix:
     script:
       - sudo apt update
       - sudo apt-get install dos2unix bash tree locate -y
-      - dos2unix build-pi.sh
-      - chmod -v 777 build-pi.sh
-      - ./build-pi.sh
+      - sudo updatedb
+      - locate Python.h
+      #- dos2unix build-pi.sh
+      #- chmod -v 777 build-pi.sh
+      #- ./build-pi.sh
 
 notifications:
   email:
