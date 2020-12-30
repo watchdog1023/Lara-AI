@@ -2,6 +2,9 @@
 function pause(){
    read -p "$*"
 }
+mkdir -v assets/
+mkdir -v assets/usr/
+mkdir -v assets/usr/local/
 sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmysql++-dev libmysqlclient-dev libcurl4-openssl-dev libpython3-dev libpython-dev libmysqlcppconn-dev;
 if [ ! -e /usr/bin/pip3 ]; then
    sudo apt-get install python3-pip;
@@ -68,6 +71,34 @@ if [ $TRAVIS_BRANCH == "master" ]; then
 else
    sudo apt-get install libmpich-dev;
 fi
+if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
+    wget -c -q https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
+    tar xf mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
+    cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/jdbc/* mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/include/
+    cp -vr mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib64/ mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/lib/
+    if [ $GITPOD == "YES" ]; then
+        cp -vr mysql-*/* /workspace/Lara-AI/assets/usr/local/
+    else
+        cp -vr mysql-*/* assets/usr/local/
+    fi
+else
+    cp -vr mysql-*/* assets/usr/local/
+fi
+if [ ! -e libtitan ]; then
+    git clone https://github.com/Titan-Technology/libtitan.git
+    cd libtitan
+    git pull
+    cd C++/
+    chmod -v 777 make.sh
+    ./make.sh
+    if [ $GITPOD == "YES" ]; then
+        cp -vr libtitans.a /workspace/Lara-AI/assets/usr/local/lib
+        cp -vr Titans.h /workspace/Lara-AI/assets/usr/local/include/
+    fi
+    cp -vr libtitans.a assets/usr/local/lib
+    cp -vr Titans.h assets/usr/local/include
+    cd ../../
+fi
 sudo apt-get install libgstreamer-plugins-base1.0-dev build-essential cmake git libgtk2.0-dev pkg-config python-dev python-numpy libdc1394-22 libdc1394-22-dev libjpeg-dev libjasper-dev libavcodec-dev libavformat-dev libswscale-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev libv4l-dev libtbb-dev libqt4-dev libmp3lame-dev libtheora-dev libvorbis-dev libxvidcore-dev x264 v4l-utils unzip build-essential cmake cmake-curses-gui pkg-config libjpeg-dev libtiff5-dev libjasper-dev libpng12-dev libavcodec-dev libavformat-dev libswscale-dev libeigen3-dev libxvidcore-dev libx264-dev libgtk2.0-dev libv4l-dev v4l-utils libatlas-base-dev gfortran python2.7-dev python2-numpy python3-dev python3-numpy libavresample-dev libgphoto2-dev libopenexr-dev -y
 wget -c https://github.com/opencv/opencv/archive/3.4.3.zip -O opencv_source.zip
 wget -c https://github.com/opencv/opencv_contrib/archive/3.4.3.zip -O opencv_contrib.zip
@@ -97,7 +128,7 @@ if [ ! -e data/obj_detect/coco.names ]; then
 fi
 sudo updatedb
 sudo cp include/prim_type.h /usr/local/include/sphinxbase/prim_type.h
-mpic++ -fpermissive -std=c++14 -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include" -I"/usr/include/python3.5m/" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include/linux" -v -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
+mpic++ -fpermissive -std=c++14 -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include" -I"/usr/include/python3.5m/" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include/linux" -v -c Lara.cpp -o Lara.o -Wfatal-errors 2> LaraC.txt 
 g++ -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
 g++ -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
@@ -123,7 +154,7 @@ else
     rm -vr lara *.o
     echo "Code is Sane";
     pause 'Press [Enter] key to continue...'
-    mpic++ -v -fpermissive -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include" -I"/usr/include/python3.5m/" -std=c++14 -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include/linux" -v -c Lara.cpp -o Lara.o -Wfatal-errors
+    mpic++ -v -fpermissive -I"assets/usr/local/include" -I"/usr/local/include/pocketsphinx/" -I"/usr/local/include/sphinxbase/" -I"./include" -I"/usr/include/python3.5m/" -std=c++14 -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include" -I"/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt/include/linux" -v -c Lara.cpp -o Lara.o -Wfatal-errors
     g++ -v -time -std=c++14 -c include/IRC/Thread.cpp -o Thread.o -Wfatal-errors
     g++ -v -time -std=c++14 -c include/IRC/IRCClient.cpp -o IRCClient.o -Wfatal-errors
     g++ -v -time -std=c++14 -c include/IRC/IRCSocket.cpp -o IRCSocket.o -Wfatal-errors
