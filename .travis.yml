@@ -32,14 +32,7 @@ matrix:
       - dos2unix build-linux.sh
       - chmod -v 777 build-linux.sh
       - ./build-linux.sh
-  
-  - name: "Lara On Windows"
-    os : windows
-    script:
-      - chmod -v 777 build-windows.bat
-      - dos2unix build-windows.bat
-      - ./build-windows.bat
-  
+ 
   - name: "Lara Alive Build"
     os: linux
     dist: focal
@@ -99,6 +92,14 @@ matrix:
       - dos2unix build-pi.sh
       - chmod -v 777 build-pi.sh
       - ./build-pi.sh
+      
+  - name: "Lara On Windows"
+    os : windows
+    script:
+      - choco install sfml-mingw64 -y
+      - chmod -v 777 build-windows.bat
+      - dos2unix build-windows.bat
+      - ./build-windows.bat
 
 notifications:
   email:
