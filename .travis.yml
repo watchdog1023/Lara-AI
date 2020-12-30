@@ -96,7 +96,11 @@ matrix:
   - name: "Lara On Windows"
     os : windows
     script:
-      - choco install sfml-mingw64 -y
+      - https://github.com/jeanmimib/sfml-mingw64.git
+      - cd sfml-mingw64
+      - choco pack
+      - choco install sfml-mingw64 -s *.nupkg  -y
+      - cd ..
       - chmod -v 777 build-windows.bat
       - dos2unix build-windows.bat
       - ./build-windows.bat
