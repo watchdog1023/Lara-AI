@@ -64,7 +64,7 @@ matrix:
   - name: "Lara On Pi"
     os : linux
     arch: arm64
-    dist: Xenial #Bionic dosen't seem to work
+    dist: focal
     compiler: gcc
     addons:
       apt:
@@ -83,7 +83,6 @@ matrix:
         directories:
           - sphinxbase-5prealpha/
           - pocketsphinx-5prealpha/
-          - mpich-3.3/
           - assets/
     script:
       - sudo apt update
@@ -96,7 +95,7 @@ matrix:
   - name: "Lara On Windows"
     os : windows
     script:
-      - https://github.com/jeanmimib/sfml-mingw64.git
+      - git clone https://github.com/jeanmimib/sfml-mingw64.git
       - cd sfml-mingw64
       - choco pack
       - choco install sfml-mingw64 -s *.nupkg  -y

@@ -5,6 +5,8 @@ function pause(){
 mkdir -v assets/
 mkdir -v assets/usr/
 mkdir -v assets/usr/local/
+sudo apt update
+sudo apt install g++ gcc -y
 sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmysql++-dev libmysqlclient-dev libcurl4-openssl-dev libpython3-dev libpython-dev libmysqlcppconn-dev;
 if [ ! -e /usr/bin/pip3 ]; then
    sudo apt-get install python3-pip;
@@ -44,33 +46,7 @@ fi;
 #   sudo make install
 #   cd ..
 #fi
-if [ $TRAVIS_BRANCH == "master" ]; then
-  #if [ ! -e mpich-3.3/ ]; then
-   wget -c http://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz;
-   tar xf mpich-3.3.tar.gz;
-   cd mpich-3.3/;
-   ./configure --disable-fortran;
-   make CXX="g++-8" CC="gcc-8" FC="gfortran-8";
-   sudo make install;
-   cd ../
- #else
- #  if [ "$(ls -A mpich-3.3/)" ]; then
- #     cd mpich-3.3/;
- #     sudo make install;
- #     cd ../
- #  else
- #     wget -c http://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz;
- #     tar xf mpich-3.3.tar.gz;
- #     cd mpich-3.3/;
- #     ./configure --disable-fortran;
- #     make CXX="g++-8" CC="gcc-8" FC="gfortran-8";
- #     sudo make install;
- #     cd ../
- #  fi
- #fi
-else
-   sudo apt-get install libmpich-dev;
-fi
+sudo apt-get install libmpich-dev -y
 if [ ! -e mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit/ ]; then
     wget -c -q https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
     tar xf mysql-connector-c++-8.0.16-linux-glibc2.12-x86-64bit.tar.gz
