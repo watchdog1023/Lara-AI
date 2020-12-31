@@ -100,6 +100,7 @@ matrix:
       - choco pack
       - choco install sfml-mingw64 -s *.nupkg  -y
       - cd ..
+      - choco install curl -y
       - chmod -v 777 build-windows.bat
       - dos2unix build-windows.bat
       - ./build-windows.bat
