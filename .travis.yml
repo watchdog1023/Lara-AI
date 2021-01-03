@@ -4,7 +4,7 @@ cache:
   pip: true
 
 matrix:
-  exclude:
+  include:
   - name: "Lara On Linux"
     os: linux
     dist: focal
@@ -60,7 +60,7 @@ matrix:
       - dos2unix build-linux.sh
       - chmod -v 777 build-linux.sh
       - ./build-linux.sh alive
-  include:  
+  exclude:  
   - name: "Lara On Pi"
     os : linux
     arch: arm64
