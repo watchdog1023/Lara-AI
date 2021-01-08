@@ -100,7 +100,7 @@ if [ -z ${PREBUILD+x} ]; then
         if [ ! -e /usr/bin/swig ]; then
            sudo apt-get install swig;
         fi
-        sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev;
+        sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmariadb-dev-compat;
         }
         which dnf && {
         echo Fedora;
@@ -301,11 +301,15 @@ else
     cp -vr libtensorflow-*/* assets/usr/local/
 fi
 if [  -e /usr/bin/pip2 ]; then
+   sudo python2 -m pip install --upgrade pip
+   sudo pip freeze - local | grep -v ‘^\-e’ | cut -d = -f 1 | xargs -n1 pip install -U
    sudo -H pip install --upgrade pip
    sudo -H pip install --upgrade setuptools
    sudo -H pip install --upgrade pyscreenshot selenium datetime requests
 fi
 if [  -e /usr/bin/pip3 ]; then
+   sudo python3 -m pip install --upgrade pip
+   sudo pip3 freeze - local | grep -v ‘^\-e’ | cut -d = -f 1 | xargs -n1 pip3 install -U
    sudo -H pip3 install --upgrade pip
    sudo -H pip3 install --upgrade setuptools
    sudo -H pip3 install --upgrade pyscreenshot selenium datetime requests
