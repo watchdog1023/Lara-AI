@@ -10,7 +10,7 @@ case `uname` in
 	which brew && {	
 	echo Brew found;
 	brew update;
-	brew install --verbose --debug boost opencv tesseract python wget mysql-connector-c++ zbar ncurses curlpp sfml mpich mysql@5.7;
+	brew install --verbose --debug boost opencv tesseract python wget mysql-connector-c++ zbar ncurses curlpp sfml mpich mysql@5.7 gh;
 	wget -c https://tenet.dl.sourceforge.net/project/cmusphinx/pocketsphinx/5prealpha/pocketsphinx-5prealpha.tar.gz
 	return;
 	}
