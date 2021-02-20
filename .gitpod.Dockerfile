@@ -9,7 +9,6 @@ RUN apt-get install libmpich-dev python3 python3-pip build-essential make swig l
 RUN apt-get install checkinstall -y
 RUN pip3 install cpplint requests
 RUN updatedb
-RUN serive docker start
 USER gitpod
 # Install custom tools, runtime, etc. using apt-get
 # For example, the command below would install "bastet" - a command line tetris clone:
