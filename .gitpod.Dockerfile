@@ -3,6 +3,8 @@ FROM gitpod/workspace-full
 USER root
 RUN apt update
 RUN apt upgrade -y
+#Grabbing Compilers
+RUN apt-get install clang gcc g++ clang++ -y
 #Grabbing Deps
 RUN apt-get install libmpich-dev python3 python3-pip build-essential make swig libboost-all-dev libsfml-dev libtesseract-dev bash splint shellcheck locate -y
 #get packager
