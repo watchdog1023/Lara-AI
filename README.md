@@ -122,7 +122,8 @@ Python3 with pip is requied to make Lara
 
 To use voice rec please pass "-hmm model/en-us/en-us -lm model/en-us/en-us.lm.bin -dict model/en-us/cmudict-en-us.dict" to lara program
 
-#Coming Soon
+# Coming Soon
+
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 
 # Family Tree
