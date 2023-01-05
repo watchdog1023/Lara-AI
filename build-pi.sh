@@ -25,7 +25,7 @@ fi;
    tar xf sphinxbase-5prealpha.tar.gz
    cd sphinxbase-5prealpha
    ./configure --without-python
-   make
+   make >/dev/null || make
    sudo make install
    cd ..
 #else
@@ -38,7 +38,7 @@ fi;
    tar xf pocketsphinx-5prealpha.tar.gz
    cd pocketsphinx-5prealpha
    ./configure --without-python
-   make
+   make >/dev/null || make
    sudo make install
    cd ..
 #else
