@@ -1,6 +1,7 @@
 FROM debian:trixie-backports
 
 RUN export PREBUILD=YES
+RUN export GITPOD=NO
 RUN apt update
 RUN apt install sudo -y
 RUN sudo apt install g++ gcc -y
