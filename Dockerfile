@@ -1,4 +1,4 @@
-FROM debian:bullseye-backports
+FROM debian:trixie-backports
 
 RUN export PREBUILD=YES
 RUN apt update
