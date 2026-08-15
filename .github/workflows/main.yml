@@ -7,7 +7,7 @@ jobs:
     steps:
       - run: export PREBUILD=YES
       - run: sudo apt update
-      - run: sudo apt install g++ gcc dos2unix bash tree locate libboost-all-dev libsfml-dev libtesseract-dev libmpich-dev libpulse-dev libopenexr24 -y
+      - run: sudo apt install g++ gcc dos2unix bash tree locate libboost-all-dev libsfml-dev libtesseract-dev libmpich-dev libpulse-dev libopenexr-dev -y
       - run: sudo updatedb
       - run: wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/jsoncpp_3.13.2-1_amd64.deb
       - run: wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/libtitan_1.2-1_amd64.deb
