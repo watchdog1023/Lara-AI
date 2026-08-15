@@ -5,7 +5,7 @@ jobs:
   check-bats-version:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: export PREBUILD=YES
       - run: sudo apt update
       - run: sudo apt install g++ gcc dos2unix bash tree locate libboost-all-dev libsfml-dev libtesseract-dev libmpich-dev libpulse-dev libopenexr-dev -y

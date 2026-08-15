@@ -1,9 +1,10 @@
 FROM debian:bullseye-backports
 
 RUN export PREBUILD=YES
-RUN sudo apt update
+RUN apt update
+RUN apt install sudo -y
 RUN sudo apt install g++ gcc -y
-RUN apt-get install curl git wget rsync sudo -y
+RUN sudo apt-get install curl git wget rsync -y
 RUN sudo apt-get install dos2unix bash tree locate -y
 RUN sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmpich-dev libpulse-dev libopenexr24 -y
 RUN sudo updatedb
