@@ -6,7 +6,7 @@ RUN apt install sudo -y
 RUN sudo apt install g++ gcc -y
 RUN sudo apt-get install curl git wget rsync -y
 RUN sudo apt-get install dos2unix bash tree locate -y
-RUN sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmpich-dev libpulse-dev libopenexr24 -y
+RUN sudo apt-get install libboost-all-dev libsfml-dev libtesseract-dev libmpich-dev libpulse-dev libopenexr-dev -y
 RUN sudo updatedb
 RUN wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/jsoncpp_3.13.2-1_amd64.deb
 RUN wget -q -c https://sourceforge.net/projects/titan-robotics/files/AI/Deps/Debian%28Deb%29/libtitan_1.2-1_amd64.deb
