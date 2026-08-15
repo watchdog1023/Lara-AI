@@ -35,6 +35,5 @@ RUN mv -v yolov3.* /root/Lara-AI/data/obj_detect/
 RUN mv -v coco.names /root/Lara-AI/data/obj_detect/
 RUN dos2unix /root/Lara-AI/build-linux.sh
 RUN chmod -v 777 /root/Lara-AI/build-linux.sh
-RUN ls
 RUN cd /root/Lara-AI && ./build-linux.sh
 CMD ["/bin/bash"]
