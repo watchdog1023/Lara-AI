@@ -2,9 +2,11 @@
 function pause () {
    read -p "$*"
 }
-if [ $GITPOD == "YES" ]; then
+
+if [ -v GITPOD ]; then
     mkdir assets/
 fi
+
 if [ -z ${PREBUILD+x} ]; then
    which yum && {
         echo centos;
@@ -59,34 +61,39 @@ if [ -z ${PREBUILD+x} ]; then
         }
         which apt-get && {
         echo debian;
+        sudo apt update
         if [ ! -e /usr/bin/mpic++ ]; then
-         if [ $TRAVIS_BRANCH == "master" ]; then
-            if [ ! -e mpich-3.3/ ]; then
-               wget -c http://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz;
-               tar xf mpich-3.3.tar.gz;
-               cd mpich-3.3/;
-               ./configure --disable-fortran;
-               make CXX="g++" CC="gcc-8" FC="gfortran-8";
-               sudo make install;
-               cd ../
-             else
-               if [ "$(ls -A mpich-3.3/)" ]; then
-                  cd mpich-3.3/;
-                  sudo make install;
-                  cd ../
-               else
-                  wget -c http://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz;
-                  tar xf mpich-3.3.tar.gz;
-                  cd mpich-3.3/;
-                  ./configure --disable-fortran;
-                  make CXX="g++" CC="gcc-8" FC="gfortran-8";
-                  sudo make install;
-                  cd ../
-               fi
-             fi
-        else
-           sudo apt-get install libmpich-dev;
-        fi
+            if [ -v TRAVIS_BRANCH ]; then
+                if [ $TRAVIS_BRANCH == "master" ]; then
+                    if [ ! -e mpich-3.3/ ]; then
+                        wget -c http://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz;
+                        tar xf mpich-3.3.tar.gz;
+                        cd mpich-3.3/;
+                        ./configure --disable-fortran;
+                        make CXX="g++" CC="gcc-8" FC="gfortran-8";
+                        sudo make install;
+                        cd ../
+                    else
+                        if [ "$(ls -A mpich-3.3/)" ]; then
+                            cd mpich-3.3/;
+                            sudo make install;
+                            cd ../
+                        else
+                            wget -c http://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz;
+                            tar xf mpich-3.3.tar.gz;
+                            cd mpich-3.3/;
+                            ./configure --disable-fortran;
+                            make CXX="g++" CC="gcc-8" FC="gfortran-8";
+                            sudo make install;
+                            cd ../
+                        fi
+                    fi
+                else
+                    sudo apt-get install libmpich-dev;
+                fi
+            else
+                sudo apt-get install libmpich-dev;
+            fi
         fi;
         if [ ! -e /usr/bin/python3 ]; then
            sudo apt-get install python3;
